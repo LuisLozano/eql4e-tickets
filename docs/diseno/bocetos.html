@@ -1,0 +1,1104 @@
+<title>Bocetos EQL4E Tickets</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: pestañas por rol; pantallas como marcos de móvil o de navegador sobre un fondo neutro.
+   Marca monocroma (tinta del logo); el color se reserva para los estados del ticket. */
+:root{
+  --paper:#eef0f2; --surface:#ffffff; --sunken:#f6f7f8; --ink:#15171b; --on-ink:#ffffff;
+  --muted:#5a616b; --line:#d9dde2; --focus:#2f6fde; --scrim:rgba(15,17,20,.48);
+  --pa:#9a4a00; --pa-bg:#fdf0d5;   /* pendiente de autorizar */
+  --pp:#1f4fbf; --pp-bg:#e1ebff;   /* pendiente de pago */
+  --pg:#1d7a3e; --pg-bg:#dcf3e3;   /* pagado */
+  --rj:#b4232a; --rj-bg:#fde4e4;   /* rechazado */
+  --an:#5f6670; --an-bg:#eceef1;   /* anulado */
+  --receipt:#fffdf7; --receipt-ink:#26231e;
+  --logo:url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAfQAAAH0CAMAAAD8CC+4AAAAkFBMVEX///8AAAAEBAT7+/v5+fn29vYICAgLCwsSEhLu7u7x8fEPDw8ZGRkVFRXq6uobGxvk5OTa2tokJCQfHx8mJiaUlJQvLy/Gxsbc3NyDg4PR0dFHR0ddXV2NjY0zMzNOTk68vLx7e3s8PDxnZ2fLy8uurq5ycnKhoaGxsbFVVVU5OTmkpKSZmZlQUFBiYmJ2dnZyBjBOAAAgAElEQVR4nO2d6ZqqyrKu50h6EARBehRFFPv7v7sJBVhaotJkAom8z/5x9j611kCCzIyM5ov//hsZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRkZGRn5SgiCl03TNnw/PHmW51mPePPTMYx8wzZljiK6ftiRJhAkL8nKJtp528veWa8X2nQiMuDfM4AR2MlEW6ydsxtY86NvmxJPdv38I9UgeNMIT1awPGjqhGVAkaVfkHwA6kx3AusUbUx+XPj9h6Ck2Nze1nU0kQZVjP1kfEBPdMfdeqGhjMu+t5CSHZ1W+4M2FZpY+9H0tDCdLZax6Tcy1fUPHHmA4kzjtHLXU4aGZe5H2zOivgy8SJFGR68XEJwdepe1JlY6uqvbHQBWXexXO0Me9/pOITkl8oJDvJ+XtRwTI7AxQkby/2RKbxDJkt9boS2Nhu8GyvTnl/Xsk8Fjj4ydqJp+iC9ke3e7Su7lj1ir+E63dNYLXVNFlv60YQBmerjMfXM841uG4uyjddbY1/YBNCOIs4WzvGyt+S70DVuRZUnieJ6n/sJzkiSbysZIgjerwF2u9eSm92b5A1Y7r462NBq+LUjZmF8O08I4y49FhKm2WP5EWYwkzEJRJFHO/yJIMv4EpCR4F85XwXIxE+l3C971xhO+BYh4U/dcXSw0eHxki7PDObB20aZxTI2Mjb+J5tt94iO+WPSA1d25L48uPUoo2bfOevGmDtjZ2l2d/I3Mxysb0j9IxOve9nfWxdFfeIs0q+89f7zEI4KUjHiNC4U7rag78TXalhGFTSlJMY6x5bXi2H2y3o3RoYdOfBvfXRYFaxzQor68nnwTdYKMjC3vn7ZJfLdom1lcdjY3bvMQ4ZXoup48WTwxuLONDc639iSc4s8DR2OfDQ8m62uktPckw4aIt/Wlyjy9ZEFdB4nB2z5OfyJCl8Xk6Yn+MerSM6RxuTeGUo7B4ukgj+/Jy1Voc109FSFtdtu1+nzCC4sgHJd7M/jNfKn+3UqTi1LsMHec644XfLhaPtudjpf7prOvEXsIybfW4l+Li3p/QiJUbHdHe7rLseuVP+7ydSDkKPh7QQOC7p56dTkieNO3nCePQ9CDSB7NXhHKPLqzxxUEmNnZ86Wun+yZeL1f19M/QTuguscxJ1MFSpmf1T8vceKsor6+RYK3j/G29OeJp+e50tMH7h+UPV8+HuXxtn7Z9fwFcsnF8o/PKS7ndr+fuidQtuf8MfnE8Xp1kL+AMsPt4nG5A9GxRrN/gtp4zqP3xmhu3xf5L5wRe3WPy51xvNHs74hX+fohvg7Yw9Xvyf2sFEQSTNIfnHkgrkezvyTZ2Nk/+7pl4BfekqLr4TE1xC5PJkZfbnsQ5sl5qI0Ak/PJxs/k/yUpQcN7+i278d7+F0IO3YdLGq3u8TnKn4jvcJ4zfTD77DKGax7h/EC7939o7YJ7aCO+eJ4fzE7rWx/LjQsN1MZa3Ps+TGxynLy3F1D26fzgyjOH0aPLMefOvd9Da0E4AJMnUMpuf7/a42v7Tu76oXoAIUUX9cHkl3BAZx+pPG7yQA38r8+7Usb1/lYL1MtQVnlOfLY/ePLCYbX56j2ejK9pdzfz5JJmDmeV58Quy/o+/iAuv/n6xj3s7PGBN9T0BG9c7z1VWvtaP560vcPvmwDCwdoM9k3EnsvDnVRYf2eIjovcOw8n+fgH7eCQ5oMjnzh0g/3EX0Ha1uL3ywfT/XHwxxxlW4e7BCITL/auH6ld+Gg/ud/shnqYP8L529n9Yr/43/CrMwjFu1vm8c5ufMuPl3f3NUH0+vQ1oRrKv0zvfPZ92MNiR1RQj8fabPsld3Z55/w67czCsr/LjX28p7Lnb/jkCXul3X4zmF6iQfvsRZDmfP3r0NELTxm6C8v77u+hxhze/mCCJEkq0QNJoeL/dRivhzeCO4dOHbpLI50OtxMNTNwXV1WCl+Qf3Zfd7pSIP/1gzU+7Y/Qj1Yy9Yishn9a/R5zgHAe83ZH2ana3r1lPy5wgedk2opMV7J2DrqlTkWUTPd8EhhXF6Uw/OPutdYp+BFsxtj3p353sQB/uFh9fzn/zDuw+/PN5U5Ltz6+uo0/fq3kBmmGnuuOu5j7Gml6EOf/d9P5NLsYw3dl4S/vd2rXVvdNOULIdWu46kW5+ae2/0KK2dq1w03XPcl0o3/0NUDHO3zUwCJQ7r51xdnetvLwSxQZXhRpivkBQD64VKVjanVAs/faTYy9+cIEayghu6Yb7+GMi57taPrd4VzK85lxDLFV+uHB5O/DAbGVj+BPewN/9Ojp2W7KtnVeOW+ejumsJuzOqsz3a+K133tj++nMDO9jlu5uaEG/tP/9HyvSt5eyl2GdVmNnSilrUmYLDQxpCOA8oVGXenV2im+bNuY231wuUuRoAEvFGA7dtXjr+dmzSh9NAgrKEfVVvdtGuiddOyv6qQBcOgt3F9SrCTLOTugtSxjf2Qbhz5OZy+01pLpE0w6BI/BGO2QX9csSrFCmJWd2c3NlK6fp5mkP5+9vuxS4jPlGTCTRoJ3kRNE4d7T/I899qwckW+7QjH/3mUSeBQVHmztWetRYhw6j7E1Zmj+9ut5fCupgX1HDHWxQuCcLxicmhOm+voFW8Vvv9wU4vsba6NF/cDqvFXE5kwlox+c+rm7k4FVuSm+2tnIhxQtyunr/I3u2qxjhH5bH0uwWzY1VWTSjWLU5Nr3e4Xt3k31/B7iN/tUB+lv9FOOCk7STPb3EabC/sppVfRMD0cjw9ysm0xQSngnpudyutwDT/8mvzf6LrBRrKS9obaB2jaiQuujnxQMPQ6ubqFoZj1+6h9Z39F8HBp0mU8n/rTGbYWV35Db3SsxcTtdoCzPBZ7KRxi1+CmYWV1Qnl+lsUApCG30ohOEds/CI7uF3YVaysrmwn72zQPrSOT4WCsrql2NUVPla/X+d9YYJPt6Bs3WqG8Vnr5nX67vV3RLzF4xLmwtDq8qqPNk9y1XNcvPi7UCYeVpe92dt33yHqFpeDXZ7frD7z+u+Dyp7WqWHfgk/W8s7q/Y/ScPOuQm+lYJwQE6tLpzur93ut88dDn22eKL3g0iwo3dY60E99fmbqt2air+CTv5JumyZY7Pp78SD8ZYcx9pIkTnzXL6ockpdbnV7391Qy9kUj7fsGPmXG8i1RSTtRT+8dtouDzZOspYWJAu2v1Zmz0ctHNrd/h+H2Fg2LiMd/P8HNzOrCxe76YQowexqIKwKfCgXlVi7JbvunViFb6tv33C9A3+++OcRvpnWy6pusKLfTO7ViVYA27/Pd9xdi4+Y3Im3erw+VCtf9Dso8AfRTf+++95D+PrM6OPQqT0j6y74HZZ4Aeo8jHvdQvpO93Pji1qPrun3B47L2AFj36RW+gT/m2yiz78/Fra8Z9A/Qjt+bV/gW2corkcRtXxqZOa/XmbXXCPtN1++uDKR/vkW3Vasfzhx1XHRpuSZMr31ZOO9QgrvmIH3XhzOJMPBz4nKwCNJw8/uyFNCLM0kJMHTicsBi1/fr+t/bMON2fyZJq/6VO1eAWfr9Fvu4C85kiNeudydqp+PpxOX0xx8uRrL+3oyA1nVY6RY4wJZ+V5tSu8XTogLrbpPr9t+9Bz/Aob9VKf8RvlOwkdJLo8Nnet57MIRx+1sN/yLUKW67S7iR4fPegyHT3m7wf0OdTN4ArHWWNyDxP9BTFsd+bvDSnxoF1g2yK3t3eQMb5xv6PfS5lxs8/+dmBBbhJg/OMR1VT3Hz3jatVWVq9TDLSkV/mgiEQCGNc/Z/Uzs5k6hCxxJTFn2IbT5CPTURqPFBTuUtRJ1cOojNBfvb2i/Mvm/1Z9RTEwFYJsn024WJcTetf6jyEG5rv6jzfvly5ObyV3dPSLOqdr7Ypq3XcZMRbkVx72GWvSorvxfJz1mkcTgyP1bBoW0P3h7S5p6gWp2m24gfbv/bncRUDr3NFjZ3yu5tdMsevORhnVsrgF535MsRvJTMlY0iP/IN20xmShbZ/N9sl6cDlSBbcJNWy2iIgW3uCeK2/YwlwZvG0QqWa12bxWj6YRlYoeEX2Dx149L/1N0G3+KHag4lLHNH+0ckr4Srsy4+DJYFtDDR9QLtZObum+SPWWcJE7R36aBOgwnL3DFpVamPlH3LmZV3jNTT3Scpr9KtALR46fCHt7n/S0719pY6IR9drcpuCZz7bCphLLMNfu239MTydhh5lr9M2+oQJOTwbnp6KZjgwWe7heXb2uCJI+YVUq9oK3XFG9vKc03U+aPLJudKrNquFV/Odoe50JOl3sKpTprzdeUYB3D8x/8WIk9r0600bAyiWqYY2kFfGksZQY1Gfib4+zlKXqZM0sZlnYh6rhTXBA25YBsV1moNKcj92m56sQOHEPkGj5GyTHWQlyZQu1pLBizCpy2IzJsgWOS+3EDK4l6xQJuk5nb1Wj0fL2wZcjYlByCv9sJFNqwmaG9AtTtDGLfgsW6+HLNHuz8NqESqmANCV46qnbGgC83K5SLraEuncO5QLcfUQ+fKbfZ109GguC1dyariacdAeOuQPJx0w+oAXGRqbU1qjYrFsIjcwZoivLaRg1/oCF05KmrSJVBcBylv86WO7lSSV53MS20VZotof5ebjbBi3IJjnYgO6f+vgCyWSHVzXQM0I7AsK7Q0089BU2TaWGmvMPLGZcsQINugzGvLdXGAmejOZeV589PpNPdWF0cTkZ8vqofk9ZnXpkGtQrtuzlm27YrmrklG7S50ZrZchYYi8RSZwkuKcdw6E7RPAVwUThGEvr/COkgqu0ODBZpTXW5zoQNxfY1M7mmnJTj7dNEFhHYHaxT3n1sJawO0ImEpe58tdSSnOhm2OHuLdbzNs8WzB5H91QFhXHB2QrC/w0hZMEHBUufzr0l7Ds83Rwlau64xB2vztqOQ87c6sqcRtvC7GUkojX960ameF0TTCCLIRGsLHUwD/9O1iZDCPapsHzjDlx6CsbsnS73gyagwS9whWOrytqUTnT54ZT5Z0l6hEifV4b89ONo8RRnW5ORIr20M/MJ9v6XCOOYclYuOEPIJ0RA4cQX7UKdCOCMQCu/qfC7TqkeQH7uthS665cWtuQjNGDjGhb1kZEgKi4VhuVveBfpSD9tJqU6uVYRAKP+MYq0D2G1txGYJZ5ssVpDjw2ypz0Koj21uW6mdmFScSETdiWJDRJvDPdSpI6wBN7PCyTO5TDTkEhC/lWpIMagq+INGA2Wygntpk6G1/gmFAnKxy/DzFsDCh/jU7ZQ9szUENagjgtgw+1Rw3AjSP8B6MrAsrHLPi9hEmHl1ow3BOKbWWBr+BP/mxpyhFp1xK3ghheLmZG6eFsHTa3j6oVwbBTNArzfjGsEAGRqq4i5hr+E9mlpYzkVsMt8GYglNKwt9Wjc5CL+cB2gniEanThCXDFMs9k5lNZKFtdK1eJwngQhmWfeexJ9gx42AakF03yWYStngUhwj3mQhC2g9Og+DYxABGpTxmtCfT4RYM0X4UAeSvqhx5zMZWbYoPF8Dsg0NArrYLS33gNAVcAQXXs6F20L9JF+8JyIzElhHUDapNmQCgTpvcDWGvtQZiCORDGj3tR9ePZmUvQM47datNDgwjdKZFOyRzkCH1gnKQ7yvJby6WBBZ1I9ewpjM2UqDQ8PGks0e7ncJZidYnpwC+ebz8jYpZ3KOMHqciDbGtIBFs8+Th/1hQtMCp2r2qb7kpdGprE4DxnSSW2EGSuh9w4MItq8pXiEFOSTY86ZfZgAJO03lwdAEl7wWwu6s13BhwVYzZF9ch6tC+gfIDpHzck/Mo73NR9K0srv/U5s6H/wc7v7O7OEM+JAatzj85fzyaktGaVq9+f5OtVEPCdZNrxlECHeyM/16QVV6LOgBbPAmgiC7WYXkseG+KV9bqJ4Qto1PUMh5dXCAclHncgkoaNBvSqJip/Hnb5iGU9sgpoLfMGneXgD5FAILKHk2+2k8Q1Mm72TplayxTW/W4sSd2tCSUpv3Yclw67kAlDJoBDcf/Z2oEG+l9ZdsYVFVacw22lqA1rxmgbOgrilQ2DdWFfip/vepUyLbl5lGdw/CaKNRFSya349ID+qWBGDMtUQwobKwx+UXM3XlgN7EDaV2rUhPHJoXcRJzyEaH0MWIIFNVXDhzIy9xYptMWDdb0f4FUIwOdagMjMH0CBb6p/kd8RUxXepNxsz5rYhJwTE61FUFw+gS/IKjYj25O/L+hKlf+7E5q51eph6u9A/7aBkQxDI/zt/Lp7swq9qRD7ulsR0QHDnIZ/q/YrW+Ktz6CiFy+FgWk2nQgHXdCxERtSMVCPTeee8QjK7AH1cobD++qFzPSK0bXJKslsR/Z81VvDjIEneNSxEoyNmAhBK6Ybn6gVD3o1Ug16O8ZNp8dooJt5UazJrU7CVADhEmsCU6A/IqVnpfc/f02xIcEZum06EPlmnsvSMoIS5X/WZnBZKaX+u5OcjH5GuY5tJtsLNsTY3OW9BfXjlRyFycXax3/bDbaGbKfk/TOxsRwu1yAbNmsXdiA72Furg1/Ym8CYCuNxvcRyXk88y0afaah1zU1XSlw2xUTWHLJsmzfiSg+3Weu8VRXELT4eUK5Bq5hlm2eKFDfZykfqtsB1Aef69VVa60URyXAZYN93fYblPDfDoFuyS7wnDIPIlfK7/aSn9y/pv0Zvs79AZ6sGjUEmbCbr7Qyt8giWxqCF2ja5lsdaKq2Gx/N86wm5UXTb5CCnaqpVLvvpzK0IK3RTbFSFab41pop0nxDAVFhPOeZqpiSu0JPcUIlcR4+Hk6sbmGKkWbR/rPEzZY6rDduEQioUFkmIT8DdLVxHhIP1XSZKr3W7fRlP7ww+pX+CCoPxSazLeTIbcy6RXrHLN/v7oUCTdv75b+84QfU8WvQaCU0WR+KQH5G5ysKj4Lb02TByge6/UO+JIeH6BrT6xH8X1OVvVPG+kKNcARH+gVH4D003JWoeqXa7eVYbsh1lRLIeCXoiWFM/VjM3Cfp46eiJmqDtEV5fDqjwWt/+u0eilsFLO9way+phgH99pTeY9OHiGLxFZsWm5FRewP9DqsEe+WPATOB1jUlh8hDAfmtaeWhAzlpZe2ih8MLIHySgh7o/KmytWdTv0Wpr4GH5e9cDgIRWO5PkJE6UuZVPti4N98y8Beqk7HajzXsJj6kmKEvYf45kDNGapK+laqfTKEgUQ9/yNiYFf6kXyjobVvnuNa13nnYe48QN/Vew4uC79XUppqRWimCDHYVLA6H6KZ4hI773XTLQrMwEztklwqTedX8+Q4r53pHc8Irl/6OaUdoisG0I91dWqhzXD4l9yz64YF88GJlVo2ZOiFH6VhnJLiGYRiocoD0mu/3sv+z4ZY7F73QE9Q0p5lsVgzupB21IVe/VbdKzPIhTcCZGnA2pF3mMXuYNFAOobbZzmX8ppDVNTRkZ7+2okbftyVzPka3f1CDGqepTI8MSkwa9JuweeHevnYNg9Tlr4GtL4y3pmdlEN3ivCznFr1grCUD2+GQ92odPYkx9QpU8vXd7YiGPgOwB5WxqsPnVSOFw3pjVLf1fPjJHi9Vcy5UQEZYaTnTOHIxmIUuBLldQDsIthtpL8rjuBl3zuraIMIdWdiED60Glj6UL3W6QEzrbsvXTidjIHpJDTzCGAmh4vn2zKX+rAEL5nGcbXXRdT+BnOpd5py8Lpa1PrVBSnZDBFmX7YCqJVRDqWgRW3tXr1TgrcKlgtVaOHJJvWOdGjDNZMajqZ6W1zqUpa/9qHosq0NoBlWFJP/EeiWPsWawoEUNE+IPlfNQTw/TCaWW64B7r+f+XaQnh5L6qr02LDqsGGId5NRGhosLY3WufPeLey1VlCE92BloyHo3fxH2GlMrrQOeIdB2D5QU0IO2ole3uN+a8T0ccSSKXUCgVoKTqxrFWNTsBTn6dIO91uktCJCuJQbTp4r0H0pwK11W1IgSWHAGqyWtfcBp9wnRMIdGYgb9QphyR0k57dOIWQRVJhasWRrKBV2lUzvBSWXxh9gHYkVy9peQ2ZDAGflNo6u0y3dwtSaMkGd4OyOTKVWxXcQdnpIl0y5fLfzXjqa8QCkziqwbn5Dz8l65MVyKZfW5OP6CNiX83b/AEfcCugnaDPvcyE7xi11AWxLEbaX1Jz/uYHSkQ5nOG6GlGoGlVOJJTbfHIRd16tLg1I+LOyrlAJ/gjul/rhWxksg/S923oWg5lrjmnty9ft2C8kLc2dlYk1U+MXOez03LqGxXAvQm8rR/rFjNpBRLXNn40/fm25pMubIbFgUOXkzZq8O+Ug9tYwiHsT6D+zQTg3CYc16ppnXQ1TrkUfTS4nESvA1q3GhWu/XE3aDyzp4ORe9LvlobbaMqIb8vTm2hpVphB3UXus6hDlwf58mTQEJZYr45Q67W7qlcYIrtnrNQgqx/qCdl2STm5hLiS9Z/tqAXAOBqwzC3tayerM5mS/I2m3ofYlfpXxrNp1p0DCYQyjXGkIUwGlcCFlANgCSdkrEYe0u+9i6BEoQlDCt6ho4etMp94VwaS1PqTis3cZM3R5SQV37LdJ8UfF8bD4OrBA+resAixJGN7409D6p0Mv9Fi6spi8lfp62Vou8dkYr0aTVznzV3tFEnPYPpH+ZlN8tmeadDS8eI0r3bNX//LctjV3sGUBtPibsBqF4pUUywOIIpyjuiVwttJTRvzL0zjQSnH+CC8/l4jRA8+CG3H8hspbEafj5b48dyAZ2jzqHmdaMD1Tb0sv4c2LjVsWXEEbW73D6/LeQxxPjAVOv2P0dUhm1DBixgVfkykGs9flvrc4FCdoHHJoOhiuAUubOh9xVbXXAUtippp2w+vyn32h0mF7cHbyxWrwzO0B0Q8+w086mcaUXQtcrgS0B51/115d29gKjVfElmcCvcP38p9evS6fTCA/WxOwHtvhsj/9dRN9aSlbLwwSf//TraiiAEyHZ3HM4w3OKgjVAh9fZUEim3864n//022oowAFJuuMeyj65+tNynzUYGVKKPM22/PynX1ZDARYQu0peQkqGt9eE+5s7C7kQ8hkp7VYuY3TI0wN7DtDmLdg8gZB977KYMtmCp0uPSa5NZnSw/vynLc7V7QFq1aFnTSA5O7L2C5EG0BK578jHDuuf//SrjD5FlNZ8DSFtQi9w9sgdiVsVxWj0RxBGvt9B8hKHfJ2PRi+G2UPLofeR0egFIA3K9IDR6M/A0nHqLaPRn9Fa8KU6pYLRl19idK380ANMyWugD5//9EsicjAEWHsOVz4i9x1Gn8IqeO4xFcKwwTcYXdyWn12FLZmad5ks2zekVgVoGn19Jsuylcmnf0HlDLMsP9sTYzIVSGH7+U+9wRsdrId+WUvJ9FDGGrl/kHUZ+4xSvjBy8HXvjcdfYQKRF0aWKIHeDdzo7WdTO4LIRjyL3ue/DYfdy8ZeOsmmdgBhp0Iyk93nvx121yrqsuMekfeyTaPPfztoowO94QxTjCCzGc9lWpX9IStRsF/ixCWQfqoeNPM//+1mwGN7gIO8BLU/5KIEWonfPGShoWkZcdyhkGnOlBIaGrCkGFNXzR1LcnWpdYkrqjLY0hlwGHQd5F/4dLQDvSxR2T9cmdBSItjDIUunlxLZGKwgMBoxzv6SN62WUoEOBppQn0IaaIkL5vUndSaUmS7IXYeZZmPcLyiWueeWZCvxrfPeMDMuGnQZ/X5zC72XmQdE7QaZcRG+baETmzT0rpYJPJPDDL7PvO+onLhBGnnovYT7ShhDHMZHL7/Ldf8d0aWVCk4MMviOVrGtj1BRake9VLphiPM8Gg7fwhH+mEZhnVKFQuYA9aWgzisuA7XZdJzbyTrZSg1rSqaGDu7OBg6IJdv+QmwuXZ8nUlr1LpZ7Dn43OPc9vq+hfsePyFsVxdStSo+QbthqufAEGQ3OfW+7RZXzZsApMToFJUp6TdfKKS8QxtDKKIDjI37Dj3C7BQBatwUbhP0z1wEsyhWCEvZ5YMlVsd2+ZO6UrBqh2/2d9H9ubPSyZKumuR1YykUvUQQMD3mup2usZefxEf7045kJgVnO6LI1rDEuzL5FN45QVtkIRnHbohjlE1K6csWyd9VcoGYolLy1QIHzg3xyC92CEuhr5HOabilbREAdBxWIBXqJGVVwIB/Gtkw6XOqZH1d+jCsVDaoglj63tLsTUhTcz1QGC5Rjed6T+XHgUHa3IY1BRd9ZNFN5nuCMv/Na6GVnkpRUWgpbvi4wH+g1DIDWhu9OcIa1fiounGxRTQT6BJcGYSvUiGViJcOAaeG+HJt8VTiep7PSDSldt6Wd9191+EEgQh6o+QylhNsX89fQTtt7g5me0NPy8eesIWYYII7MkLLvnWcvj8M2JjgUQBiLn3++QjUo6Q/HkwNnlI2qpHy8PM9hevj3nS7ky6hj2tJURdxcGU7DA4NyKBIXubNPeYpOVOX5TEIuqODPDKiOgi1T9l0Poty4bLqDtc6lObMKflySJxrMoT5DdqTz0V4sdQoyTuupFyWrhK3SyUVF64Ec6mCJ6kiXTuuyGWh6fWzXhyfDrDW9ihdJbIYyko9BVREpe3r5dUEfTq1m9KksNHOuVANsBgNJqbOI5jcoq1mVvRBoqza7qrh0zbJV/LjEkxtIQ1vJErGqmNVs/i8RqmzR6kp6Ok+r5ZS5+TA8OeAgaXKQLbWqzwPUVWtxeDJKj55KflzyHxuGJ0dX2+BKwnlajbejtRaHp7yfb7LyDDJ7GJ4cEj+OCmvVG4B1W/d1LvXIKpeJycMojmRRFLwbNauF2bYqacxlmmKrGozkT3V2sN5Rsr+j2iutvR5m7YyCy6QigV658n4Y1TM6/FhYgxQkWLfSO8unVy+6uiaqeRlAziU+RqHf2DZu/VYQIWhjg5fdVGGo+j82iEIKcIY+ios7Nen0m7ZQr0f6aXy4RgMfGVYIM/YVGnq3KmE0EtQEC/Qy1Px8lmPuwzoAAA47SURBVHbYRNU/+M0ANGJp6Ntp0w2wlKpbM+R0MhddJ9U0hEOdhn5Nb3Ki/zxROTWQBuTJslr+A+fhH35nYDc0UWHDNm4wQz1PJA8dqbXuhz7+hzoLO/IpN05ECag157MDCCxqiSIMoE1dhV2AbDfc3X9E5+E+0l+ULAZ7qeXO8PjPYtQgV6wQzfNQALEUSnxhS9OqNYUw8J/bVLpnsySc11yOR6i3BEs/YpoUr7m7xxtF472saxYRXKObQfPcI4O2ibbZ7p7Mg8A80wa90WBzbu7b0ghCw78QWZ9K7dElBO560LAHeBDZTMNmD6WjFJ7nd6mghFZ7uqiNefkMWG6gGh2KRAeYoRwrYl5/7pTAqX2GSBbeQTlQVk+rJHCSUEgFqTfpPVtocEXw8d7foRsdiuxWpV6jilBh2q06axAMUPZY7++wjS6tYHi24hXdSs+q3Ogm10L+hLX/DtvocgDjDotQv5LI6p3EJgH+vLcdUwBkaf/eGz2PuzebL6pccI7PAMiDW/pudEJxfxY606zslpvjvL/DvqfDOdMnK1RnOhmlHcpis0hAPngdT8pL55UDjveO7srGpVoSjb91+YrxVR1ATrhAuaeDih1m5SEyXX+26VdFhTin2jS4RocTkUMWhqXmqUrkoun+hrd65AxuEQWU2Dtdta2wNGYaVYFQXI91/fv0BHcntSEEq5jqjSfloMJ0H4IQ28dafkaAXCMnb5t7OIyLqIiCy6JxMCTMFIxLoWFXw8KQ0kR1YyM2aTROgNEbi7MoBQ07DtK8rRMg6Kn8IXfjoPiJOCtNQe9waS6lSdfPdL/HTPutGDidXJKFrSsHvZeteWWkiGh3pzK9R0hRAAJfeWBQTUitxLto6tYCHVGFnJy6XvQSUlm9GeBaAA+/P73p/s64aLItRNbMNIHlxeTFdhgC3Wuijs2avSaIwnH8Kq2NW0BrlduccXXl4GvONFvqJUfYV8dwfkwEyY1L4BupL3QJCz250axvdYbovsZlzjbMqb7Y9jJC71VOiozrJ9XZLZoEW+xr/xgI6gg6HtdBnAgUIxvMOkGmLsVlsqUq1IkGBqZaJLCr5BL42hMQZoimTBCZ00U7UNugJQvPsimgI8hj1h1bJ14RpVpypUfYgjY+puNXRYiezQ3brePBCy50fbPb8/wsdHDw4f738h6eARoEnlwyjLbGHZZeotID5rLcnwhdpM7AM60Oqiohl4KMnKpWZ5wQUZVUXtwE4FdncJg2M6IZwMiHFa1OI7N5vNDTgGntlvQ3YHqqsygO9aSgaFllEQjobP6fkspjxPdB+P/dkoVlLBbVuCbKd8tfaEQXnb4/dUxbz5BI22N6qtNIDvUYcrMtObwHzLao/Pb/bspAiGbKclg68GDho3gZMYR8csps8YyDcigbn1ZJ1RSI/AiBp+7/5IRsZ+WN7cdhq7S2hdtQ94esKhvsEW0mMpZhOZRjlQkpCt7u8UC9hEhnNOVZkckc0T+D51h1tLqchBxedKH4tQBGc3cy0gEeRCZyhmyhJ8JyOApDiye0713yLUdl/tod0FPnGsmIR6dzWfP0DHIrzx14NrYxF9QS65QSWfuFOmEZmgaAphlR1Z1rqCAf3UFEafCEuSBUoeRwHNyFzn//haAkxT+erOs25mqdIlvmWxjMJKe1W7Bbsh8hsBzMCLe04P0LIimKam2QLnVMS7cE6KNqHuB3GC71dgZjdcAmy7ToiKdF4FgDDz3P3BPyeefQat1fAUHmvn2maHX1OyI3BXBqi/+WRV7BENtpFxpNXLpjzG1qiamFeKHH+BjWSGoo1bY7gtqlXhzkashicCyHZuFXQncNkZdsaehyC3eYjXu0Wwes4QrK9QApK3VnEaYW7mk6kK4D1BbOvVbJp+iCtd/OPyhdsYvQMLAb1bvGTAeqIimMK8ZYYufLzWDPYuyWXAgIfV7hBgFDObFdGPiT1DskFwdpbXNPkBt0bnaEhqrKoAvMVDKu5agTfuUUwsUezFLPWyih6yi9h5vjJlOANv3YKnkFEzggkjh4Rb7B4IPQns+DmKy74Z/atnOKoc4Y9LnaHZHvshD1ZcoiYbfB0+dBnOq3POcCXafUS2zsorETdNWDLWJns5TaSK49QWAXogHOAO7qeeUE081thKutvdIVAsKBly1BZcqQsGcSlUbBzoNHJePWGreE6qSrDBJ+GzyyFta2sIN0nXV4/yRD3IQKMK+Wk7wsFIe+LO412E31AYsIY1+OCrPbmoamL7kkygWz1HoHEQ1oEP4yfdsIR/SWArdjHaj4bvBKfqB3/eESuNVOMV0eh42QrFmeRO/6F2A34YVF2eGJEH6XjRfQ2mvNewl2+TY8iyTzqAzCocxV2OwxO9YPR/yOddLIJPfZfnRjxheJjs1YEWGPVPoHCXY2BxMsOz/QU7hTs2E2rSNucUuymte04rn1YpnXyLg5c6qH17GeR+L+6T3KDuchYVyIj/XuPeDySKfsXjxZ9eJATyEMzJw5KPOm24I/Zo57zyp6qQizBmYGnfAabKg8+tq73ix+t+jYjBVhcSmOJYxseEgPW28l3BJu7BYPq+e1iEDvYTWvucJMThK5Pg8UzGv2WvvZgpl3z2IDDvHY22142tP6PvuC2cVt1nury1lm7Z/YWwGVTYUJF30AaD0P0sheptXY49TgrbQDF4Dea6tLXhbfFvY9u6zdQ1WfV9Ytvba6NM9szix7HUriQ8wEJXts9Vsei0E2uxES/A6z8imgW2Yvt85bwB2se5NZe8VtT8IFoK6UHlqdy1cPFjUfHG5W/zfZ2r07MqVTlmQBCywkTiUPt8511u1bKY2c++3/9Hn/13nCLeWPDcwy6tNyIhQru58DHRtRLPysTi969HJJI8jTGPjY/C6ShA1As/riznHRMgtsYrTOE2IfvlsjVgZMEE4+roLpLbJ6FLDoUUVcGbC7uSUNT4jHJZaBMrZq9uJim+O0zhOk3QGvAqr4YNetrmvQpGO+tf+j10fcbJ6U861xs/q/eIvv0osnbSvf2v8xa6wKdnO4I2bZlxjm4JldXdkJLnSn+ZkY2xyv8zyHD/GzOpi6kdTJHk/Fy/z2uhinA2VAOFC45dcTmMVq074bT8jH8+Tm+jLL3hW+lof097jJSsaLXTy37sZz/vbutiPse50//wRpYFY39wOtBVGbnjNle+u718Re+pYKqAhhB5hVRv/AHCyjLUeKMnd3O/s/oGLXU/sEoaxmuIVp/iV7vGNt2vClSPPozu7vtlpPizqqIXs6dhf2f0lc1vE2HOL3T5nHi3b/dkCfMj9NkHb4hWkSYrPHmzw6sxOUsnO1h/sN42AYhiuGD5cYunMxgF2vfAmNV0Vw9nw/e1wN4r7TiCBcKOOCWctTDmAXQWjCvzQTkm850z8b4DQw8L2eP0PYWxzduR8YzT1toC73eJEfgwX754UAbdXX1qW6yPMFlgd7Aj1Zb482D+d0J3glXDnqU6iSXsz7WoFfHx7D/MsvtOpcQ5ujmhmeIDklss5awYuIXbjhHOe/UIaL6cH+A2DUdXAy5PqnLiltjldHE4rOOfEyqOP8DmWFW+ncH+jJwvUiW6q80xMUp/hesJ6+2Ow0a2jH+S+43tjvoAV17VpHw+TKunYEZxqhdXE09tVvH9DtvAjKdyet2ggJgJnqy8A6+huT46kX5zxBUrxk2v7R254X08I9PWM62K09g1As7ComCwG0MNEOjru1Tkff2NiKKUucFCPLpqnYhh+drK3rHLSpQL/9wUD3+lJ8jQ5p5+CXY38FADQrTlVtsXaW+0uQ4O73S2e9mKmT2Nqfv292OeitPYc3sMy2vgfE5k8BP5T9j6nbgW/tOfEWj2+gBirMeoABmVdwEYZlVPARLwPKr3yGsFdYJtlhkpRbd22HlpHCvTgIN74mQA18PCvbm3DfzvF9COv5EKqiKkNI0W9Hx3fxncs8hVS8wzc6dKzzncs8g/cDzHMw1aH1q/FNTnsB8m6Jc8K1OpP9V4Tg3kN9lUMX39P6p1/WBXzkYltAVw1aC74qHPMOwtydv2GPF/fH74m6fia+tK8H7scD1vmCHGo1OGPYgVnm0E5vHGZw8fUN43rZtzD6djzMCyGk6KIO0aOj1cDvRtMEC+SjOzizg5k73szfQsjH/aDqasDUDbvXJOw7idkHs9qB6h5Hk5eBlMPLIKI1YHYJ5TH+VhIiNruG+wWO0YJxY68EIflbrO/tzGE1euzV4YzVGtOKqkS4ZAzF1IO352cMD3egXXb2aPLaUGYYHP5KNvQaIK630ei9NYOQDG+JzRUOJFIlqHXIvgLKPGKx3BOVknGRQ4OUjPl+1u9sjKDHJ/m4yKFCmdH1pZBD1wBGW1r+eCmHD8HZu+1h0r9tnpk5q0gZ3XVEENLm9Fq4pQuAMHOuoQJJbmykGFKyj9sCGbYuAKx2tiJlPMjbgLPD1fK1bk87BqfFxd7zESiIjryA4E3fcxeTrhY8o663iabcuMZbhpCNeKPXxfc6PtABzGRxXoX2tzYgdk6y4E/bRKGtHcMDRtT3q10T2cgRKMSG38UrXn0n1dbc3PEZrh321nE0eF8geNkOvSBe8gwCywNamB7215OvSOMh3jco0zjGltdVkSmt6fXB3ECYxut7dYpsRPMdRiBAxmve31nBfq0lpq9r+3g3Zya64269cGM2FfweaYdEhDfaeVt3rc+m7Aehzjtb0wIrqjPd2V+9XbQxx0AbfpAUJyubaDdfBZdEu1PXZlNRoB/UOwFg2Ml0pumOs3SDlbcLDVuRx8U9AAiKk2L7G74f7uae51kZnjefn46R7xsbU64u4z4yMjIyMjIyMjIyMjIyMjIyMjIyMjIyMhLzP6GwhSupAJxEAAAAAElFTkSuQmCC");
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --paper:#0f1114; --surface:#1a1d22; --sunken:#14171b; --ink:#eef0f3; --on-ink:#15171b;
+  --muted:#a0a7b1; --line:#2d323a; --focus:#7aa7ff; --scrim:rgba(0,0,0,.6);
+  --pa:#f6c25b; --pa-bg:#3a2b0c; --pp:#9dbcff; --pp-bg:#16274d; --pg:#7fd9a0; --pg-bg:#123222;
+  --rj:#ff9b9b; --rj-bg:#421718; --an:#bcc2ca; --an-bg:#2a2e35; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --paper:#0f1114; --surface:#1a1d22; --sunken:#14171b; --ink:#eef0f3; --on-ink:#15171b;
+  --muted:#a0a7b1; --line:#2d323a; --focus:#7aa7ff; --scrim:rgba(0,0,0,.6);
+  --pa:#f6c25b; --pa-bg:#3a2b0c; --pp:#9dbcff; --pp-bg:#16274d; --pg:#7fd9a0; --pg-bg:#123222;
+  --rj:#ff9b9b; --rj-bg:#421718; --an:#bcc2ca; --an-bg:#2a2e35; color-scheme:dark }
+
+*{box-sizing:border-box}
+.lg{display:inline-block;flex:none;background:#fff var(--logo) center/contain no-repeat}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{max-width:1320px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;line-height:1.15}
+p{margin:0}
+.mono,.money{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.i{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* Cabecera del documento */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px;padding-block:12px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand .lg{width:34px;height:34px;border-radius:50%;background:#fff}
+.brand h1{font-size:19px}
+.brand small{display:block;color:var(--muted);font-size:12px;font-family:var(--f-body)}
+.tabs{display:flex;gap:4px;overflow-x:auto;max-width:100%;margin-left:auto}
+.tab{border:1px solid transparent;background:none;padding:7px 12px;border-radius:8px;cursor:pointer;white-space:nowrap;color:var(--muted);font-weight:700;font-size:14px}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--on-ink)}
+.tab:hover:not([aria-selected="true"]){border-color:var(--line);color:var(--ink)}
+
+main .wrap{padding-block:28px 64px}
+.intro{display:flex;flex-direction:column;gap:6px;max-width:72ch;margin-bottom:24px}
+.intro h2{font-size:26px}
+.legend{font-size:13px;color:var(--muted)}
+.screens{display:flex;flex-wrap:wrap;gap:36px 28px;align-items:flex-start}
+figure.screen{margin:0;display:flex;flex-direction:column;gap:10px;max-width:100%;scroll-margin-top:110px;border-radius:30px;transition:box-shadow .3s}
+figure.screen.wide{width:100%}
+figure.screen.flash{box-shadow:0 0 0 4px var(--focus)}
+figcaption{display:flex;flex-direction:column;gap:2px;max-width:360px;padding-inline:4px}
+figure.wide figcaption{max-width:72ch}
+figcaption b{font-family:var(--f-display);font-size:16px}
+figcaption .hu{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);letter-spacing:.02em}
+figcaption span:last-child{font-size:13px;color:var(--muted)}
+[data-go]{cursor:pointer}
+[data-go]:hover{outline:2px dashed var(--focus);outline-offset:2px}
+
+/* Marco de móvil */
+.phone{width:360px;max-width:100%;min-height:680px;background:var(--surface);border:1px solid var(--line);border-radius:28px;overflow:hidden;display:flex;flex-direction:column;position:relative;box-shadow:0 18px 40px -24px rgba(0,0,0,.35)}
+.sbar{display:flex;justify-content:space-between;padding:10px 20px 4px;font-size:12px;font-weight:700}
+.appbar{display:flex;align-items:center;gap:10px;padding:8px 16px 10px;border-bottom:1px solid var(--line)}
+.appbar .logo{width:28px;height:28px;border-radius:50%;background:#fff;border:1px solid var(--line)}
+.appbar b{font-family:var(--f-display);font-size:18px;flex:1;min-width:0}
+.iconbtn{border:none;background:none;padding:6px;border-radius:8px;display:inline-flex;cursor:pointer}
+.iconbtn .i{width:20px;height:20px}
+.pbody{flex:1;display:flex;flex-direction:column;gap:14px;padding:16px}
+.pfoot{display:flex;flex-direction:column;gap:8px;padding:12px 16px 18px;border-top:1px solid var(--line);background:var(--surface)}
+
+/* Marco de navegador */
+.desk-scroll{overflow-x:auto;max-width:100%;border-radius:12px}
+.desk{min-width:1140px;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;position:relative;box-shadow:0 18px 40px -26px rgba(0,0,0,.35)}
+.chrome{display:flex;align-items:center;gap:12px;padding:9px 14px;background:var(--sunken);border-bottom:1px solid var(--line)}
+.dots{display:flex;gap:6px}.dots i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.url{flex:1;max-width:560px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px 14px;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.dbody{display:grid;grid-template-columns:216px 1fr;min-height:620px}
+.side{border-right:1px solid var(--line);padding:16px 12px;display:flex;flex-direction:column;gap:4px;background:var(--sunken)}
+.side .brand{padding:0 6px 14px}
+.side .brand .lg{width:30px;height:30px}
+.side .brand b{font-family:var(--f-display);font-size:16px}
+.nav{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;color:var(--muted);font-weight:700;font-size:14px}
+.nav.on{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+.nav .count{margin-left:auto;font-family:var(--f-mono);font-size:11px;background:var(--pa-bg);color:var(--pa);border-radius:999px;padding:1px 7px}
+.side hr{border:none;border-top:1px solid var(--line);margin:8px 4px;width:auto}
+.side .who{margin-top:auto;padding:10px;font-size:13px;border-top:1px solid var(--line)}
+.main{padding:22px 26px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.mhead{display:flex;align-items:center;gap:10px}
+.mhead h2{font-size:24px;flex:1}
+
+/* Componentes */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:15px;border-radius:10px;padding:10px 16px;border:1.5px solid var(--ink);background:var(--ink);color:var(--on-ink);cursor:pointer;white-space:nowrap}
+.btn.sec{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.danger{background:transparent;color:var(--rj);border-color:var(--rj)}
+.btn.danger.fill{background:var(--rj);color:var(--surface)}
+.btn.off{opacity:.4;cursor:not-allowed}
+.btn.block{width:100%;padding:13px 16px}
+.btn.sm{font-size:13px;padding:6px 10px;border-radius:8px}
+.link{color:var(--ink);text-decoration:underline;text-underline-offset:3px;font-size:14px;background:none;border:none;padding:0;cursor:pointer}
+.field{display:flex;flex-direction:column;gap:5px}
+.field>label{font-weight:700;font-size:14px}
+.field .hint{font-size:12.5px;color:var(--muted)}
+.input{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface);min-height:44px;font-size:15px}
+.input .pre,.input .suf{color:var(--muted);font-family:var(--f-mono);font-size:14px}
+.input .ph{color:var(--muted)}
+.input.locked{background:var(--sunken)}
+.input.area{align-items:flex-start;min-height:84px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips.scroll{flex-wrap:nowrap;overflow-x:auto}
+.chip{border:1.5px solid var(--line);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:700;white-space:nowrap;background:var(--surface)}
+.chip.on{background:var(--ink);color:var(--on-ink);border-color:var(--ink)}
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:3px 9px 3px 7px;border-radius:999px;background:var(--b-bg);color:var(--b-fg);white-space:nowrap}
+.badge .i{width:13px;height:13px;stroke-width:2.4}
+.badge.lg{font-size:14px;padding:5px 12px 5px 9px}
+.b-pa{--b-fg:var(--pa);--b-bg:var(--pa-bg)} .b-pp{--b-fg:var(--pp);--b-bg:var(--pp-bg)}
+.b-pg{--b-fg:var(--pg);--b-bg:var(--pg-bg)} .b-rj{--b-fg:var(--rj);--b-bg:var(--rj-bg)}
+.b-an{--b-fg:var(--an);--b-bg:var(--an-bg)}
+.ubadge{font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;border:1.5px solid var(--ink)}
+.ubadge.inv{border-style:dashed;border-color:var(--muted);color:var(--muted)}
+.ubadge.baja{border-color:var(--line);color:var(--muted);text-decoration:line-through}
+.banner{display:flex;gap:10px;align-items:flex-start;border-radius:10px;padding:11px 12px;font-size:14px;background:var(--b-bg);color:var(--ink);border:1px solid var(--b-fg)}
+.banner>.i{color:var(--b-fg);width:18px;height:18px;margin-top:1px}
+.banner b{color:var(--b-fg)}
+.banner .col{display:flex;flex-direction:column;gap:6px;min-width:0}
+.totals{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tot{background:var(--sunken);border-radius:10px;padding:9px 10px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.tot span{font-size:11.5px;color:var(--muted);font-weight:700;letter-spacing:.02em}
+.tot b{font-family:var(--f-mono);font-size:15px;font-weight:600}
+.list{display:flex;flex-direction:column;margin:0 -16px}
+.item{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:12px 16px;border-top:1px solid var(--line);align-items:center}
+.item:last-child{border-bottom:1px solid var(--line)}
+.item .t1{display:flex;gap:8px;align-items:baseline;min-width:0}
+.item .num{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.item .name{font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item .amt{font-family:var(--f-mono);font-weight:600;text-align:right;font-size:15px}
+.item .t2{font-size:13px;color:var(--muted)}
+.item .why{grid-column:1/-1;font-size:13px;color:var(--rj)}
+.thumbs{display:flex;gap:10px;flex-wrap:wrap}
+.thumb{position:relative;width:76px;height:96px;border-radius:8px;border:1px solid var(--line);overflow:hidden;background:var(--receipt)}
+.thumb .x{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--on-ink);display:grid;place-items:center}
+.thumb .x .i{width:12px;height:12px;stroke-width:3}
+.thumb.old{opacity:.45}
+.thumb .tag{position:absolute;left:0;right:0;bottom:0;font-size:10.5px;font-weight:700;text-align:center;background:var(--ink);color:var(--on-ink);padding:2px}
+.mini{font-family:var(--f-mono);font-size:5.5px;line-height:1.5;color:var(--receipt-ink);padding:8px 7px;white-space:pre}
+.blur .mini{filter:blur(1.4px)}
+.capture{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.capbtn{border:1.5px dashed var(--muted);border-radius:12px;padding:14px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:700;font-size:14px;background:var(--sunken)}
+.capbtn .i{width:24px;height:24px}
+.dl{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-size:14px;margin:0}
+.dl dt{color:var(--muted)}
+.dl dd{margin:0;font-weight:700;min-width:0}
+.tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:0}
+.tl li{display:grid;grid-template-columns:14px 1fr;gap:10px;font-size:13.5px;padding-bottom:12px;position:relative}
+.tl li::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--surface);border:2px solid var(--muted);margin-top:4px}
+.tl li::after{content:"";position:absolute;left:5px;top:18px;bottom:0;border-left:2px solid var(--line)}
+.tl li:last-child::after{display:none}
+.tl .when{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.tl .what{display:flex;flex-direction:column;gap:2px}
+.sec-t{font-family:var(--f-display);font-size:15px;font-weight:700}
+.stack{display:flex;flex-direction:column;gap:10px}
+.hstack{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.spacer{flex:1}
+.empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;padding:24px}
+.empty .lg{width:96px;height:96px;opacity:.18;border-radius:50%}
+.empty h3{font-size:20px}
+.scrim{position:absolute;inset:0;background:var(--scrim);z-index:2}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:3;background:var(--surface);border-radius:20px 20px 0 0;padding:20px 16px 22px;display:flex;flex-direction:column;gap:12px}
+.sheet::before{content:"";width:40px;height:4px;border-radius:2px;background:var(--line);align-self:center}
+.modal{position:absolute;z-index:3;left:50%;top:50%;transform:translate(-50%,-50%);width:520px;max-width:92%;background:var(--surface);border-radius:14px;padding:22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 30px 60px -20px rgba(0,0,0,.5)}
+.modal h3{font-size:20px}
+
+/* Tabla */
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.filters .field{min-width:150px}
+.filters .input{min-height:38px;padding:7px 10px;font-size:14px}
+.stbar{display:grid;grid-template-columns:repeat(5,1fr) 1.2fr;gap:8px}
+.st{border-radius:10px;padding:9px 12px;background:var(--b-bg);display:flex;flex-direction:column;gap:2px}
+.st span{font-size:12px;font-weight:700;color:var(--b-fg);display:flex;align-items:center;gap:5px}
+.st b{font-family:var(--f-mono);font-size:16px}
+.st small{font-family:var(--f-mono);color:var(--muted);font-size:12px}
+.st.all{background:var(--sunken);--b-fg:var(--ink)}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{text-align:left;font-size:12px;letter-spacing:.03em;color:var(--muted);font-weight:700;padding:8px 10px;border-bottom:1.5px solid var(--line);white-space:nowrap}
+.tbl th.sorted{color:var(--ink)}
+.tbl th .i{width:12px;height:12px;vertical-align:-1px}
+.tbl td{padding:10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr.hl td{background:var(--sunken)}
+.tbl .r{text-align:right}
+.tbl td.money{font-weight:600}
+.box{width:16px;height:16px;border:1.5px solid var(--muted);border-radius:4px;display:inline-grid;place-items:center;vertical-align:middle}
+.box.on{background:var(--ink);border-color:var(--ink);color:var(--on-ink)}
+.box.on .i{width:11px;height:11px;stroke-width:3.2}
+.own{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--muted)}
+.own .i{width:12px;height:12px}
+.tfoot{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+
+/* Visor de ticket */
+.viewer{background:var(--sunken);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.vtools{display:flex;gap:6px;align-self:stretch;align-items:center}
+.receipt{background:var(--receipt);color:var(--receipt-ink);font-family:var(--f-mono);font-size:12px;line-height:1.55;padding:18px 20px 22px;width:300px;white-space:pre;box-shadow:0 8px 20px -10px rgba(0,0,0,.4);transform:rotate(-1.2deg);
+  -webkit-mask:linear-gradient(#000 0 0) top/100% calc(100% - 8px) no-repeat,conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/12px 8px repeat-x;
+          mask:linear-gradient(#000 0 0) top/100% calc(100% - 8px) no-repeat,conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/12px 8px repeat-x}
+.vthumbs{display:flex;gap:8px}
+.vthumbs .thumb{width:48px;height:60px}
+.vthumbs .thumb.on{outline:2px solid var(--ink);outline-offset:1px}
+.detail{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:24px}
+.panel{border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:14px;background:var(--surface)}
+.seg{display:flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden}
+.seg span{flex:1;text-align:center;padding:8px 6px;font-weight:700;font-size:14px;border-left:1px solid var(--line)}
+.seg span:first-child{border-left:none}
+.seg span.on{background:var(--ink);color:var(--on-ink)}
+.drop{border:1.5px dashed var(--muted);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;font-size:14px;background:var(--sunken)}
+.bigtotal{display:flex;justify-content:space-between;align-items:baseline;padding:12px 2px 0;border-top:1.5px solid var(--ink)}
+.bigtotal b{font-family:var(--f-mono);font-size:24px}
+.variants{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:20px;width:100%}
+.variants .panel{position:relative;overflow:hidden;min-height:300px}
+.variants .panel .modal{position:static;transform:none;width:auto;max-width:none;box-shadow:none;padding:0}
+.toggle{width:36px;height:20px;border-radius:999px;background:var(--line);position:relative;flex:none}
+.toggle::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--surface)}
+.toggle.on{background:var(--ink)}
+.toggle.on::after{left:18px}
+.bnav{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);padding:6px 4px 14px}
+.bnav span{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:700;color:var(--muted)}
+.bnav span.on{color:var(--ink)}
+.bnav .i{width:20px;height:20px}
+
+/* Mapa y guía */
+.map{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:24px}
+.flow{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.flow h3{font-size:20px}
+.flow ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:10px}
+.flow li::marker{font-family:var(--f-mono);color:var(--muted)}
+.flow .go{display:inline;border:none;background:none;padding:0;font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.flow .r{font-family:var(--f-mono);font-size:12px;color:var(--muted);margin-left:6px}
+.guide{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,520px),1fr));gap:24px}
+.gcard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.gcard h3{font-size:19px}
+.states{display:flex;flex-direction:column;gap:10px}
+.states>div{display:grid;grid-template-columns:170px 1fr;gap:12px;align-items:center;font-size:14px}
+.typo>div{display:flex;flex-direction:column;gap:2px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.typo>div:last-child{border-bottom:none}
+.typo small{color:var(--muted);font-size:12px}
+.fmt{display:grid;grid-template-columns:auto 1fr;gap:8px 18px;font-size:14px}
+.fmt dt{color:var(--muted)}
+.fmt dd{margin:0;font-family:var(--f-mono)}
+.msgs-wrap{overflow-x:auto}
+.msgs{width:100%;border-collapse:collapse;font-size:14px}
+.msgs th,.msgs td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.msgs th{font-size:12px;color:var(--muted);letter-spacing:.03em}
+.msgs td:first-child{color:var(--muted);white-space:nowrap}
+
+@media (max-width:640px){
+  .tabs{margin-left:0;width:100%}
+  .intro h2{font-size:22px}
+  .states>div{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-euro" viewBox="0 0 24 24"><path d="M17.5 6.5a7 7 0 1 0 0 11"/><path d="M4 10h9M4 14h9"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-slash" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M6 18L18 6"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></symbol>
+  <symbol id="i-sort" viewBox="0 0 24 24"><path d="M8 5v14M5 16l3 3 3-3M16 19V5M13 8l3-3 3 3"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></symbol>
+  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 6L4 11l5 5"/><path d="M4 11h10a5 5 0 0 1 0 10h-3"/></symbol>
+  <symbol id="i-rotate" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></symbol>
+  <symbol id="i-zoom" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.3-4.3M11 8v6M8 11h6"/></symbol>
+  <symbol id="i-zoomout" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.3-4.3M8 11h6"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V4H4v12h4"/></symbol>
+  <symbol id="i-grip" viewBox="0 0 24 24"><path d="M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01" stroke-width="3.2"/></symbol>
+  <symbol id="i-wifioff" viewBox="0 0 24 24"><path d="M3 3l18 18M8.5 16.5a5 5 0 0 1 7 0M4.5 12.5a10 10 0 0 1 5-2.6M19.5 12.5a10 10 0 0 0-2.8-1.9M12 20h.01"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0 1 12 0M16 4.5a3.5 3.5 0 0 1 0 7M21 20a6 6 0 0 0-4-5.6"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.5"/></symbol>
+  <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5h.01"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18h.01"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></symbol>
+</svg>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <span class="lg" role="img" aria-label="Logo de la asociación EQL4E"></span>
+      <div><h1>EQL4E Tickets · bocetos</h1><small>v0.1 · Tarea 3 · datos de ejemplo, sin lógica</small></div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Secciones">
+      <button class="tab" role="tab" data-tab="mapa">Mapa</button>
+      <button class="tab" role="tab" data-tab="socio">Socio · móvil</button>
+      <button class="tab" role="tab" data-tab="tesorero">Tesorero · escritorio</button>
+      <button class="tab" role="tab" data-tab="tesorero-movil">Tesorero · móvil</button>
+      <button class="tab" role="tab" data-tab="guia">Guía visual</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+<!-- ============================ MAPA ============================ -->
+<section id="mapa" class="wrap" hidden>
+  <div class="intro">
+    <h2>Mapa de navegación</h2>
+    <p class="muted">Una sola aplicación. Al entrar, cada persona aterriza en su pantalla según su rol. Un tesorero también es socio: desde el menú lateral llega a «Mis tickets». Pulsa cualquier pantalla para ir a su boceto.</p>
+  </div>
+  <div class="map">
+    <div class="flow">
+      <h3>Socio</h3>
+      <ol>
+        <li><button class="go" data-go="s-activar">Activar cuenta</button> desde el enlace del email <span class="r">/activar</span></li>
+        <li><button class="go" data-go="s-entrar">Entrar</button> con teléfono y contraseña <span class="r">/entrar</span></li>
+        <li><button class="go" data-go="s-lista">Mis tickets</button>, con totales y filtro <span class="r">/tickets</span> · <button class="go" data-go="s-vacio">vacío</button></li>
+        <li><button class="go" data-go="s-nuevo">Nuevo ticket</button>: foto, importe, fecha, concepto <span class="r">/tickets/nuevo</span> · <button class="go" data-go="s-error">sin conexión</button></li>
+        <li>Detalle <span class="r">/tickets/[número]</span>
+          <ol>
+            <li><button class="go" data-go="s-rechazado">Rechazado</button> → <button class="go" data-go="s-reenviar">corregir y reenviar</button> o <button class="go" data-go="s-anular">anular</button></li>
+            <li><button class="go" data-go="s-pagado">Pagado</button>, con justificante</li>
+          </ol>
+        </li>
+        <li>Menú: Mis tickets · Cuenta (cambiar contraseña) · Salir <span class="r">/cuenta</span></li>
+      </ol>
+    </div>
+    <div class="flow">
+      <h3>Tesorero</h3>
+      <ol>
+        <li><button class="go" data-go="t-listado">Tickets</button>: filtros, ordenación, totales, CSV <span class="r">/gestion/tickets</span></li>
+        <li><button class="go" data-go="t-detalle">Revisar ticket</button> → autorizar o <button class="go" data-go="t-rechazar">rechazar</button> <span class="r">/gestion/tickets/[número]</span></li>
+        <li><button class="go" data-go="t-variantes">Casos especiales</button>: ticket propio, cambio concurrente, deshacer pago</li>
+        <li><button class="go" data-go="t-pago">Registrar pago</button> de uno o varios tickets <span class="r">/gestion/pagos/nuevo</span></li>
+        <li><button class="go" data-go="t-usuarios">Usuarios</button>: alta, invitación, baja <span class="r">/gestion/usuarios</span></li>
+        <li><button class="go" data-go="t-conceptos">Conceptos</button> <span class="r">/gestion/conceptos</span></li>
+        <li>En el móvil: <button class="go" data-go="m-listado">listado</button> y <button class="go" data-go="m-detalle">revisión</button></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ SOCIO ============================ -->
+<section id="socio" class="wrap" hidden>
+  <div class="intro">
+    <h2>Socio · móvil</h2>
+    <p class="muted">Pensado para usar con una mano y con prisa, en la tienda o al salir de ella. La acción principal está siempre abajo, al alcance del pulgar.</p>
+    <p class="legend">Los elementos que se marcan con borde punteado al pasar el ratón llevan a otra pantalla.</p>
+  </div>
+  <div class="screens">
+
+    <figure class="screen" id="s-entrar">
+      <figcaption><b>Entrar</b><span class="hu">HU-A02</span><span>El error no dice si falla el teléfono o la contraseña. Al quinto intento fallido, bloqueo de 15 minutos.</span></figcaption>
+      <div class="phone">
+        <div class="sbar"><span>9:41</span><span>4G</span></div>
+        <div class="pbody" style="justify-content:center;gap:22px">
+          <div class="stack" style="align-items:center;text-align:center;gap:8px">
+            <span class="lg" aria-hidden="true" style="width:84px;height:84px;border-radius:50%;background:#fff"></span>
+            <h2 style="font-size:26px">EQL4E Tickets</h2>
+            <p class="muted">Reembolso de compras de la asociación</p>
+          </div>
+          <div class="banner b-rj"><svg class="i"><use href="#i-alert"/></svg><span>Teléfono o contraseña incorrectos.</span></div>
+          <div class="field"><label>Teléfono</label><div class="input"><span class="pre">+34</span>612 345 678</div></div>
+          <div class="field"><label>Contraseña</label><div class="input">••••••••••</div></div>
+          <button class="btn block" data-go="s-lista">Entrar</button>
+          <button class="link" style="align-self:center">He olvidado mi contraseña</button>
+        </div>
+        <div class="pfoot" style="border:none"><p class="muted" style="font-size:13px;text-align:center">¿Aún no tienes cuenta? Pide la invitación a un tesorero.</p></div>
+      </div>
+    </figure>
+
+    <figure class="screen" id="s-activar">
+      <figcaption><b>Activar cuenta</b><span class="hu">HU-A01</span><span>Se abre desde el enlace del email, con el código ya rellenado.</span></figcaption>
+      <div class="phone">
+        <div class="sbar"><span>9:41</span><span>4G</span></div>
+        <div class="appbar"><span class="lg logo" aria-hidden="true"></span><b>Activa tu cuenta</b></div>
+        <div class="pbody">
+          <p>Elige una contraseña para empezar a enviar tickets.</p>
+          <div class="field"><label>Código de invitación</label><div class="input locked mono"><svg class="i"><use href="#i-lock"/></svg>K7QF-9TXB-2M4R-WZ8D</div></div>
+          <div class="field"><label>Teléfono</label><div class="input"><span class="pre">+34</span>612 345 678</div><span class="hint">El mismo que dio la asociación al darte de alta.</span></div>
+          <div class="field"><label>Contraseña nueva</label><div class="input">••••••••••</div><span class="hint">Mínimo 8 caracteres. Evita contraseñas comunes.</span></div>
+          <div class="field"><label>Repite la contraseña</label><div class="input">••••••••••</div></div>
+          <p class="muted" style="font-size:12.5px">La asociación usa tu nombre, teléfono y email solo para gestionar reembolsos. Los tickets se borran a los 18 meses de la fecha de compra.</p>
+        </div>
+        <div class="pfoot"><button class="btn block" data-go="s-vacio">Activar y entrar</button></div>
+      </div>
+    </figure>
+
+    <figure class="screen" id="s-lista">
+      <figcaption><b>Mis tickets</b><span class="hu">HU-S02</span><span>Primero lo más reciente. El motivo de un rechazo se ve sin entrar al detalle.</span></figcaption>
+      <div class="phone">
+        <div class="sbar"><span>9:41</span><span>4G</span></div>
+        <div class="appbar"><span class="lg logo" aria-hidden="true"></span><b>Mis tickets</b><button class="iconbtn" aria-label="Menú"><svg class="i"><use href="#i-menu"/></svg></button></div>
+        <div class="pbody">
+          <div class="totals">
+            <div class="tot"><span>Por autorizar</span><b>23,45 €</b></div>
+            <div class="tot"><span>Por cobrar</span><b>60,75 €</b></div>
+            <div class="tot"><span>Cobrado 2026</span><b>32,40 €</b></div>
+          </div>
+          <div class="chips scroll"><span class="chip on">Todos</span><span class="chip">Pendientes</span><span class="chip">Rechazados</span><span class="chip">Pagados</span><span class="chip">Anulados</span></div>
+          <div class="list">
+            <div class="item"><div class="t1"><span class="name">Ferretería</span><span class="num">T-000148</span></div><span class="amt">23,45 €</span><span class="t2">Compra 02/11/2026</span><span class="badge b-pa"><svg class="i"><use href="#i-clock"/></svg>Pend. autorizar</span></div>
+            <div class="item"><div class="t1"><span class="name">Ferretería</span><span class="num">T-000142</span></div><span class="amt">18,95 €</span><span class="t2">Compra 28/10/2026</span><span class="badge b-pp"><svg class="i"><use href="#i-euro"/></svg>Pend. pago</span></div>
+            <div class="item"><div class="t1"><span class="name">Alimentación</span><span class="num">T-000139</span></div><span class="amt">41,80 €</span><span class="t2">Compra 25/10/2026</span><span class="badge b-pp"><svg class="i"><use href="#i-euro"/></svg>Pend. pago</span></div>
+            <div class="item" data-go="s-rechazado"><div class="t1"><span class="name">Alimentación</span><span class="num">T-000137</span></div><span class="amt">15,20 €</span><span class="t2">Compra 22/10/2026</span><span class="badge b-rj"><svg class="i"><use href="#i-x"/></svg>Rechazado</span><span class="why">La foto está borrosa y no se lee el importe…</span></div>
+            <div class="item" data-go="s-pagado"><div class="t1"><span class="name">Ferretería</span><span class="num">T-000118</span></div><span class="amt">32,40 €</span><span class="t2">Compra 09/10/2026</span><span class="badge b-pg"><svg class="i"><use href="#i-check"/></svg>Pagado</span></div>
+          </div>
+        </div>
+        <div class="pfoot"><button class="btn block" data-go="s-nuevo"><svg class="i"><use href="#i-camera"/></svg>Nuevo ticket</button></div>
+      </div>
+    </figure>
+
+    <figure class="screen" id="s-vacio">
+      <figcaption><b>Mis tickets · vacío</b><span class="hu">HU-S02</span><span>Primera visita después de activar la cuenta.</span></figcaption>
+      <div class="phone">
+        <div class="sbar"><span>9:41</span><span>4G</span></div>
+        <div class="appbar"><span class="lg logo" aria-hidden="true"></span><b>Mis tickets</b><button class="iconbtn" aria-label="Menú"><svg class="i"><use href="#i-menu"/></svg></button></div>
+        <div class="banner b-pg" style="margin:16px 16px 0"><svg class="i"><use href="#i-check"/></svg><span>Cuenta activada. Bienvenida, Marta.</span></div>
+        <div class="empty">
+          <span class="lg" aria-hidden="true"></span>
+          <h3>Aún no has enviado ningún ticket</h3>
+          <p class="muted">Cuando compres algo para la asociación, haz una foto al ticket y envíalo desde aquí. Te lo reembolsará un tesorero.</p>
+        </div>
+        <div class="pfoot"><button class="btn block" data-go="s-nuevo"><svg class="i"><use href="#i-camera"/></svg>Nuevo ticket</button></div>
+      </div>
+    </figure>
+
+    <figure class="screen" id="s-nuevo">
+      <figcaption><b>Nuevo ticket</b><span class="hu">HU-S01</span><span>Las fotos se reducen en el móvil antes de enviarse. Se puede añadir más de una foto (tickets largos) o un PDF.</span></figcaption>
+      <div class="phone">
+        <div class="sbar"><span>9:41</span><span>4G</span></div>
+        <div class="appbar"><button class="iconbtn" aria-label="Volver" data-go="s-lista"><svg class="i"><use href="#i-back"/></svg></button><b>Nuevo ticket</b></div>
+        <div class="pbody">
+          <div class="field"><label>Fotos del ticket <span class="muted" style="font-weight:400">· 1 de 5</span></label>
+            <div class="thumbs">
+              <div class="thumb"><div class="mini">FERRETERÍA EL
+CLAVO
+02/11/2026
+--------------
+TORNILLOS 4x40
+  6,90
+BRIDAS 200u
+  5,60
+CINTA AMERIC.
+  10,95
+--------------
+TOTAL  23,45</div><span class="x"><svg class="i"><use href="#i-x"/></svg></span></div>
+            </div>
+            <span class="hint">Reducida de 4,2 MB a 380 KB.</span>
+          </div>
+          <div class="capture">
+            <div class="capbtn"><svg class="i"><use href="#i-camera"/></svg>Hacer foto</div>
+            <div class="capbtn"><svg class="i"><use href="#i-file"/></svg>Elegir archivo</div>
+          </div>
+          <div class="row2">
+            <div class="field"><label>Importe</label><div class="input money">23,45<span class="spacer"></span><span class="suf">€</span></div></div>
+            <div class="field"><label>Fecha de compra</label><div class="input money">02/11/2026</div></div>
+          </div>
+          <div class="field"><label>Concepto</label>
+            <div class="chips"><span class="chip on">Ferretería</span><span class="chip">Alimentación</span><span class="chip">Representación</span><span class="chip">Transporte</span><span class="chip">Otro…</span></div>
+          </div>
+          <div class="field"><label>Observaciones <span class="muted" style="font-weight:400">(opcional)</span></label><div class="input"><span class="ph">Ej.: material para el escenario</span></div></div>
+        </div>
+        <div class="pfoot"><button class="btn block" data-go="s-lista">Enviar ticket</button></div>
+      </div>
+    </figure>
+
+    <figure class="screen" id="s-error">
+      <figcaption><b>Nuevo ticket · sin conexión</b><span class="hu">HU-S01</span><span>El borrador queda guardado en el móvil. También muestra el concepto «Otro» con su texto libre.</span></figcaption>
+      <div class="phone">
+        <div class="sbar"><span>9:41</span><span>—</span></div>
+        <div class="appbar"><button class="iconbtn" aria-label="Volver"><svg class="i"><use href="#i-back"/></svg></button><b>Nuevo ticket</b></div>
+        <div class="pbody">
+          <div class="banner b-rj"><svg class="i"><use href="#i-wifioff"/></svg><div class="col"><b>No se ha podido enviar</b><span>No hay conexión. Tus datos y fotos siguen guardados en este móvil; reintenta cuando tengas cobertura.</span></div></div>
+          <div class="thumbs">
+            <div class="thumb"><div class="mini">FLORISTERÍA
+LAS DALIAS
+30/10/2026
+--------------
+CENTRO MESA
+  35,00
+--------------
+TOTAL  35,00</div><span class="x"><svg class="i"><use href="#i-x"/></svg></span></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label>Importe</label><div class="input money">35,00<span class="spacer"></span><span class="suf">€</span></div></div>
+            <div class="field"><label>Fecha de compra</label><div class="input money">30/10/2026</div></div>
+          </div>
+          <div class="field"><label>Concepto</label>
+            <div class="chips"><span class="chip">Ferretería</span><span class="chip">Alimentación</span><span class="chip">Representación</span><span class="chip">Transporte</span><span class="chip on">Otro…</span></div>
+            <div class="input">Floristería</div><span class="hint">Describe el concepto en pocas palabras (máximo 100 caracteres).</span>
+          </div>
+        </div>
+        <div class="pfoot"><button class="btn block">Reintentar envío</button></div>
+      </div>
+    </figure>
+
+    <figure class="screen" id="s-rechazado">
+      <figcaption><b>Detalle · rechazado</b><span class="hu">HU-S03 · S05 · S06</span><span>El motivo aparece arriba y destacado. Desde aquí se corrige o se anula.</span></figcaption>
+      <div class="phone">
+        <div class="sbar"><span>9:41</span><span>4G</span></div>
+        <div class="appbar"><button class="iconbtn" aria-label="Volver" data-go="s-lista"><svg class="i"><use href="#i-back"/></svg></button><b class="mono" style="font-family:var(--f-mono);font-size:17px">T-000137</b><span class="badge b-rj"><svg class="i"><use href="#i-x"/></svg>Rechazado</span></div>
+        <div class="pbody">
+          <div class="banner b-rj"><svg class="i"><use href="#i-info"/></svg><div class="col"><b>Motivo del rechazo</b><span>La foto está borrosa y no se lee el importe. Sube otra foto, por favor.</span><span class="muted" style="font-size:12.5px">Elena Navarro · 23/10/2026</span></div></div>
+          <div class="thumbs"><div class="thumb blur"><div class="mini">AUTOSERVICIO
+LA PLAZA
+22/10/2026
+--------------
+AGUA 1,5L x6
+  3,90
+HIELO 5KG x2
+  4,80
+VASOS 100u
+  6,50</div></div></div>
+          <dl class="dl">
+            <dt>Importe</dt><dd class="money">15,20 €</dd>
+            <dt>Fecha de compra</dt><dd class="money">22/10/2026</dd>
+            <dt>Concepto</dt><dd>Alimentación</dd>
+            <dt>Observaciones</dt><dd style="font-weight:400">Agua y hielo para el ensayo</dd>
+          </dl>
+          <div class="stack" style="gap:8px"><span class="sec-t">Historial</span>
+            <ul class="tl">
+              <li><span></span><div class="what"><span><b>Rechazado</b> por Elena Navarro</span><span class="when">23/10/2026 18:02</span></div></li>
+              <li><span></span><div class="what"><span><b>Enviado</b> por ti</span><span class="when">22/10/2026 21:15</span></div></li>
+            </ul>
+          </div>
+        </div>
+        <div class="pfoot"><button class="btn block" data-go="s-reenviar">Corregir y reenviar</button><button class="btn block danger" data-go="s-anular">Anular ticket</button></div>
+      </div>
+    </figure>
+
+    <figure class="screen" id="s-reenviar">
+      <figcaption><b>Corregir y reenviar</b><span class="hu">HU-S04 · S06</span><span>La foto sustituida no se borra: queda en el historial. Es el mismo formulario que se usa para editar un ticket pendiente.</span></figcaption>
+      <div class="phone">
+        <div class="sbar"><span>9:41</span><span>4G</span></div>
+        <div class="appbar"><button class="iconbtn" aria-label="Volver" data-go="s-rechazado"><svg class="i"><use href="#i-back"/></svg></button><b>Corregir T-000137</b></div>
+        <div class="pbody">
+          <div class="field"><label>Fotos del ticket</label>
+            <div class="thumbs">
+              <div class="thumb old blur"><div class="mini">AUTOSERVICIO
+LA PLAZA
+22/10/2026</div><span class="tag">Sustituida</span></div>
+              <div class="thumb"><div class="mini">AUTOSERVICIO
+LA PLAZA
+22/10/2026
+--------------
+AGUA 1,5L x6
+  3,90
+HIELO 5KG x2
+  4,80
+VASOS 100u
+  6,50
+--------------
+TOTAL  15,20</div><span class="x"><svg class="i"><use href="#i-x"/></svg></span></div>
+            </div>
+            <span class="hint">La foto anterior se conserva en el historial del ticket.</span>
+          </div>
+          <div class="capture">
+            <div class="capbtn"><svg class="i"><use href="#i-camera"/></svg>Hacer foto</div>
+            <div class="capbtn"><svg class="i"><use href="#i-file"/></svg>Elegir archivo</div>
+          </div>
+          <div class="row2">
+            <div class="field"><label>Importe</label><div class="input money">15,20<span class="spacer"></span><span class="suf">€</span></div></div>
+            <div class="field"><label>Fecha de compra</label><div class="input money">22/10/2026</div></div>
+          </div>
+          <div class="field"><label>Concepto</label>
+            <div class="chips"><span class="chip">Ferretería</span><span class="chip on">Alimentación</span><span class="chip">Representación</span><span class="chip">Transporte</span><span class="chip">Otro…</span></div>
+          </div>
+        </div>
+        <div class="pfoot"><button class="btn block" data-go="s-lista">Reenviar ticket</button></div>
+      </div>
+    </figure>
+
+    <figure class="screen" id="s-anular">
+      <figcaption><b>Confirmar anulación</b><span class="hu">HU-S05</span><span>Confirmación dentro de la propia página. Anular no se puede deshacer.</span></figcaption>
+      <div class="phone">
+        <div class="sbar"><span>9:41</span><span>4G</span></div>
+        <div class="appbar"><button class="iconbtn" aria-label="Volver"><svg class="i"><use href="#i-back"/></svg></button><b style="font-family:var(--f-mono);font-size:17px">T-000137</b><span class="badge b-rj"><svg class="i"><use href="#i-x"/></svg>Rechazado</span></div>
+        <div class="pbody">
+          <div class="banner b-rj"><svg class="i"><use href="#i-info"/></svg><div class="col"><b>Motivo del rechazo</b><span>La foto está borrosa y no se lee el importe.</span></div></div>
+          <dl class="dl"><dt>Importe</dt><dd class="money">15,20 €</dd><dt>Concepto</dt><dd>Alimentación</dd></dl>
+        </div>
+        <div class="scrim"></div>
+        <div class="sheet">
+          <h3 style="font-size:20px">¿Anular el ticket T-000137?</h3>
+          <p class="muted">No se podrá corregir ni reenviar. Quedará en tu lista como <b>Anulado</b>.</p>
+          <button class="btn block danger fill" data-go="s-lista">Anular ticket</button>
+          <button class="btn block sec" data-go="s-rechazado">Cancelar</button>
+        </div>
+      </div>
+    </figure>
+
+    <figure class="screen" id="s-pagado">
+      <figcaption><b>Detalle · pagado</b><span class="hu">HU-S03</span><span>Si el pago incluye varios tickets, se indica.</span></figcaption>
+      <div class="phone">
+        <div class="sbar"><span>9:41</span><span>4G</span></div>
+        <div class="appbar"><button class="iconbtn" aria-label="Volver" data-go="s-lista"><svg class="i"><use href="#i-back"/></svg></button><b style="font-family:var(--f-mono);font-size:17px">T-000118</b><span class="badge b-pg"><svg class="i"><use href="#i-check"/></svg>Pagado</span></div>
+        <div class="pbody">
+          <div class="banner b-pg"><svg class="i"><use href="#i-check"/></svg><div class="col"><b>Pagado el 15/10/2026 por Bizum</b><span>Este pago incluye 2 tickets: T-000118 y T-000117, en total <span class="money">47,60 €</span>.</span><button class="btn sm sec" style="align-self:flex-start"><svg class="i"><use href="#i-file"/></svg>Ver justificante</button></div></div>
+          <div class="thumbs"><div class="thumb"><div class="mini">FERRETERÍA EL
+CLAVO
+09/10/2026
+--------------
+PINTURA 4L
+  24,90
+RODILLO
+  7,50
+--------------
+TOTAL  32,40</div></div></div>
+          <dl class="dl">
+            <dt>Importe</dt><dd class="money">32,40 €</dd>
+            <dt>Fecha de compra</dt><dd class="money">09/10/2026</dd>
+            <dt>Concepto</dt><dd>Ferretería</dd>
+          </dl>
+          <div class="stack" style="gap:8px"><span class="sec-t">Historial</span>
+            <ul class="tl">
+              <li><span></span><div class="what"><span><b>Pagado</b> por Pablo Serrano · Bizum</span><span class="when">15/10/2026 10:30</span></div></li>
+              <li><span></span><div class="what"><span><b>Autorizado</b> por Elena Navarro</span><span class="when">12/10/2026 19:44</span></div></li>
+              <li><span></span><div class="what"><span><b>Enviado</b> por ti</span><span class="when">09/10/2026 13:05</span></div></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </figure>
+
+  </div>
+</section>
+
+<!-- ============================ TESORERO ESCRITORIO ============================ -->
+<section id="tesorero" class="wrap" hidden>
+  <div class="intro">
+    <h2>Tesorero · escritorio</h2>
+    <p class="muted">Pantallas de trabajo para una sesión semanal: ver lo pendiente, revisar, pagar en bloque. Los filtros y el orden viven en la URL, así que cada vista se puede guardar como marcador.</p>
+    <p class="legend">En pantallas estrechas, cada marco se desplaza en horizontal dentro de su propio recuadro.</p>
+  </div>
+  <div class="screens">
+
+    <figure class="screen wide" id="t-listado">
+      <figcaption><b>Tickets</b><span class="hu">HU-T01 · T07 · T03 (múltiple)</span><span>Orden por defecto: estado (lo que requiere acción primero) y, dentro de cada estado, lo más antiguo arriba. Los totales son los del resultado filtrado.</span></figcaption>
+      <div class="desk-scroll"><div class="desk">
+        <div class="chrome"><div class="dots"><i></i><i></i><i></i></div><div class="url">tickets-eql4e.ddns.net/gestion/tickets?orden=estado</div></div>
+        <div class="dbody">
+          <aside class="side">
+            <div class="brand"><span class="lg" aria-hidden="true"></span><b>EQL4E Tickets</b></div>
+            <span class="nav on"><svg class="i"><use href="#i-receipt"/></svg>Tickets<span class="count">3</span></span>
+            <span class="nav" data-go="t-pago"><svg class="i"><use href="#i-euro"/></svg>Registrar pago</span>
+            <span class="nav" data-go="t-usuarios"><svg class="i"><use href="#i-users"/></svg>Usuarios</span>
+            <span class="nav" data-go="t-conceptos"><svg class="i"><use href="#i-tag"/></svg>Conceptos</span>
+            <hr>
+            <span class="nav"><svg class="i"><use href="#i-camera"/></svg>Mis tickets</span>
+            <div class="who"><b>Elena Navarro</b><br><span class="muted">Tesorera · Salir</span></div>
+          </aside>
+          <div class="main">
+            <div class="mhead"><h2>Tickets</h2><button class="btn sec"><svg class="i"><use href="#i-down"/></svg>Exportar CSV</button><button class="btn" data-go="t-pago"><svg class="i"><use href="#i-euro"/></svg>Registrar pago</button></div>
+            <div class="stbar">
+              <div class="st b-pa"><span><svg class="i"><use href="#i-clock"/></svg>Pend. autorizar</span><b>99,55 €</b><small>3 tickets</small></div>
+              <div class="st b-pp"><span><svg class="i"><use href="#i-euro"/></svg>Pend. pago</span><b>180,75 €</b><small>3 tickets</small></div>
+              <div class="st b-rj"><span><svg class="i"><use href="#i-x"/></svg>Rechazado</span><b>35,00 €</b><small>1 ticket</small></div>
+              <div class="st b-pg"><span><svg class="i"><use href="#i-check"/></svg>Pagado</span><b>61,90 €</b><small>2 tickets</small></div>
+              <div class="st b-an"><span><svg class="i"><use href="#i-slash"/></svg>Anulado</span><b>7,25 €</b><small>1 ticket</small></div>
+              <div class="st all"><span>Total filtrado</span><b>384,45 €</b><small>10 tickets</small></div>
+            </div>
+            <div class="filters">
+              <div class="field"><label>Estado</label><div class="input">Todos<span class="spacer"></span><svg class="i"><use href="#i-down"/></svg></div></div>
+              <div class="field"><label>Concepto</label><div class="input">Todos<span class="spacer"></span><svg class="i"><use href="#i-down"/></svg></div></div>
+              <div class="field" style="min-width:200px"><label>Socio</label><div class="input"><span class="ph">Buscar por nombre o teléfono</span></div></div>
+              <div class="field" style="min-width:230px"><label>Fecha de compra</label><div class="input money">01/10/2026 – 04/11/2026</div></div>
+              <div class="field" style="min-width:150px"><label>Importe (€)</label><div class="input money"><span class="ph">mín</span> – <span class="ph">máx</span></div></div>
+              <button class="link" style="padding-bottom:10px">Limpiar filtros</button>
+            </div>
+            <div class="hstack" style="font-size:13px"><span class="muted">0 seleccionados</span><button class="btn sm sec off">Autorizar seleccionados</button></div>
+            <table class="tbl">
+              <thead><tr><th><span class="box"></span></th><th>Nº</th><th class="sorted">Estado <svg class="i"><use href="#i-sort"/></svg></th><th>Compra</th><th>Socio</th><th>Concepto</th><th class="r">Importe</th><th>Enviado</th></tr></thead>
+              <tbody>
+                <tr><td><span class="box"></span></td><td class="mono">T-000148</td><td><span class="badge b-pa"><svg class="i"><use href="#i-clock"/></svg>Pend. autorizar</span></td><td class="mono">02/11/2026</td><td>Marta Gil</td><td>Ferretería</td><td class="r money">23,45 €</td><td class="mono muted">02/11 14:20</td></tr>
+                <tr class="hl" data-go="t-detalle"><td><span class="box"></span></td><td class="mono">T-000150</td><td><span class="badge b-pa"><svg class="i"><use href="#i-clock"/></svg>Pend. autorizar</span></td><td class="mono">03/11/2026</td><td>Javier Ortega</td><td>Alimentación</td><td class="r money">64,10 €</td><td class="mono muted">03/11 20:41</td></tr>
+                <tr data-go="t-variantes"><td><span class="box"></span></td><td class="mono">T-000151</td><td><span class="badge b-pa"><svg class="i"><use href="#i-clock"/></svg>Pend. autorizar</span></td><td class="mono">03/11/2026</td><td>Elena Navarro <span class="own"><svg class="i"><use href="#i-lock"/></svg>tuyo</span></td><td>Transporte</td><td class="r money">12,00 €</td><td class="mono muted">04/11 09:12</td></tr>
+                <tr><td><span class="box"></span></td><td class="mono">T-000139</td><td><span class="badge b-pp"><svg class="i"><use href="#i-euro"/></svg>Pend. pago</span></td><td class="mono">25/10/2026</td><td>Marta Gil</td><td>Alimentación</td><td class="r money">41,80 €</td><td class="mono muted">25/10 18:03</td></tr>
+                <tr><td><span class="box"></span></td><td class="mono">T-000142</td><td><span class="badge b-pp"><svg class="i"><use href="#i-euro"/></svg>Pend. pago</span></td><td class="mono">28/10/2026</td><td>Marta Gil</td><td>Ferretería</td><td class="r money">18,95 €</td><td class="mono muted">28/10 12:47</td></tr>
+                <tr><td><span class="box"></span></td><td class="mono">T-000144</td><td><span class="badge b-pp"><svg class="i"><use href="#i-euro"/></svg>Pend. pago</span></td><td class="mono">29/10/2026</td><td>Andrés Prieto</td><td>Representación</td><td class="r money">120,00 €</td><td class="mono muted">29/10 22:10</td></tr>
+                <tr><td><span class="box"></span></td><td class="mono">T-000146</td><td><span class="badge b-rj"><svg class="i"><use href="#i-x"/></svg>Rechazado</span></td><td class="mono">30/10/2026</td><td>Lucía Romero</td><td>Otro: Floristería</td><td class="r money">35,00 €</td><td class="mono muted">30/10 19:30</td></tr>
+                <tr><td><span class="box"></span></td><td class="mono">T-000131</td><td><span class="badge b-pg"><svg class="i"><use href="#i-check"/></svg>Pagado</span></td><td class="mono">16/10/2026</td><td>Carmen Vidal (baja)</td><td>Alimentación</td><td class="r money">52,30 €</td><td class="mono muted">16/10 11:02</td></tr>
+                <tr><td><span class="box"></span></td><td class="mono">T-000128</td><td><span class="badge b-pg"><svg class="i"><use href="#i-check"/></svg>Pagado</span></td><td class="mono">14/10/2026</td><td>Javier Ortega</td><td>Transporte</td><td class="r money">9,60 €</td><td class="mono muted">14/10 08:55</td></tr>
+                <tr><td><span class="box"></span></td><td class="mono">T-000120</td><td><span class="badge b-an"><svg class="i"><use href="#i-slash"/></svg>Anulado</span></td><td class="mono">10/10/2026</td><td>Andrés Prieto</td><td>Ferretería</td><td class="r money">7,25 €</td><td class="mono muted">10/10 17:40</td></tr>
+              </tbody>
+            </table>
+            <div class="tfoot"><span>10 tickets</span><span>Se pagina a partir de 50 filas</span></div>
+          </div>
+        </div>
+      </div></div>
+    </figure>
+
+    <figure class="screen wide" id="t-detalle">
+      <figcaption><b>Revisar ticket</b><span class="hu">HU-T02 · T03 · T04</span><span>La foto ocupa la mitad de la pantalla porque es lo que hay que comprobar. Hay zoom, giro y paso entre fotos.</span></figcaption>
+      <div class="desk-scroll"><div class="desk">
+        <div class="chrome"><div class="dots"><i></i><i></i><i></i></div><div class="url">tickets-eql4e.ddns.net/gestion/tickets/150</div></div>
+        <div class="dbody">
+          <aside class="side">
+            <div class="brand"><span class="lg" aria-hidden="true"></span><b>EQL4E Tickets</b></div>
+            <span class="nav on" data-go="t-listado"><svg class="i"><use href="#i-receipt"/></svg>Tickets<span class="count">3</span></span>
+            <span class="nav"><svg class="i"><use href="#i-euro"/></svg>Registrar pago</span>
+            <span class="nav"><svg class="i"><use href="#i-users"/></svg>Usuarios</span>
+            <span class="nav"><svg class="i"><use href="#i-tag"/></svg>Conceptos</span>
+            <hr><span class="nav"><svg class="i"><use href="#i-camera"/></svg>Mis tickets</span>
+            <div class="who"><b>Elena Navarro</b><br><span class="muted">Tesorera · Salir</span></div>
+          </aside>
+          <div class="main">
+            <div class="mhead"><button class="iconbtn" data-go="t-listado" aria-label="Volver"><svg class="i"><use href="#i-back"/></svg></button><h2 style="font-family:var(--f-mono);font-size:22px;flex:none">T-000150</h2><span class="badge lg b-pa"><svg class="i"><use href="#i-clock"/></svg>Pendiente de autorizar</span><span class="spacer"></span></div>
+            <div class="detail">
+              <div class="viewer">
+                <div class="vtools"><button class="iconbtn" aria-label="Alejar"><svg class="i"><use href="#i-zoomout"/></svg></button><button class="iconbtn" aria-label="Acercar"><svg class="i"><use href="#i-zoom"/></svg></button><button class="iconbtn" aria-label="Girar"><svg class="i"><use href="#i-rotate"/></svg></button><span class="spacer"></span><span class="muted mono" style="font-size:13px">Foto 1 de 2 · JPEG 412 KB</span></div>
+                <div class="receipt">    AUTOSERVICIO LA PLAZA
+      C/ Mayor, 12 · Madrid
+  03/11/2026 19:58   Caja 2
+------------------------------
+AGUA 1,5L  x6            3,90
+REFRESCO COLA  x12       9,48
+CERVEZA SIN  x24        16,80
+PATATAS FRITAS  x6       8,94
+VASOS 100 UDS            4,95
+SERVILLETAS              3,25
+HIELO 5KG  x4            9,60
+FRUTOS SECOS             7,18
+------------------------------
+TOTAL                   64,10
+TARJETA                 64,10
+     GRACIAS POR SU VISITA</div>
+                <div class="vthumbs"><div class="thumb on"><div class="mini">AUTOSERVICIO
+LA PLAZA</div></div><div class="thumb"><div class="mini">...
+TOTAL 64,10
+TARJETA</div></div></div>
+              </div>
+              <div class="stack" style="gap:16px">
+                <div class="panel">
+                  <dl class="dl">
+                    <dt>Socio</dt><dd>Javier Ortega <span class="muted mono" style="font-weight:400;font-size:13px">+34 655 210 448</span></dd>
+                    <dt>Importe</dt><dd class="money" style="font-size:20px">64,10 €</dd>
+                    <dt>Fecha de compra</dt><dd class="money">03/11/2026</dd>
+                    <dt>Concepto</dt><dd>Alimentación</dd>
+                    <dt>Observaciones</dt><dd style="font-weight:400">Bebida y aperitivo para la asamblea del sábado</dd>
+                    <dt>Enviado</dt><dd class="money" style="font-weight:400">03/11/2026 20:41</dd>
+                  </dl>
+                  <div class="hstack"><button class="btn" style="flex:1"><svg class="i"><use href="#i-check"/></svg>Autorizar</button><button class="btn danger" style="flex:1" data-go="t-rechazar"><svg class="i"><use href="#i-x"/></svg>Rechazar…</button></div>
+                  <button class="link" data-go="t-pago" style="align-self:flex-start">Autorizar y registrar el pago de Javier Ortega</button>
+                </div>
+                <div class="panel"><span class="sec-t">Historial</span>
+                  <ul class="tl"><li><span></span><div class="what"><span><b>Enviado</b> por Javier Ortega</span><span class="when">03/11/2026 20:41</span></div></li></ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </figure>
+
+    <figure class="screen wide" id="t-rechazar">
+      <figcaption><b>Rechazar con motivo</b><span class="hu">HU-T04</span><span>El motivo es obligatorio (de 5 a 500 caracteres). El socio lo verá tal cual, así que el diálogo lo avisa.</span></figcaption>
+      <div class="desk-scroll"><div class="desk" style="min-height:440px">
+        <div class="chrome"><div class="dots"><i></i><i></i><i></i></div><div class="url">tickets-eql4e.ddns.net/gestion/tickets/150</div></div>
+        <div class="main" style="opacity:.6"><div class="mhead"><h2 style="font-family:var(--f-mono);font-size:22px;flex:none">T-000150</h2><span class="badge lg b-pa"><svg class="i"><use href="#i-clock"/></svg>Pendiente de autorizar</span></div><div style="height:300px"></div></div>
+        <div class="scrim"></div>
+        <div class="modal">
+          <h3>Rechazar T-000150</h3>
+          <p class="muted">Javier Ortega verá este motivo y podrá corregir el ticket y reenviarlo.</p>
+          <div class="field"><label>Motivo</label><div class="input area">Las cervezas sin alcohol no entran en el presupuesto de la asamblea. Descuenta esa línea del importe y reenvíalo.</div><span class="hint mono" style="align-self:flex-end">115 / 500</span></div>
+          <div class="hstack" style="justify-content:flex-end"><button class="btn sec" data-go="t-detalle">Cancelar</button><button class="btn danger fill">Rechazar ticket</button></div>
+        </div>
+      </div></div>
+    </figure>
+
+    <figure class="screen wide" id="t-variantes">
+      <figcaption><b>Casos especiales</b><span class="hu">R-04 · E-04 · HU-T06</span><span>Tres situaciones del panel de acciones que no aparecen en el flujo normal.</span></figcaption>
+      <div class="variants">
+        <div class="panel">
+          <span class="sec-t">Ticket propio (separación de funciones)</span>
+          <div class="hstack"><span class="mono">T-000151</span><span class="badge b-pa"><svg class="i"><use href="#i-clock"/></svg>Pend. autorizar</span></div>
+          <dl class="dl"><dt>Socio</dt><dd>Elena Navarro (tú)</dd><dt>Importe</dt><dd class="money">12,00 €</dd></dl>
+          <div class="banner b-an"><svg class="i"><use href="#i-lock"/></svg><span>Es tu propio ticket. Debe autorizarlo, rechazarlo o pagarlo otro tesorero.</span></div>
+          <div class="hstack"><button class="btn off" style="flex:1">Autorizar</button><button class="btn danger off" style="flex:1">Rechazar…</button></div>
+        </div>
+        <div class="panel">
+          <span class="sec-t">Otro tesorero se ha adelantado</span>
+          <div class="banner b-pa"><svg class="i"><use href="#i-alert"/></svg><div class="col"><b>Este ticket ha cambiado</b><span>Pablo Serrano lo ha autorizado hace un momento. Hemos actualizado la pantalla: revisa su estado antes de seguir.</span></div></div>
+          <div class="hstack"><span class="mono">T-000148</span><span class="badge b-pp"><svg class="i"><use href="#i-euro"/></svg>Pend. pago</span></div>
+          <div class="hstack"><button class="btn sec" style="flex:1"><svg class="i"><use href="#i-undo"/></svg>Deshacer autorización…</button></div>
+        </div>
+        <div class="panel">
+          <div class="modal">
+            <span class="sec-t">Deshacer un pago</span>
+            <p>Deshacer el pago del <b class="money">04/11/2026</b> a Marta Gil (Bizum, <span class="money">60,75 €</span>).</p>
+            <p class="muted" style="font-size:14px">Estos tickets volverán a <b>Pendiente de pago</b>:</p>
+            <div class="list" style="margin:0">
+              <div class="item" style="padding:8px 0"><span class="mono">T-000139 · Alimentación</span><span class="amt">41,80 €</span></div>
+              <div class="item" style="padding:8px 0"><span class="mono">T-000142 · Ferretería</span><span class="amt">18,95 €</span></div>
+            </div>
+            <div class="field"><label>Motivo</label><div class="input">El Bizum se envió a otro número.</div></div>
+            <div class="hstack" style="justify-content:flex-end"><button class="btn sec">Cancelar</button><button class="btn danger fill"><svg class="i"><use href="#i-undo"/></svg>Deshacer pago</button></div>
+          </div>
+        </div>
+      </div>
+    </figure>
+
+    <figure class="screen wide" id="t-pago">
+      <figcaption><b>Registrar pago</b><span class="hu">HU-T05</span><span>Se elige un socio y aparecen solo sus tickets pendientes de pago. El importe total se calcula; no se escribe a mano.</span></figcaption>
+      <div class="desk-scroll"><div class="desk">
+        <div class="chrome"><div class="dots"><i></i><i></i><i></i></div><div class="url">tickets-eql4e.ddns.net/gestion/pagos/nuevo?socio=marta-gil</div></div>
+        <div class="dbody">
+          <aside class="side">
+            <div class="brand"><span class="lg" aria-hidden="true"></span><b>EQL4E Tickets</b></div>
+            <span class="nav" data-go="t-listado"><svg class="i"><use href="#i-receipt"/></svg>Tickets<span class="count">3</span></span>
+            <span class="nav on"><svg class="i"><use href="#i-euro"/></svg>Registrar pago</span>
+            <span class="nav"><svg class="i"><use href="#i-users"/></svg>Usuarios</span>
+            <span class="nav"><svg class="i"><use href="#i-tag"/></svg>Conceptos</span>
+            <hr><span class="nav"><svg class="i"><use href="#i-camera"/></svg>Mis tickets</span>
+            <div class="who"><b>Elena Navarro</b><br><span class="muted">Tesorera · Salir</span></div>
+          </aside>
+          <div class="main">
+            <div class="mhead"><h2>Registrar pago</h2></div>
+            <div class="detail">
+              <div class="panel">
+                <div class="field"><label>Socio</label><div class="input">Marta Gil <span class="muted mono" style="font-size:13px">+34 612 345 678</span><span class="spacer"></span><svg class="i"><use href="#i-down"/></svg></div><span class="hint">Solo se listan socios con tickets en Pendiente de pago. No aparecen tus propios tickets.</span></div>
+                <table class="tbl">
+                  <thead><tr><th><span class="box on"><svg class="i"><use href="#i-check"/></svg></span></th><th>Nº</th><th>Compra</th><th>Concepto</th><th class="r">Importe</th></tr></thead>
+                  <tbody>
+                    <tr><td><span class="box on"><svg class="i"><use href="#i-check"/></svg></span></td><td class="mono">T-000139</td><td class="mono">25/10/2026</td><td>Alimentación</td><td class="r money">41,80 €</td></tr>
+                    <tr><td><span class="box on"><svg class="i"><use href="#i-check"/></svg></span></td><td class="mono">T-000142</td><td class="mono">28/10/2026</td><td>Ferretería</td><td class="r money">18,95 €</td></tr>
+                  </tbody>
+                </table>
+                <div class="bigtotal"><span class="sec-t">Total a pagar · 2 tickets</span><b>60,75 €</b></div>
+              </div>
+              <div class="panel">
+                <div class="field"><label>Fecha de pago</label><div class="input money">04/11/2026</div></div>
+                <div class="field"><label>Método</label><div class="seg"><span class="on">Bizum</span><span>Transferencia</span><span>Efectivo</span><span>Otro</span></div></div>
+                <div class="field"><label>Justificante <span class="muted" style="font-weight:400">(opcional · imagen o PDF)</span></label>
+                  <div class="drop"><svg class="i"><use href="#i-file"/></svg><span class="mono" style="font-size:13px">bizum-04-11.jpg · 210 KB</span><span class="spacer"></span><button class="link">Quitar</button></div>
+                </div>
+                <div class="banner b-pp"><svg class="i"><use href="#i-info"/></svg><span>Se marcarán 2 tickets como <b>Pagado</b>. Si te equivocas, podrás deshacer el pago completo.</span></div>
+                <button class="btn block">Registrar pago de <span class="money">60,75 €</span></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </figure>
+
+    <figure class="screen wide" id="t-usuarios">
+      <figcaption><b>Usuarios</b><span class="hu">HU-G01 · G02 · G03</span><span>El alta envía la invitación por email. Si el envío falla, se puede copiar el enlace para mandarlo por otro medio.</span></figcaption>
+      <div class="desk-scroll"><div class="desk">
+        <div class="chrome"><div class="dots"><i></i><i></i><i></i></div><div class="url">tickets-eql4e.ddns.net/gestion/usuarios</div></div>
+        <div class="dbody">
+          <aside class="side">
+            <div class="brand"><span class="lg" aria-hidden="true"></span><b>EQL4E Tickets</b></div>
+            <span class="nav" data-go="t-listado"><svg class="i"><use href="#i-receipt"/></svg>Tickets<span class="count">3</span></span>
+            <span class="nav"><svg class="i"><use href="#i-euro"/></svg>Registrar pago</span>
+            <span class="nav on"><svg class="i"><use href="#i-users"/></svg>Usuarios</span>
+            <span class="nav" data-go="t-conceptos"><svg class="i"><use href="#i-tag"/></svg>Conceptos</span>
+            <hr><span class="nav"><svg class="i"><use href="#i-camera"/></svg>Mis tickets</span>
+            <div class="who"><b>Elena Navarro</b><br><span class="muted">Tesorera · Salir</span></div>
+          </aside>
+          <div class="main">
+            <div class="mhead"><h2>Usuarios</h2><button class="btn"><svg class="i"><use href="#i-plus"/></svg>Nuevo usuario</button></div>
+            <div class="detail" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
+              <div class="stack">
+                <div class="chips"><span class="chip on">Todos · 7</span><span class="chip">Activos · 5</span><span class="chip">Invitados · 1</span><span class="chip">De baja · 1</span></div>
+                <table class="tbl">
+                  <thead><tr><th>Nombre</th><th>Teléfono</th><th>Email</th><th>Roles</th><th>Estado</th><th></th></tr></thead>
+                  <tbody>
+                    <tr><td>Elena Navarro</td><td class="mono">+34 611 908 112</td><td>elena.navarro@example.com</td><td>Socia · Tesorera</td><td><span class="ubadge">Activo</span></td><td></td></tr>
+                    <tr><td>Pablo Serrano</td><td class="mono">+34 622 418 703</td><td>pablo.serrano@example.com</td><td>Socio · Tesorero</td><td><span class="ubadge">Activo</span></td><td></td></tr>
+                    <tr><td>Marta Gil</td><td class="mono">+34 612 345 678</td><td>marta.gil@example.com</td><td>Socia</td><td><span class="ubadge">Activo</span></td><td></td></tr>
+                    <tr><td>Javier Ortega</td><td class="mono">+34 655 210 448</td><td>javier.ortega@example.com</td><td>Socio</td><td><span class="ubadge">Activo</span></td><td></td></tr>
+                    <tr><td>Lucía Romero</td><td class="mono">+34 677 093 251</td><td>lucia.romero@example.com</td><td>Socia</td><td><span class="ubadge inv">Invitado · caduca 09/11</span></td><td><button class="btn sm sec"><svg class="i"><use href="#i-mail"/></svg>Reenviar</button></td></tr>
+                    <tr><td>Andrés Prieto</td><td class="mono">+34 630 552 974</td><td>andres.prieto@example.com</td><td>Socio</td><td><span class="ubadge">Activo</span></td><td></td></tr>
+                    <tr><td class="muted">Carmen Vidal</td><td class="mono muted">+34 691 207 385</td><td class="muted">carmen.vidal@example.com</td><td class="muted">Socia</td><td><span class="ubadge baja">De baja</span></td><td><button class="btn sm sec">Reactivar</button></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="panel">
+                <span class="sec-t">Nuevo usuario</span>
+                <div class="field"><label>Nombre</label><div class="input">Sergio Campos</div></div>
+                <div class="field"><label>Teléfono</label><div class="input"><span class="pre">+34</span>699 432 187</div></div>
+                <div class="field"><label>Email</label><div class="input">sergio.campos@example.com</div></div>
+                <div class="field"><label>Roles</label><div class="hstack"><span class="hstack" style="gap:6px"><span class="box on"><svg class="i"><use href="#i-check"/></svg></span>Socio</span><span class="hstack" style="gap:6px"><span class="box"></span>Tesorero</span></div></div>
+                <button class="btn block"><svg class="i"><use href="#i-mail"/></svg>Dar de alta y enviar invitación</button>
+                <span class="muted" style="font-size:12px;font-weight:700;letter-spacing:.04em">DESPUÉS DE GUARDAR</span>
+                <div class="banner b-pg"><svg class="i"><use href="#i-check"/></svg><span>Invitación enviada a sergio.campos@example.com. Caduca el 11/11/2026.</span></div>
+                <div class="banner b-pa"><svg class="i"><use href="#i-alert"/></svg><div class="col"><span>Si no le llega, copia el enlace y envíaselo por otro medio.</span><span class="mono" style="font-size:12px;word-break:break-all">tickets-eql4e.ddns.net/activar?codigo=K7QF…WZ8D</span><button class="btn sm sec" style="align-self:flex-start"><svg class="i"><use href="#i-copy"/></svg>Copiar enlace</button></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div></div>
+    </figure>
+
+    <figure class="screen wide" id="t-conceptos">
+      <figcaption><b>Conceptos</b><span class="hu">HU-G04</span><span>Un concepto con tickets no se borra, se desactiva: deja de ofrecerse pero los tickets antiguos lo conservan.</span></figcaption>
+      <div class="desk-scroll"><div class="desk">
+        <div class="chrome"><div class="dots"><i></i><i></i><i></i></div><div class="url">tickets-eql4e.ddns.net/gestion/conceptos</div></div>
+        <div class="dbody" style="min-height:460px">
+          <aside class="side">
+            <div class="brand"><span class="lg" aria-hidden="true"></span><b>EQL4E Tickets</b></div>
+            <span class="nav" data-go="t-listado"><svg class="i"><use href="#i-receipt"/></svg>Tickets<span class="count">3</span></span>
+            <span class="nav"><svg class="i"><use href="#i-euro"/></svg>Registrar pago</span>
+            <span class="nav" data-go="t-usuarios"><svg class="i"><use href="#i-users"/></svg>Usuarios</span>
+            <span class="nav on"><svg class="i"><use href="#i-tag"/></svg>Conceptos</span>
+            <hr><span class="nav"><svg class="i"><use href="#i-camera"/></svg>Mis tickets</span>
+            <div class="who"><b>Elena Navarro</b><br><span class="muted">Tesorera · Salir</span></div>
+          </aside>
+          <div class="main" style="max-width:720px">
+            <div class="mhead"><h2>Conceptos</h2></div>
+            <p class="muted">El orden de esta lista es el que ven los socios al enviar un ticket. «Otro…» siempre aparece al final.</p>
+            <table class="tbl">
+              <thead><tr><th></th><th>Concepto</th><th class="r">Tickets</th><th>Activo</th><th></th></tr></thead>
+              <tbody>
+                <tr><td><svg class="i muted"><use href="#i-grip"/></svg></td><td><b>Ferretería</b></td><td class="r money">41</td><td><span class="toggle on"></span></td><td><button class="link">Renombrar</button></td></tr>
+                <tr><td><svg class="i muted"><use href="#i-grip"/></svg></td><td><b>Alimentación</b></td><td class="r money">63</td><td><span class="toggle on"></span></td><td><button class="link">Renombrar</button></td></tr>
+                <tr><td><svg class="i muted"><use href="#i-grip"/></svg></td><td><b>Representación</b></td><td class="r money">12</td><td><span class="toggle on"></span></td><td><button class="link">Renombrar</button></td></tr>
+                <tr><td><svg class="i muted"><use href="#i-grip"/></svg></td><td><b>Transporte</b></td><td class="r money">28</td><td><span class="toggle on"></span></td><td><button class="link">Renombrar</button></td></tr>
+                <tr><td><svg class="i muted"><use href="#i-grip"/></svg></td><td class="muted">Imprenta <span style="font-size:12px">(ejemplo de desactivado)</span></td><td class="r money muted">5</td><td><span class="toggle"></span></td><td><button class="link">Renombrar</button></td></tr>
+              </tbody>
+            </table>
+            <div class="hstack"><div class="input" style="flex:1"><span class="ph">Nombre del nuevo concepto</span></div><button class="btn"><svg class="i"><use href="#i-plus"/></svg>Añadir</button></div>
+          </div>
+        </div>
+      </div></div>
+    </figure>
+
+  </div>
+</section>
+
+<!-- ============================ TESORERO MÓVIL ============================ -->
+<section id="tesorero-movil" class="wrap" hidden>
+  <div class="intro">
+    <h2>Tesorero · móvil</h2>
+    <p class="muted">La gestión también se puede hacer desde el móvil. La tabla pasa a ser una lista y los filtros se abren en una hoja inferior. Por debajo de 1024 px de ancho se usa esta versión.</p>
+  </div>
+  <div class="screens">
+    <figure class="screen" id="m-listado">
+      <figcaption><b>Tickets</b><span class="hu">HU-T01</span><span>Los totales por estado se pueden pulsar y funcionan como filtro rápido.</span></figcaption>
+      <div class="phone">
+        <div class="sbar"><span>9:41</span><span>4G</span></div>
+        <div class="appbar"><span class="lg logo" aria-hidden="true"></span><b>Tickets</b><button class="iconbtn" aria-label="Ordenar"><svg class="i"><use href="#i-sort"/></svg></button><button class="iconbtn" aria-label="Filtros"><svg class="i"><use href="#i-filter"/></svg></button></div>
+        <div class="pbody">
+          <div class="chips scroll">
+            <span class="badge lg b-pa"><svg class="i"><use href="#i-clock"/></svg>3 · 99,55 €</span>
+            <span class="badge lg b-pp"><svg class="i"><use href="#i-euro"/></svg>3 · 180,75 €</span>
+            <span class="badge lg b-rj"><svg class="i"><use href="#i-x"/></svg>1 · 35,00 €</span>
+          </div>
+          <div class="list">
+            <div class="item"><div class="t1"><span class="name">Marta Gil</span><span class="num">T-000148</span></div><span class="amt">23,45 €</span><span class="t2">Ferretería · 02/11</span><span class="badge b-pa"><svg class="i"><use href="#i-clock"/></svg>Pend. autorizar</span></div>
+            <div class="item" data-go="m-detalle"><div class="t1"><span class="name">Javier Ortega</span><span class="num">T-000150</span></div><span class="amt">64,10 €</span><span class="t2">Alimentación · 03/11</span><span class="badge b-pa"><svg class="i"><use href="#i-clock"/></svg>Pend. autorizar</span></div>
+            <div class="item"><div class="t1"><span class="name">Elena Navarro <span class="own"><svg class="i"><use href="#i-lock"/></svg>tuyo</span></span><span class="num">T-000151</span></div><span class="amt">12,00 €</span><span class="t2">Transporte · 03/11</span><span class="badge b-pa"><svg class="i"><use href="#i-clock"/></svg>Pend. autorizar</span></div>
+            <div class="item"><div class="t1"><span class="name">Marta Gil</span><span class="num">T-000139</span></div><span class="amt">41,80 €</span><span class="t2">Alimentación · 25/10</span><span class="badge b-pp"><svg class="i"><use href="#i-euro"/></svg>Pend. pago</span></div>
+            <div class="item"><div class="t1"><span class="name">Marta Gil</span><span class="num">T-000142</span></div><span class="amt">18,95 €</span><span class="t2">Ferretería · 28/10</span><span class="badge b-pp"><svg class="i"><use href="#i-euro"/></svg>Pend. pago</span></div>
+          </div>
+        </div>
+        <div class="bnav"><span class="on"><svg class="i"><use href="#i-receipt"/></svg>Tickets</span><span><svg class="i"><use href="#i-euro"/></svg>Pago</span><span><svg class="i"><use href="#i-users"/></svg>Usuarios</span><span><svg class="i"><use href="#i-menu"/></svg>Más</span></div>
+      </div>
+    </figure>
+
+    <figure class="screen" id="m-detalle">
+      <figcaption><b>Revisar ticket</b><span class="hu">HU-T02 · T03 · T04</span><span>La foto se abre a pantalla completa al pulsarla. Las acciones quedan fijas abajo.</span></figcaption>
+      <div class="phone">
+        <div class="sbar"><span>9:41</span><span>4G</span></div>
+        <div class="appbar"><button class="iconbtn" aria-label="Volver" data-go="m-listado"><svg class="i"><use href="#i-back"/></svg></button><b style="font-family:var(--f-mono);font-size:17px">T-000150</b><span class="badge b-pa"><svg class="i"><use href="#i-clock"/></svg>Pend. autorizar</span></div>
+        <div class="pbody">
+          <div class="viewer" style="padding:10px"><div class="receipt" style="font-size:9px;width:230px;padding:12px 14px 16px">  AUTOSERVICIO LA PLAZA
+ 03/11/2026 19:58  Caja 2
+--------------------------
+AGUA 1,5L  x6        3,90
+REFRESCO COLA  x12   9,48
+CERVEZA SIN  x24    16,80
+PATATAS FRITAS  x6   8,94
+…
+--------------------------
+TOTAL               64,10</div><span class="muted" style="font-size:12px">Foto 1 de 2 · pulsa para ampliar</span></div>
+          <dl class="dl">
+            <dt>Socio</dt><dd>Javier Ortega</dd>
+            <dt>Importe</dt><dd class="money">64,10 €</dd>
+            <dt>Compra</dt><dd class="money">03/11/2026</dd>
+            <dt>Concepto</dt><dd>Alimentación</dd>
+          </dl>
+        </div>
+        <div class="pfoot" style="flex-direction:row"><button class="btn danger" style="flex:1">Rechazar…</button><button class="btn" style="flex:1.4"><svg class="i"><use href="#i-check"/></svg>Autorizar</button></div>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<!-- ============================ GUÍA ============================ -->
+<section id="guia" class="wrap" hidden>
+  <div class="intro">
+    <h2>Guía visual</h2>
+    <p class="muted">El logo es en blanco y negro, así que la marca también lo es: la tinta del logo es el color de los botones principales y de la navegación. El color se reserva para los estados, de modo que el estado de un ticket se distingue de un vistazo y nunca compite con la marca.</p>
+  </div>
+  <div class="guide">
+    <div class="gcard">
+      <h3>Estados del ticket</h3>
+      <p class="muted" style="font-size:14px">Cada estado lleva color, icono y texto, para que no dependa solo del color (accesibilidad).</p>
+      <div class="states">
+        <div><span class="badge lg b-pa"><svg class="i"><use href="#i-clock"/></svg>Pend. autorizar</span><span>Hay que revisarlo. Ámbar: requiere acción.</span></div>
+        <div><span class="badge lg b-pp"><svg class="i"><use href="#i-euro"/></svg>Pend. pago</span><span>Autorizado; se debe dinero al socio.</span></div>
+        <div><span class="badge lg b-pg"><svg class="i"><use href="#i-check"/></svg>Pagado</span><span>Cerrado con éxito.</span></div>
+        <div><span class="badge lg b-rj"><svg class="i"><use href="#i-x"/></svg>Rechazado</span><span>El socio debe corregirlo o anularlo.</span></div>
+        <div><span class="badge lg b-an"><svg class="i"><use href="#i-slash"/></svg>Anulado</span><span>Retirado por el socio. Final.</span></div>
+      </div>
+    </div>
+    <div class="gcard">
+      <h3>Tipografía</h3>
+      <div class="typo stack">
+        <div><span style="font-family:var(--f-display);font-size:26px;font-weight:700">Bricolage Grotesque</span><small>Títulos de pantalla y de sección. Solo en titulares.</small></div>
+        <div><span style="font-size:17px">Atkinson Hyperlegible: diseñada para lectura fácil, con letras que no se confunden (I l 1, 0 O).</span><small>Texto, formularios y botones. Pensada para socios de cualquier edad.</small></div>
+        <div><span class="mono" style="font-size:17px">T-000150 · 1.234,56 € · 03/11/2026</span><small>IBM Plex Mono: números de ticket, importes y fechas. Cifras de ancho fijo para que las columnas cuadren, como en un ticket de caja.</small></div>
+      </div>
+    </div>
+    <div class="gcard">
+      <h3>Formatos</h3>
+      <dl class="fmt">
+        <dt>Importe</dt><dd>1.234,56 €</dd>
+        <dt>Fecha</dt><dd>04/11/2026</dd>
+        <dt>Fecha y hora</dt><dd>04/11/2026 20:41</dd>
+        <dt>Número de ticket</dt><dd>T-000150</dd>
+        <dt>Teléfono</dt><dd>+34 612 345 678</dd>
+        <dt>CSV</dt><dd>separador ; · coma decimal · UTF-8 con BOM</dd>
+      </dl>
+    </div>
+    <div class="gcard">
+      <h3>Botones</h3>
+      <div class="hstack"><button class="btn">Principal</button><button class="btn sec">Secundario</button><button class="btn danger">Peligro</button><button class="btn danger fill">Confirmar peligro</button><button class="btn off">Desactivado</button></div>
+      <p class="muted" style="font-size:14px">Un solo botón principal por pantalla. En móvil, la acción principal va abajo y a todo el ancho. Las acciones irreversibles (anular, rechazar, deshacer) piden confirmación en la propia página.</p>
+    </div>
+  </div>
+  <div class="gcard" style="margin-top:24px">
+    <h3>Mensajes clave</h3>
+    <div class="msgs-wrap"><table class="msgs">
+      <thead><tr><th>Situación</th><th>Texto</th></tr></thead>
+      <tbody>
+        <tr><td>Error al entrar</td><td>Teléfono o contraseña incorrectos.</td></tr>
+        <tr><td>Bloqueo por intentos</td><td>Demasiados intentos fallidos. Vuelve a intentarlo dentro de 15 minutos.</td></tr>
+        <tr><td>Código no válido</td><td>Este código de invitación no es válido o ha caducado. Pide uno nuevo a un tesorero.</td></tr>
+        <tr><td>Ticket enviado</td><td>Ticket T-000148 enviado. Puedes seguir su estado en Mis tickets.</td></tr>
+        <tr><td>Sin conexión</td><td>No se ha podido enviar. No hay conexión. Tus datos y fotos siguen guardados en este móvil; reintenta cuando tengas cobertura.</td></tr>
+        <tr><td>Fichero no admitido</td><td>«factura.docx» no es una imagen ni un PDF. Sube una foto o un PDF.</td></tr>
+        <tr><td>Fichero demasiado grande</td><td>«extracto.pdf» pesa 14 MB. El máximo es 10 MB por fichero.</td></tr>
+        <tr><td>Cambio concurrente</td><td>Pablo Serrano ha autorizado este ticket hace un momento. Hemos actualizado la pantalla: revisa su estado antes de seguir.</td></tr>
+        <tr><td>Ticket propio</td><td>Es tu propio ticket. Debe autorizarlo, rechazarlo o pagarlo otro tesorero.</td></tr>
+        <tr><td>Email no enviado</td><td>No se ha podido enviar el email. Copia el enlace de activación y envíaselo por otro medio.</td></tr>
+        <tr><td>Último tesorero</td><td>No puedes quitar el rol de tesorero: es el único tesorero activo.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+</main>
+
+<script>
+(function(){
+  var TABS=['mapa','socio','tesorero','tesorero-movil','guia'];
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function show(id){
+    TABS.forEach(function(t){
+      document.getElementById(t).hidden=(t!==id);
+      var b=document.querySelector('.tab[data-tab="'+t+'"]');
+      b.setAttribute('aria-selected',t===id?'true':'false');
+    });
+  }
+  function go(target){
+    var el=document.getElementById(target); if(!el) return;
+    var sec=el.closest('section'); if(sec) show(sec.id);
+    if(el.tagName==='FIGURE'){
+      el.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});
+      el.classList.add('flash'); setTimeout(function(){el.classList.remove('flash')},1400);
+    } else window.scrollTo(0,0);
+    try{history.replaceState(null,'','#'+target)}catch(e){}
+  }
+  document.querySelectorAll('.tab').forEach(function(b){
+    b.addEventListener('click',function(){go(b.dataset.tab)});
+  });
+  document.addEventListener('click',function(e){
+    var t=e.target.closest('[data-go]'); if(!t) return;
+    e.preventDefault(); go(t.dataset.go);
+  });
+  var h=(location.hash||'').slice(1);
+  if(h&&document.getElementById(h)) go(h); else show('socio');
+})();
+</script>
