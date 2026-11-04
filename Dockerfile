@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # Imagen de eql4e-tickets (ADR-0006): compilación en varias etapas, ejecución sin privilegios.
 
-FROM node:24-bookworm-slim AS base
+FROM node:26-bookworm-slim AS base
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
 RUN corepack enable
@@ -21,7 +21,7 @@ COPY . .
 RUN pnpm build
 
 # Ejecución.
-FROM node:24-bookworm-slim
+FROM node:26-bookworm-slim
 ENV NODE_ENV=production \
 	HOST=0.0.0.0 \
 	PORT=3000 \
