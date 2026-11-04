@@ -135,9 +135,9 @@
 - Datos iniciales: *Ferretería*, *Alimentación*, *Representación*, *Transporte*.
 
 ### HU-G05 · Purga de tickets antiguos [S]
-**Como** asociación **quiero** que los tickets se eliminen pasados 5 años **para** cumplir el periodo máximo de conservación (RNF-22).
+**Como** asociación **quiero** que los tickets se eliminen pasados 18 meses **para** cumplir el periodo máximo de conservación (RNF-22).
 
-- Un proceso automático (mensual) elimina **definitivamente** los tickets en estado *Pagado*, *Rechazado* o *Anulado* cuya **fecha de compra** tenga más de 5 años: datos, ficheros e historial.
+- Un proceso automático (mensual) elimina **definitivamente** los tickets en estado *Pagado*, *Rechazado* o *Anulado* cuya **fecha de compra** tenga más de 18 meses: datos, ficheros e historial.
 - Un Pago se elimina cuando ya no le queda ningún ticket, junto con su justificante.
 - Los tickets en *Pendiente de autorizar* o *Pendiente de pago* **no** se eliminan; aparecen en un aviso al tesorero para que los resuelva.
 - Cada ejecución queda registrada en el log con el número de tickets eliminados, sin datos personales.

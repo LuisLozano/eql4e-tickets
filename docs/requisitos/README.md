@@ -24,6 +24,6 @@ Aplicación para que los socios de la asociación envíen tickets de compra y lo
 9. Repositorio: `github.com/LuisLozano/eql4e-tickets` (público). Nunca se suben secretos: van en un `.env` excluido de git, con un `.env.example` de muestra.
 10. Separación de funciones: un tesorero no actúa sobre sus propios tickets (R-04).
 11. El concepto es obligatorio. Conceptos iniciales: Ferretería, Alimentación, Representación y Transporte.
-12. Volumen: menos de 200 usuarios y menos de 5.000 tickets al año. Los tickets se conservan **como máximo 5 años** y después se purgan.
+12. Volumen: menos de 200 usuarios y menos de 5.000 tickets al año. Los tickets se conservan **como máximo 18 meses (1,5 años)** y después se purgan.
 13. Añadidos aceptados: estado *Anulado*, fecha de compra y observaciones, de 1 a 5 ficheros (imagen o PDF), deshacer de un solo paso, contraseña en lugar de PIN.
 14. El proveedor de email se decide en la Tarea 2.

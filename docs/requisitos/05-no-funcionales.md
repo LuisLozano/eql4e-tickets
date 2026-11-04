@@ -7,7 +7,7 @@
 - **RNF-01** Una sola aplicación web **PWA responsive**: instalable en el móvil desde el navegador. La parte de socio está pensada primero para móvil; la de tesorero, para ordenador (≥ 1280 px) y usable en móvil.
 - **RNF-02** Navegadores soportados: las dos últimas versiones de Chrome/Edge, Firefox y Safari (iOS ≥ 16, Android ≥ 10).
 - **RNF-03** Idioma: español. Moneda: EUR. Zona horaria: Europe/Madrid.
-- **RNF-04** Volumen esperado: menos de 200 usuarios y menos de 5.000 tickets al año. Con la conservación de 5 años (RNF-22) habrá como máximo unos 25.000 tickets vivos y unos 15–25 GB de ficheros.
+- **RNF-04** Volumen esperado: menos de 200 usuarios y menos de 5.000 tickets al año. Con la conservación de 18 meses (RNF-22) habrá como máximo unos 7.500 tickets vivos y unos 5–8 GB de ficheros.
 
 ## Seguridad
 
@@ -24,7 +24,7 @@
 
 - **RNF-20** Datos personales mínimos: nombre, teléfono y email. Las imágenes de tickets y los justificantes pueden contener datos personales y bancarios parciales.
 - **RNF-21** Texto informativo de privacidad en la pantalla de activación. La asociación es la responsable del tratamiento.
-- **RNF-22** Periodo de conservación: **máximo 5 años** desde la fecha de compra del ticket. Pasado ese plazo se eliminan de forma automática y definitiva (HU-G05). Las copias de seguridad deben tener una retención igual o menor, para no conservar datos ya purgados.
+- **RNF-22** Periodo de conservación: **máximo 18 meses** desde la fecha de compra del ticket. *Aviso: es inferior a los plazos habituales de conservación de justificantes de gasto (4 años, prescripción tributaria). La asociación debe confirmar que la app no es su archivo contable o que exporta los justificantes antes de la purga.* Pasado ese plazo se eliminan de forma automática y definitiva (HU-G05). Las copias de seguridad deben tener una retención igual o menor, para no conservar datos ya purgados.
 - **RNF-23** No se envían datos a servicios de terceros, salvo el proveedor de email para invitaciones y restablecimientos.
 
 ## Fiabilidad y operación

@@ -30,7 +30,7 @@ Todo lo marcado **[M]** forma el MVP: con ello la asociación puede dejar de ges
 | — | ***Línea del MVP*** | | |
 | 20 | HU-T07 Exportar CSV | S | S3 |
 | 21 | HU-A04 He olvidado mi contraseña | S | S4 |
-| 22 | HU-G05 Purga de tickets de más de 5 años | S | S4 |
+| 22 | HU-G05 Purga de tickets de más de 18 meses | S | S4 |
 | 23 | HU-T03 Autorización múltiple | C | S4 |
 
 ## Siguientes versiones (fuera de la v1)
