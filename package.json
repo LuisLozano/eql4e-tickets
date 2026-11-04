@@ -62,7 +62,7 @@
 	"packageManager": "pnpm@12.16.1",
 	"dependencies": {
 		"drizzle-orm": "^0.45.2",
-		"postgres": "^3.4.9",
+		"postgres": "^4.0.0",
 		"zod": "^4.6.7"
 	}
 }
