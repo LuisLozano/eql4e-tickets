@@ -1,6 +1,6 @@
 # ADR-0006 · Despliegue e integración con el Caddy existente
 
-- **Estado**: Aceptada (con verificaciones pendientes en la Tarea 4)
+- **Estado**: Aceptada (verificaciones hechas el 2026-11-04)
 - **Fecha**: 2026-11-04
 
 ## Contexto (observado en la máquina)
@@ -35,7 +35,10 @@
 - **Carpeta de despliegue**: `/opt/eql4e-tickets`, con `compose.yaml`, `desplegar.sh` y `.env` (propiedad de root, permisos 600). Separada de la copia de desarrollo para que un cambio local nunca afecte a producción.
 - **Volver a una versión anterior**: `ETIQUETA=<sha corto>` en `.env` y `sudo ./desplegar.sh`. Las migraciones solo avanzan, así que volver atrás tras una migración incompatible exige restaurar copia.
 
-## Verificaciones pendientes (Tarea 4)
+## Verificaciones (Tarea 4, hechas el 2026-11-04)
+
+> Resultado: Caddy es el contenedor `salazar-https-caddy-1` (compose en `/home/luis/salazar/https`, red del host), así que llega a `127.0.0.1:3080` sin cambios. `tickets-eql4e.ddns.net` resuelve a la misma IP que `yaroki` y Let's Encrypt emitió el certificado sin problemas. El procedimiento completo está en el [manual de despliegue](../../../deploy/README.md).
+
 
 1. Dónde está el `Caddyfile` y cómo se recarga (¿contenedor? ¿qué compose?).
 2. Que el puerto 443 de `tickets-eql4e.ddns.net` llega a esta máquina: crear el nombre DDNS con la misma IP pública y comprobar la redirección del router, que debería ser la misma que la de `yaroki`.

@@ -14,7 +14,8 @@ eql4e-tickets/
 │   ├── .env.example                # variables documentadas, sin secretos
 │   ├── compose.dev.yaml            # PostgreSQL de desarrollo (127.0.0.1:5436)
 │   ├── Caddyfile.snippet           # bloque para el Caddy existente
-│   └── desplegar.sh                # pull + up -d + comprobación de salud
+│   ├── desplegar.sh                # pull + up -d + comprobación de salud
+│   └── README.md                   # manual de despliegue y operación
 ├── scripts/migrar.js               # aplica las migraciones (entrypoint y pruebas)
 ├── drizzle/                        # migraciones SQL generadas y versionadas
 ├── src/
