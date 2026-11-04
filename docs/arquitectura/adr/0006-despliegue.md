@@ -37,7 +37,19 @@
 
 1. Dónde está el `Caddyfile` y cómo se recarga (¿contenedor? ¿qué compose?).
 2. Que el puerto 443 de `tickets-eql4e.ddns.net` llega a esta máquina: crear el nombre DDNS con la misma IP pública y comprobar la redirección del router, que debería ser la misma que la de `yaroki`.
-3. Acceso de `luis` a Docker: grupo `docker` (equivale a root en la máquina) o despliegue con `sudo`. Hay que decidirlo.
+3. Acceso a Docker en la máquina: ver la sección siguiente.
+
+## Acceso a Docker: `sudo` (decidido 2026-11-04)
+
+`luis` **no** se añade al grupo `docker`. El despliegue y la operación en producción se hacen con `sudo docker compose …`.
+
+Impacto y cómo se resuelve:
+
+| Impacto | Solución |
+|---|---|
+| Las pruebas de integración con Testcontainers necesitan Docker sin `sudo` | En local, se usa un PostgreSQL de desarrollo (`deploy/compose.dev.yaml`, levantado con `sudo`) y las pruebas lo detectan con `TEST_DATABASE_URL`, con una base de datos por ejecución. **En la CI** se usa Testcontainers sin restricciones. *Alternativa a valorar:* Docker *rootless* para `luis`, que da Docker sin `sudo` y sin equivaler a root. |
+| El asistente (Claude) no puede ejecutar `sudo` porque pide contraseña | Los comandos con `sudo` (despliegue, logs, recargar Caddy) los ejecuta el usuario en su terminal; el asistente los prepara. |
+| Los volúmenes y ficheros creados por los contenedores son de root o del UID del contenedor | Se usan volúmenes con nombre, no carpetas montadas del home, así que no hay conflictos de permisos con `luis`. |
 
 ## Alternativas descartadas
 

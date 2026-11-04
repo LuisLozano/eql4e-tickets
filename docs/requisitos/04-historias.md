@@ -61,6 +61,7 @@
 
 ### HU-S04 · Editar un ticket pendiente [M]
 - **Dado** un ticket mío en *Pendiente de autorizar*, puedo cambiar ficheros, importe, fecha, concepto y observaciones. El cambio queda en el historial.
+- Los ficheros sustituidos **no se borran**: dejan de mostrarse en el ticket, pero siguen accesibles desde el historial (para el socio y el tesorero) hasta la purga.
 - **Dado** que un tesorero lo ha autorizado o rechazado mientras yo editaba, **entonces** al guardar se me avisa y no se aplica (E-04).
 
 ### HU-S05 · Anular un ticket [M]
@@ -68,7 +69,7 @@
 
 ### HU-S06 · Corregir y reenviar un ticket rechazado [M]
 - **Dado** un ticket mío *Rechazado*, puedo modificar sus datos y ficheros y **reenviarlo**; vuelve a *Pendiente de autorizar*.
-- El historial conserva el rechazo anterior y su motivo.
+- El historial conserva el rechazo anterior, su motivo y los ficheros sustituidos.
 
 ---
 

@@ -74,6 +74,8 @@ erDiagram
         text tipo_mime
         int tamano_bytes
         int orden
+        timestamptz sustituido_en "null = vigente"
+        uuid sustituido_por FK "usuario"
     }
     pago {
         uuid id PK
@@ -129,6 +131,7 @@ erDiagram
 - **Ordenar por concepto**: `COALESCE(concepto.nombre, ticket.concepto_otro)`.
 - **El motivo de rechazo** está en `ticket` (el último, para mostrarlo con facilidad) y en `historial` (todos).
 - **El pago anulado no se borra** (E-03): sus tickets vuelven a `pendiente_pago` con `pago_id = NULL`. El pago queda con `anulado_en` y el historial de cada ticket apunta a él.
-- **Ficheros reemplazados al editar o reenviar**: se borran del disco. El historial guarda en `cambios` los nombres originales, no el contenido. *Consecuencia aceptada*: no se conserva la foto que motivó un rechazo una vez corregida.
+- **Ficheros sustituidos al editar o reenviar**: **no se borran**. La fila se marca con `sustituido_en` y `sustituido_por`, y el fichero sigue en el disco. El ticket muestra solo los vigentes (`sustituido_en IS NULL`); el historial enlaza los sustituidos, así que el tesorero puede ver la foto que motivó un rechazo. Solo la purga (HU-G05) los elimina.
+- **Al menos un fichero vigente por ticket**: se valida en el servicio, porque no se puede expresar con un `CHECK`.
 - **`numero` visible** (`T-000123`): se genera con una secuencia. Es lo que se usa para hablar de un ticket ("el T-123"); nunca se expone el UUID en la interfaz.
 - **Un socio dado de baja** conserva sus tickets y aparece como "(baja)" en los listados.

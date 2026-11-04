@@ -1,6 +1,6 @@
 # ADR-0004 · Envío de email
 
-- **Estado**: **Propuesta** (pendiente de confirmar la cuenta)
+- **Estado**: Aceptada (2026-11-04)
 - **Fecha**: 2026-11-04
 
 ## Contexto
@@ -18,7 +18,7 @@
 | Requisitos | Cuenta de Gmail con verificación en dos pasos + contraseña de aplicación | Alta en Brevo + clave SMTP |
 | Límite | ~500 al día | 300 al día |
 
-## Decisión propuesta
+## Decisión
 
 **SMTP de una cuenta de Gmail de la asociación** con contraseña de aplicación, mediante **Nodemailer**.
 
@@ -27,6 +27,8 @@
 - El envío es **síncrono** dentro de la acción. Si falla, el alta se guarda igualmente y el tesorero ve el aviso con el enlace para copiarlo (HU-G02). No hace falta cola con este volumen.
 - Si en el futuro la asociación tiene dominio propio, se cambia a Brevo o similar solo con configuración.
 
-## Pendiente
+## Configuración por entorno
 
-- ¿La asociación tiene una cuenta de Gmail (u otro correo con SMTP) que se pueda usar? Si no, la opción es crear una.
+- **Producción**: la cuenta de Gmail de la asociación (confirmado que existe).
+- **Pruebas manuales**: cualquier cuenta, por ejemplo la personal del desarrollador, cambiando solo las variables `SMTP_*` del `.env` local. Ninguna cuenta está escrita en el código.
+- **Desarrollo y pruebas automáticas**: `CORREO_MODO=consola`, que nunca envía correos reales.
