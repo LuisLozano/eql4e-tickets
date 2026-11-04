@@ -1,6 +1,6 @@
 # Diseño · eql4e-tickets
 
-> Estado: **v0.1 en revisión** · 2026-11-04
+> Estado: **v1.0 aprobada** · 2026-11-04
 
 - **Bocetos navegables**: [bocetos.html](bocetos.html). Se ven mejor publicados como artifact (enlace en la conversación de la Tarea 3).
 - **Logo**: [../imagenes/eql4e.png](../imagenes/eql4e.png)
