@@ -1,0 +1,5 @@
+# Bloque para el Caddy existente (ADR-0006). No toca el de yaroki.ddns.net.
+tickets-eql4e.ddns.net {
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:3080
+}

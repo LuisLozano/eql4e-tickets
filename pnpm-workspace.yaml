@@ -1,0 +1,7 @@
+allowBuilds:
+  esbuild: true
+  # Compilaciones nativas opcionales de ssh2 (lo usa Testcontainers); no hacen falta.
+  cpu-features: false
+  protobufjs: false
+  ssh2: false
+engineStrict: true

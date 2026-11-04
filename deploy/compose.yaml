@@ -1,0 +1,49 @@
+# Producción (ADR-0006). Uso: sudo ./desplegar.sh
+# La app solo escucha en 127.0.0.1:3080; el Caddy existente la publica en tickets-eql4e.ddns.net.
+name: eql4e
+
+services:
+  app:
+    image: ghcr.io/luislozano/eql4e-tickets:${ETIQUETA:-latest}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgres://eql4e:${POSTGRES_PASSWORD}@db:5432/eql4e
+      # Detrás de Caddy: IP real del cliente y protocolo original (para CSRF).
+      ADDRESS_HEADER: X-Forwarded-For
+      XFF_DEPTH: '1'
+      PROTOCOL_HEADER: X-Forwarded-Proto
+    ports:
+      - 127.0.0.1:3080:3000
+    volumes:
+      - ficheros:/data/ficheros
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: eql4e
+      POSTGRES_DB: eql4e
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Falta POSTGRES_PASSWORD en .env}
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U eql4e -d eql4e]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # Sin puertos publicados: solo accesible desde la red interna del compose.
+
+volumes:
+  pgdata:
+    name: eql4e_pgdata
+  ficheros:
+    name: eql4e_ficheros

@@ -1,0 +1,101 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+
+/* Fuentes alojadas en la propia app (RNF-23): solo latín y latín extendido. */
+@import '@fontsource-variable/bricolage-grotesque/opsz.css';
+@import '@fontsource/atkinson-hyperlegible/latin-400.css';
+@import '@fontsource/atkinson-hyperlegible/latin-700.css';
+@import '@fontsource/ibm-plex-mono/latin-400.css';
+@import '@fontsource/ibm-plex-mono/latin-500.css';
+@import '@fontsource/ibm-plex-mono/latin-600.css';
+
+/*
+ * Tema de la guía visual (docs/diseno/bocetos.html).
+ * La marca es la tinta del logo; el color se reserva para los estados del ticket.
+ */
+:root {
+	--paper: #eef0f2;
+	--surface: #ffffff;
+	--sunken: #f6f7f8;
+	--ink: #15171b;
+	--on-ink: #ffffff;
+	--muted: #5a616b;
+	--line: #d9dde2;
+	--focus: #2f6fde;
+	--scrim: rgb(15 17 20 / 0.48);
+	--pa: #9a4a00; /* pendiente de autorizar */
+	--pa-bg: #fdf0d5;
+	--pp: #1f4fbf; /* pendiente de pago */
+	--pp-bg: #e1ebff;
+	--pg: #1d7a3e; /* pagado */
+	--pg-bg: #dcf3e3;
+	--rj: #b4232a; /* rechazado */
+	--rj-bg: #fde4e4;
+	--an: #5f6670; /* anulado */
+	--an-bg: #eceef1;
+	--receipt: #fffdf7;
+	--receipt-ink: #26231e;
+	color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) {
+		--paper: #0f1114;
+		--surface: #1a1d22;
+		--sunken: #14171b;
+		--ink: #eef0f3;
+		--on-ink: #15171b;
+		--muted: #a0a7b1;
+		--line: #2d323a;
+		--focus: #7aa7ff;
+		--scrim: rgb(0 0 0 / 0.6);
+		--pa: #f6c25b;
+		--pa-bg: #3a2b0c;
+		--pp: #9dbcff;
+		--pp-bg: #16274d;
+		--pg: #7fd9a0;
+		--pg-bg: #123222;
+		--rj: #ff9b9b;
+		--rj-bg: #421718;
+		--an: #bcc2ca;
+		--an-bg: #2a2e35;
+		color-scheme: dark;
+	}
+}
+
+@theme inline {
+	--color-paper: var(--paper);
+	--color-surface: var(--surface);
+	--color-sunken: var(--sunken);
+	--color-ink: var(--ink);
+	--color-on-ink: var(--on-ink);
+	--color-muted: var(--muted);
+	--color-line: var(--line);
+	--color-focus: var(--focus);
+	--color-scrim: var(--scrim);
+	--color-pa: var(--pa);
+	--color-pa-bg: var(--pa-bg);
+	--color-pp: var(--pp);
+	--color-pp-bg: var(--pp-bg);
+	--color-pg: var(--pg);
+	--color-pg-bg: var(--pg-bg);
+	--color-rj: var(--rj);
+	--color-rj-bg: var(--rj-bg);
+	--color-an: var(--an);
+	--color-an-bg: var(--an-bg);
+	--color-receipt: var(--receipt);
+	--color-receipt-ink: var(--receipt-ink);
+
+	--font-display: 'Bricolage Grotesque Variable', 'Segoe UI', system-ui, sans-serif;
+	--font-sans: 'Atkinson Hyperlegible', 'Segoe UI', system-ui, sans-serif;
+	--font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+
+@layer base {
+	body {
+		@apply bg-paper font-sans text-ink antialiased;
+	}
+	:focus-visible {
+		@apply outline-2 outline-offset-2 outline-focus;
+	}
+}

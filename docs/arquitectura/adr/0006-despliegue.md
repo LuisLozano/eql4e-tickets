@@ -31,7 +31,9 @@
 - **Arranque**: un *entrypoint* aplica las migraciones y después arranca el servidor.
 - **Tareas programadas** (purga mensual y huérfanos diaria): dentro de la app con `croner`, protegidas con un *advisory lock* de PostgreSQL para que nunca se ejecuten dos a la vez.
 - **Imágenes**: la CI construye y publica la imagen en **GitHub Container Registry** (`ghcr.io/luislozano/eql4e-tickets`). El despliegue en la máquina es `docker compose pull && docker compose up -d`, lanzado manualmente o con un script. La máquina **no** abre ningún puerto a GitHub (no hay despliegue empujado).
-- **Configuración**: un fichero `.env` en la máquina, excluido de git, con `.env.example` documentado en el repositorio.
+- **Configuración**: un fichero `.env` en la máquina, excluido de git, con `deploy/.env.example` documentado en el repositorio.
+- **Carpeta de despliegue**: `/opt/eql4e-tickets`, con `compose.yaml`, `desplegar.sh` y `.env` (propiedad de root, permisos 600). Separada de la copia de desarrollo para que un cambio local nunca afecte a producción.
+- **Volver a una versión anterior**: `ETIQUETA=<sha corto>` en `.env` y `sudo ./desplegar.sh`. Las migraciones solo avanzan, así que volver atrás tras una migración incompatible exige restaurar copia.
 
 ## Verificaciones pendientes (Tarea 4)
 
