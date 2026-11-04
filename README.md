@@ -2,7 +2,7 @@
 
 Aplicación web (PWA *responsive*) para que los socios de la asociación envíen los tickets de sus compras y los tesoreros los autoricen y registren su pago.
 
-> Estado: **en construcción**. Requisitos, arquitectura y diseño aprobados (v1.0). Esqueleto e infraestructura (Tarea 4) en marcha.
+> Estado: **en construcción**. Requisitos, arquitectura y diseño aprobados (v1.0). Esqueleto e infraestructura (Tarea 4) desplegados en https://tickets-eql4e.ddns.net.
 
 ## Documentación
 
@@ -37,7 +37,7 @@ pnpm dev
 
 ## Despliegue
 
-Cada *push* a `main` que pasa la CI publica `ghcr.io/luislozano/eql4e-tickets`. En la máquina: `cd /opt/eql4e-tickets && sudo ./desplegar.sh`. Detalles en [ADR-0006](docs/arquitectura/adr/0006-despliegue.md).
+Cada *push* a `main` que pasa la CI publica `ghcr.io/luislozano/eql4e-tickets`. En la máquina: `cd /opt/eql4e-tickets && sudo ./desplegar.sh`. Instalación, actualización, logs y vuelta atrás: [manual de despliegue](deploy/README.md). Decisiones: [ADR-0006](docs/arquitectura/adr/0006-despliegue.md).
 
 ## Licencia
 
