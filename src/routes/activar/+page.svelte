@@ -3,6 +3,7 @@
 	import Aviso from '#lib/componentes/Aviso.svelte';
 	import Boton from '#lib/componentes/Boton.svelte';
 	import Campo from '#lib/componentes/Campo.svelte';
+	import CampoTelefono from '#lib/componentes/CampoTelefono.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -32,13 +33,10 @@
 			bind:value={$form.codigo}
 			errores={$errors.codigo}
 		/>
-		<Campo
+		<CampoTelefono
 			etiqueta="Teléfono"
 			name="telefono"
-			type="tel"
-			inputmode="tel"
 			autocomplete="tel"
-			placeholder="612 345 678"
 			ayuda="El mismo que dio la asociación al darte de alta."
 			bind:value={$form.telefono}
 			errores={$errors.telefono}

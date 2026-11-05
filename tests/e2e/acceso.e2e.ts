@@ -30,7 +30,16 @@ test('un socio activa su cuenta, sale y vuelve a entrar (HU-A01, A02, A03)', asy
 		fondo: getComputedStyle(el).backgroundColor
 	}));
 	expect(estilo).toEqual({ cabe: true, ocupaElRecuadro: true, fondo: 'rgba(0, 0, 0, 0)' });
-	await page.getByLabel('Teléfono').fill(numero);
+
+	// El teléfono se agrupa al escribir, y borrar quita cifras, no espacios.
+	const campoTelefono = page.getByLabel('Teléfono');
+	const agrupado = numero.replace(/(\d{3})(\d{3})(\d{3})/, '$1 $2 $3');
+	await campoTelefono.pressSequentially(numero);
+	await expect(campoTelefono).toHaveValue(agrupado);
+	await campoTelefono.press('Backspace');
+	await expect(campoTelefono).toHaveValue(agrupado.slice(0, -1));
+	await campoTelefono.pressSequentially(numero.slice(-1));
+	await expect(campoTelefono).toHaveValue(agrupado);
 	await page.getByLabel('Contraseña nueva').fill('12345678');
 	await page.getByLabel('Repite la contraseña').fill('12345678');
 	await page.getByRole('button', { name: 'Activar y entrar' }).click();
