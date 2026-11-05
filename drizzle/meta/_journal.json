@@ -15,6 +15,13 @@
       "when": 1793875947639,
       "tag": "0001_datos_iniciales_y_reglas",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793908884240,
+      "tag": "0002_conceptos_nombre_unico",
+      "breakpoints": true
     }
   ]
 }

@@ -41,3 +41,9 @@ export const ALTAS = {
 		email: 'alta.escritorio@ejemplo.invalid'
 	}
 } as const;
+
+/** Conceptos que crea cada tesorero en las pruebas (se borran antes de empezar). */
+export const CONCEPTOS = {
+	movil: { nombre: 'Imprenta móvil', renombrado: 'Copistería móvil' },
+	escritorio: { nombre: 'Imprenta escritorio', renombrado: 'Copistería escritorio' }
+} as const;

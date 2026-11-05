@@ -39,6 +39,18 @@ describe('datos iniciales', () => {
 	});
 });
 
+describe('restricciones del concepto', () => {
+	it.each([
+		['ferretería', 'concepto_nombre_unico'],
+		['Otro', 'concepto_nombre_no_otro'],
+		['', 'concepto_nombre_largo'],
+		['x'.repeat(51), 'concepto_nombre_largo']
+	])('rechaza «%s»', async (nombre, restriccion) => {
+		const e = await errorDe(db.insert(concepto).values({ nombre }));
+		expect(e.restriccion).toBe(restriccion);
+	});
+});
+
 describe('restricciones del ticket', () => {
 	it('un ticket nuevo queda pendiente de autorizar, con número y versión 1', async () => {
 		const socio = await crearSocio();
