@@ -47,7 +47,9 @@ export default defineConfig(
 								'El dominio no puede depender de SvelteKit: recibe lo que necesite por parámetro.'
 						},
 						{
-							group: ['**/infra/**', '#lib/server/infra/*'],
+							// Se permiten el esquema y los tipos de conexión (sin efectos);
+							// las conexiones, el correo o el almacenamiento se reciben por parámetro.
+							regex: '(^|/)infra/(?!db/(esquema|tipos)(\\.ts)?$)',
 							message: 'El dominio no importa la infraestructura: se le inyecta.'
 						}
 					]

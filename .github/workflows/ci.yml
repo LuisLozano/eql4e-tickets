@@ -44,6 +44,11 @@ jobs:
         run: pnpm lint
       - name: Tipos
         run: pnpm check
+      - name: Migraciones al día con el esquema
+        run: |
+          pnpm db:generate
+          git diff --exit-code --stat drizzle || { echo '::error::El esquema ha cambiado sin migración: ejecuta pnpm db:generate y sube drizzle/'; exit 1; }
+          test -z "$(git status --porcelain drizzle)" || { git status --porcelain drizzle; echo '::error::Hay migraciones sin subir'; exit 1; }
       - name: Pruebas unitarias con cobertura
         run: pnpm test:cobertura
       - name: Pruebas de integración (Testcontainers)

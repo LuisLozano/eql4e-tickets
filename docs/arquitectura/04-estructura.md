@@ -60,6 +60,12 @@ eql4e-tickets/
 - **Código en español** en el dominio (`autorizarTicket`, `registrarPago`), para que coincida con los requisitos. Los términos técnicos del framework se mantienen en inglés (`load`, `actions`, `hooks`).
 - **Pruebas unitarias junto al código** (`estados.test.ts`); las de integración y e2e, en `tests/`.
 - **Configuración validada al arrancar** (`src/env.ts`, con `defineEnvVars` de SvelteKit 3 y Zod): si falta una variable obligatoria, la app no arranca y lo dice claramente. Se leen con `import { DATABASE_URL } from '$app/env/private'`.
+- **La conexión se pasa como parámetro, no se importa.** No existe `@Transactional`: una transacción es un *callback* (`db.transaction(async (tx) => …)`) y dentro solo vale `tx`. Por eso los servicios de dominio reciben `conexion: Conexion` (`Db | Tx`, en `infra/db/tipos.ts`) como primer argumento, y así pueden formar parte de la transacción de quien los llama. También permite que las pruebas de integración usen su propia base de datos y que los scripts no dependan de SvelteKit.
+  - `infra/db/cliente.ts`: `crearConexion(url)`, sin leer variables de entorno.
+  - `infra/db/app.ts`: la conexión de la app (lee `$app/env/private`). Solo la importan rutas y hooks.
+  - ESLint lo impone: el dominio puede importar `infra/db/esquema.ts` y `infra/db/tipos.ts` (sin efectos), pero no `app.ts`, `cliente.ts` ni el resto de `infra/`.
+- **Migraciones**: se edita `esquema.ts`, `pnpm db:generate` escribe el SQL en `drizzle/`, se **revisa** y se sube junto con el esquema. La CI falla si el esquema y las migraciones no coinciden. No se usa `drizzle-kit push`, porque desincroniza la base de las migraciones. Los datos iniciales y los *triggers* van en migraciones `--custom`.
+- **Estados del ticket**: `src/lib/estados.ts` (compartido con el navegador) y el `pgEnum` del esquema deben coincidir; una comprobación de tipos en `esquema.ts` falla si no.
 - **Importaciones internas con `#lib/...`** y extensión explícita (`#lib/server/infra/db/cliente.ts`): SvelteKit 3 sustituye el alias `$lib` por *subpath imports* de Node.
 - **Compilación sin base de datos**: SvelteKit 3 valida las variables también al analizar las rutas durante `vite build`. El script `build` pone una `DATABASE_URL` ficticia si no hay otra; como no es estática, no se incrusta en el resultado (comprobado).
 - **Semilla inicial** (`pnpm db:semilla`): conceptos (Ferretería, Alimentación, Representación, Transporte) y el primer tesorero, a partir de variables de entorno (R-06).
