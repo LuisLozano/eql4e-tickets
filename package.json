@@ -18,7 +18,7 @@
 		"db:generate": "drizzle-kit generate",
 		"db:studio": "drizzle-kit studio",
 		"test:integracion": "vitest run --project integracion",
-		"test:cobertura": "vitest run --project unitarias --coverage",
+		"test:cobertura": "vitest run --coverage",
 		"db:migrar": "node --env-file-if-exists=.env scripts/migrar.js"
 	},
 	"devDependencies": {
@@ -37,12 +37,14 @@
 		"@testcontainers/postgresql": "^12.2.1",
 		"@types/node": "^24",
 		"@vitest/coverage-v8": "^5.1.0",
+		"@zxcvbn-ts/language-common": "^4.1.3",
 		"bits-ui": "^2.20.4",
 		"drizzle-kit": "^0.31.10",
 		"eslint": "^10.4.1",
 		"eslint-config-prettier": "^10.1.8",
 		"eslint-plugin-svelte": "^3.19.0",
 		"globals": "^17.6.0",
+		"libphonenumber-js": "^1.13.15",
 		"prettier": "^3.8.3",
 		"prettier-plugin-svelte": "^4.1.0",
 		"prettier-plugin-tailwindcss": "^0.8.0",
@@ -64,6 +66,7 @@
 	},
 	"packageManager": "pnpm@12.16.1",
 	"dependencies": {
+		"@node-rs/argon2": "^2.2.2",
 		"drizzle-orm": "^0.45.2",
 		"postgres": "^3.4.9",
 		"zod": "^4.6.7"
