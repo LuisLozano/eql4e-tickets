@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { esquemaCrear, esquemaRenombrar } from './concepto.ts';
+import { esquemaCrear, esquemaRenombrar, sinTildes } from './concepto.ts';
 
 describe('esquemaCrear', () => {
 	it('quita los espacios sobrantes', () => {
@@ -10,7 +10,8 @@ describe('esquemaCrear', () => {
 		['', 'Escribe el nombre.'],
 		['   ', 'Escribe el nombre.'],
 		['x'.repeat(51), 'Máximo 50 caracteres.'],
-		[' OTRO ', '«Otro» ya existe: es la opción para lo que no encaja en ningún concepto.']
+		[' OTRO ', '«Otro» ya existe: es la opción para lo que no encaja en ningún concepto.'],
+		['Ótro', '«Otro» ya existe: es la opción para lo que no encaja en ningún concepto.']
 	])('rechaza «%s»', (entrada, mensaje) => {
 		const r = esquemaCrear.safeParse({ nombre: entrada });
 		expect(r.error?.issues[0].message).toBe(mensaje);
@@ -32,5 +33,11 @@ describe('esquemaRenombrar', () => {
 
 	it.each(['0', 'abc', '1.5'])('rechaza el id «%s»', (id) => {
 		expect(esquemaRenombrar.safeParse({ id, nombre: 'Imprenta' }).success).toBe(false);
+	});
+});
+
+describe('sinTildes', () => {
+	it('quita las tildes y la diéresis, pero no la ñ', () => {
+		expect(sinTildes('ferretería pingüino año àèìòù')).toBe('ferreteria pinguino año aeiou');
 	});
 });

@@ -42,6 +42,8 @@ describe('datos iniciales', () => {
 describe('restricciones del concepto', () => {
 	it.each([
 		['ferretería', 'concepto_nombre_unico'],
+		['Ferreteria', 'concepto_nombre_unico'],
+		['Ótro', 'concepto_nombre_no_otro'],
 		['Otro', 'concepto_nombre_no_otro'],
 		['', 'concepto_nombre_largo'],
 		['x'.repeat(51), 'concepto_nombre_largo']
