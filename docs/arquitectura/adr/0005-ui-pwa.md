@@ -15,10 +15,12 @@
   - La validación del servidor es la que manda.
 - **Captura y compresión de imágenes**:
   - Captura con `<input type="file" accept="image/*,application/pdf" capture="environment" multiple>`. No hace falta `getUserMedia` y es más robusto en iOS y Android.
-  - Compresión en el cliente con la librería `browser-image-compression` (en un *web worker*): lado mayor de 2000 px, en JPEG o WebP.
+  - Compresión en el cliente en un *web worker* propio (`src/lib/cliente/compresor.worker.ts`), con `createImageBitmap` y `OffscreenCanvas`: lado mayor de 2000 px, en JPEG (calidad 0,82), respetando la orientación EXIF. Si no gana tamaño, se sube la original.
+    - *Cambio 2026-11-05*: la idea inicial era `browser-image-compression`. Su *worker* carga por defecto su propio código desde jsDelivr, lo que añade un tercero y choca con la CSP prevista. Lo que hace falta cabe en unas 40 líneas sin dependencias.
+    - JPEG y no WebP: Safari no genera WebP desde `OffscreenCanvas`. Da igual, porque el servidor recodifica a WebP.
   - Si un formato no se puede decodificar (algunos HEIC), se sube sin comprimir dentro del límite.
   - El servidor recodifica igualmente (ADR-0002).
-- **Conservar el formulario si falla la red**: el borrador (campos + ficheros comprimidos) se guarda en **IndexedDB** antes de enviar y se borra al confirmarse. Si el envío falla, el formulario se restaura al volver.
+- **Conservar el formulario si falla la red**: el borrador (campos + ficheros comprimidos) se guarda en **IndexedDB** antes de enviar y se borra al confirmarse. Si el envío falla, el formulario se restaura al volver (con la opción «Descartar»). Hay un borrador por usuario, porque el móvil puede ser compartido. Sin IndexedDB (navegación privada) el formulario funciona igual, sin borrador.
 - **PWA** con `@vite-pwa/sveltekit`:
   - *Manifest*, iconos y modo *standalone*.
   - El *service worker* solo cachea los **recursos estáticos** (la estructura de la app). **No** cachea datos ni ficheros de tickets, por privacidad y para no mostrar estados desactualizados.

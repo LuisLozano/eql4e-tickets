@@ -24,7 +24,7 @@ eql4e-tickets/
 │   ├── lib/
 │   │   ├── componentes/            # UI propia + shadcn-svelte (ui/)
 │   │   ├── esquemas/               # Zod compartido cliente/servidor
-│   │   ├── cliente/                # compresión de imágenes, borrador IndexedDB
+│   │   ├── cliente/                # compresión de fotos (web worker), borrador en IndexedDB
 │   │   ├── formato.ts              # importes, fechas (Intl es-ES), hoy en Madrid
 │   │   ├── importe.ts              # «23,45» → céntimos
 │   │   └── server/

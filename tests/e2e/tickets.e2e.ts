@@ -42,7 +42,8 @@ test('un socio envía un ticket con foto y PDF (HU-S01)', async ({ page }, info)
 		page.getByText('«ticket.jpg»: solo se admiten fotos (JPEG, PNG o WebP) y PDF.')
 	).toBeVisible();
 
-	// Foto y PDF, con «Otro…» y su texto libre.
+	// Se quita el fichero malo; foto y PDF, con «Otro…» y su texto libre.
+	await page.getByRole('button', { name: 'Quitar ticket.jpg' }).click();
 	await archivo.setInputFiles([
 		{ name: 'ticket.jpg', mimeType: 'image/jpeg', buffer: foto },
 		{ name: 'factura.pdf', mimeType: 'application/pdf', buffer: pdf }
@@ -66,4 +67,70 @@ test('quien solo es tesorero no puede enviar tickets (R-01: 404)', async ({ page
 	await page.getByRole('button', { name: 'Entrar' }).click();
 	await expect(page.getByRole('heading', { name: 'Todos los tickets' })).toBeVisible();
 	expect((await page.goto('/tickets/nuevo'))?.status()).toBe(404);
+});
+
+test('las fotos se reducen en el móvil y, si falla la red, el ticket no se pierde (HU-S01)', async ({
+	page,
+	context
+}, info) => {
+	const socio = REMITENTES[info.project.name as Perfil];
+	// Ruido para que el JPEG pese de verdad (unos MB), como una foto de móvil.
+	const [ancho, alto] = [2400, 3200];
+	const ruido = Buffer.alloc(ancho * alto * 3);
+	for (let i = 0; i < ruido.length; i++) ruido[i] = (i * 2654435761) >>> 24;
+	const grande = await sharp(ruido, { raw: { width: ancho, height: alto, channels: 3 } })
+		.jpeg({ quality: 95 })
+		.toBuffer();
+
+	await page.goto('/entrar');
+	await page.getByLabel('Teléfono').fill(socio.telefono.slice(3));
+	await page.getByLabel('Contraseña').fill(CONTRASENA_TESORERO);
+	await page.getByRole('button', { name: 'Entrar' }).click();
+	await page.getByRole('link', { name: 'Nuevo ticket' }).click();
+
+	await page.locator('input[type=file][capture]').setInputFiles({
+		name: 'IMG_0001.jpg',
+		mimeType: 'image/jpeg',
+		buffer: grande
+	});
+	// Elegido justo después: tiene que quedar detrás de la foto aunque se prepare antes.
+	await page.locator('input[type=file]:not([capture])').setInputFiles({
+		name: 'factura.pdf',
+		mimeType: 'application/pdf',
+		buffer: Buffer.from('%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n')
+	});
+	const lista = page.getByRole('list', { name: 'Ficheros elegidos' });
+	await expect(lista.getByRole('listitem')).toHaveCount(2);
+	await expect(lista.getByRole('listitem').first()).toContainText('IMG_0001.jpg');
+	await expect(lista.getByText(/^Reducida de [\d,]+ MB a [\d,]+ (KB|MB)$/)).toBeVisible();
+	await expect(lista.getByText('IMG_0001.jpg')).toBeVisible();
+	await expect(page.getByRole('group', { name: 'Fotos del ticket · 2 de 5' })).toBeVisible();
+
+	await page.getByLabel('Importe (€)').fill('12,30');
+	await page.locator('label', { hasText: 'Transporte' }).click();
+
+	// Sin conexión: avisa y el formulario sigue igual.
+	await context.setOffline(true);
+	await page.getByRole('button', { name: 'Enviar ticket' }).click();
+	await expect(page.getByText(/^No se ha podido enviar\./)).toBeVisible();
+	await expect(lista.getByRole('listitem')).toHaveCount(2);
+
+	// Aunque se recargue la página, el borrador vuelve.
+	await context.setOffline(false);
+	await page.reload();
+	await expect(
+		page.getByText('Hemos recuperado el ticket que no llegaste a enviar.')
+	).toBeVisible();
+	await expect(page.getByLabel('Importe (€)')).toHaveValue('12,30');
+	await expect(page.getByLabel('Transporte')).toBeChecked();
+	await expect(lista.getByRole('listitem')).toHaveCount(2);
+	await expect(lista.getByRole('listitem').first()).toContainText('IMG_0001.jpg');
+
+	await page.getByRole('button', { name: 'Enviar ticket' }).click();
+	await expect(page.getByText(/^Ticket T-\d{6} enviado\./)).toBeVisible();
+
+	// Enviado, el borrador desaparece.
+	await page.getByRole('link', { name: 'Nuevo ticket' }).click();
+	await expect(page.getByLabel('Importe (€)')).toHaveValue('');
+	await expect(page.getByText('Hemos recuperado')).toHaveCount(0);
 });
