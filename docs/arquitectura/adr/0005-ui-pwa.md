@@ -6,7 +6,8 @@
 ## Decisión
 
 - **Estilos**: Tailwind CSS.
-- **Componentes**: **shadcn-svelte**, que está construido sobre Bits UI: componentes accesibles (diálogos, menús, tablas, *selects*) que se **copian al proyecto** en lugar de ser una dependencia cerrada, así que se pueden adaptar.
+- **Componentes**: **Bits UI** (componentes accesibles sin estilos: diálogos, menús, *selects*, hojas inferiores) con componentes propios en `src/lib/componentes` que aplican el tema de los bocetos.
+  - *Cambio 2026-11-05*: la idea inicial era **shadcn-svelte**, que se construye sobre Bits UI. Su `init` (v1.8) obliga a elegir de forma interactiva un *preset* de diseño con sus propios colores, que choca con el tema monocromo y los colores de estado de los bocetos. Se usa directamente su base, Bits UI, y se escriben los componentes a mano con nuestros colores. Iconos: `@lucide/svelte`.
 - **Tabla del tesorero**: TanStack Table (con su adaptador para Svelte), con la ordenación y los filtros reflejados en la **URL** (`?estado=…&orden=…`). Así el filtrado y la paginación se hacen en el **servidor** (`load`) y cada vista se puede enlazar o recargar.
 - **Formularios y validación**:
   - **Zod**: esquemas compartidos entre cliente y servidor, en `src/lib/esquemas`.

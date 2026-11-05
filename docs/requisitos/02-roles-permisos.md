@@ -34,4 +34,4 @@ Un usuario puede tener **ambos roles** (un tesorero también hace compras y pide
 - **R-03** No se puede retirar el rol tesorero al último tesorero activo.
 - **R-04** **Separación de funciones**: un tesorero no puede autorizar, rechazar ni pagar sus **propios** tickets; debe hacerlo otro tesorero. Tampoco puede deshacer pasos sobre sus propios tickets.
 - **R-05** Un usuario dado de baja no puede iniciar sesión. Sus tickets y su historial se conservan.
-- **R-06** El primer tesorero se crea en la instalación (datos iniciales o comando de administración), no desde la interfaz.
+- **R-06** El primer tesorero se crea en la instalación, no desde la interfaz. *(Decidido 2026-11-05)* Al arrancar, si no existe ningún tesorero, la app crea un **«Tesorero inicial» con datos ficticios** (teléfono `+34 600 000 000`, email `tesorero@ejemplo.invalid`), sin contraseña, y escribe en el log del contenedor su enlace de activación. Mientras no se active, cada arranque genera un enlace nuevo. Ninguna contraseña está en el repositorio. Sus datos se cambian con HU-G03.

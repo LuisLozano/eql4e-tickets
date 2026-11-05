@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { sql } from '#lib/server/infra/db/cliente.ts';
+import { sql } from '#lib/server/infra/db/app.ts';
 import type { RequestHandler } from './$types';
 
 /** Comprobación de salud para Docker y el despliegue (RNF-34). */

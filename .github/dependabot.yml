@@ -9,6 +9,13 @@ updates:
     open-pull-requests-limit: 5
     commit-message:
       prefix: 'chore(deps)'
+    ignore:
+      # Los tipos siguen a la versión de Node que usamos (24), no a la última.
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
+      # postgres.js 4 reescribió el driver (oct. 2026): esperar a que Drizzle lo dé por soportado.
+      - dependency-name: postgres
+        update-types: [version-update:semver-major]
     groups:
       desarrollo:
         dependency-type: development
@@ -28,5 +35,11 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    ignore:
+      # El salto de versión mayor de Node (y de PostgreSQL) se decide a mano.
+      - dependency-name: node
+        update-types: [version-update:semver-major]
+      - dependency-name: postgres
+        update-types: [version-update:semver-major]
     commit-message:
       prefix: 'chore(docker)'

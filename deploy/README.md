@@ -85,6 +85,8 @@ Cada imagen lleva como etiqueta el SHA corto de su commit. Los SHA están en `gi
 
 **Cuidado con las migraciones.** Solo avanzan. Si la versión mala aplicó una migración que la anterior no entiende, volver atrás no basta: hay que restaurar una copia de la base de datos.
 
+Para que volver atrás siga siendo posible, las migraciones se escriben **compatibles con la versión anterior**. Para quitar o renombrar una columna se hace en dos despliegues: primero se añade la nueva y el código deja de usar la vieja; en un despliegue posterior se borra la vieja.
+
 ## 4. Instalación desde cero
 
 Este apartado ya se hizo el 2026-11-04. Sirve si hay que reinstalar en esta máquina o en otra.
