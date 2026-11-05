@@ -21,7 +21,15 @@ test('un socio activa su cuenta, sale y vuelve a entrar (HU-A01, A02, A03)', asy
 
 	// El enlace del correo trae el código rellenado.
 	await page.goto(`/activar?codigo=${socio.codigo}`);
-	await expect(page.getByLabel('Código de invitación')).toHaveValue(socio.codigo);
+	const campoCodigo = page.getByLabel('Código de invitación');
+	await expect(campoCodigo).toHaveValue(socio.codigo);
+	// Se ve entero y con los colores de la app (antes perdía sus estilos y salía cortado).
+	const estilo = await campoCodigo.evaluate((el: HTMLInputElement) => ({
+		cabe: el.scrollWidth <= el.clientWidth,
+		ocupaElRecuadro: el.offsetWidth === el.parentElement!.clientWidth,
+		fondo: getComputedStyle(el).backgroundColor
+	}));
+	expect(estilo).toEqual({ cabe: true, ocupaElRecuadro: true, fondo: 'rgba(0, 0, 0, 0)' });
 	await page.getByLabel('Teléfono').fill(numero);
 	await page.getByLabel('Contraseña nueva').fill('12345678');
 	await page.getByLabel('Repite la contraseña').fill('12345678');

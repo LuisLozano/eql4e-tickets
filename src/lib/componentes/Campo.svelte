@@ -18,6 +18,7 @@
 		errores,
 		prefijo,
 		id = name,
+		class: clase,
 		...resto
 	}: Props = $props();
 
@@ -45,8 +46,11 @@
 			bind:value
 			aria-invalid={errores?.length ? 'true' : undefined}
 			aria-describedby={descrito}
-			class="min-h-11 w-full rounded-lg border-0 bg-transparent px-3 text-ink focus:ring-0 focus:outline-none"
 			{...resto}
+			class={[
+				'min-h-11 w-full rounded-lg border-0 bg-transparent px-3 text-ink focus:ring-0 focus:outline-none',
+				clase
+			]}
 		/>
 	</div>
 	{#if errores?.length}

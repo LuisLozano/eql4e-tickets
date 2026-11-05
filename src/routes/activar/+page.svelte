@@ -28,7 +28,7 @@
 			autocomplete="off"
 			autocapitalize="characters"
 			spellcheck="false"
-			class="font-mono"
+			class="font-mono tracking-tighter"
 			bind:value={$form.codigo}
 			errores={$errors.codigo}
 		/>
