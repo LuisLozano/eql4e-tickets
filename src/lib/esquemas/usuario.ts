@@ -11,10 +11,14 @@ export const esquemaAlta = z
 			.min(1, 'Escribe el teléfono.')
 			.refine((t) => normalizarTelefono(t) !== null, 'El teléfono no es válido.'),
 		email: z.email('El email no es válido.').max(254),
-		esSocio: z.boolean().default(true),
-		esTesorero: z.boolean().default(false)
+		// Sin `.default(true)`: una casilla desmarcada no se envía y Superforms pondría el valor por
+		// defecto. El «Socio» marcado de inicio lo pone la página (`valoresIniciales`).
+		esSocio: z.boolean(),
+		esTesorero: z.boolean()
 	})
 	.refine((d) => d.esSocio || d.esTesorero, {
 		path: ['esSocio'],
 		message: 'Marca al menos un rol.'
 	});
+
+export const valoresIniciales = { esSocio: true, esTesorero: false };

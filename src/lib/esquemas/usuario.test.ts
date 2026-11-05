@@ -1,10 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { esquemaAlta } from './usuario';
 
-const valido = { nombre: 'Ana', telefono: '612 345 678', email: 'ana@ejemplo.com' };
+const valido = {
+	nombre: 'Ana',
+	telefono: '612 345 678',
+	email: 'ana@ejemplo.com',
+	esSocio: true,
+	esTesorero: false
+};
 
 describe('esquemaAlta', () => {
-	it('por defecto da el rol de socio', () => {
+	it('acepta un alta de socio', () => {
 		expect(esquemaAlta.parse(valido)).toMatchObject({ esSocio: true, esTesorero: false });
 	});
 

@@ -2,7 +2,7 @@ import { error, fail } from '@sveltejs/kit';
 import { message, setError, superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { URL_PUBLICA } from '$app/env/private';
-import { esquemaAlta } from '#lib/esquemas/usuario.ts';
+import { esquemaAlta, valoresIniciales } from '#lib/esquemas/usuario.ts';
 import { darDeAlta } from '#lib/server/dominio/usuario/alta.ts';
 import { mensajeInvitacion } from '#lib/server/dominio/usuario/invitacion.ts';
 import { listarUsuarios } from '#lib/server/dominio/usuario/listado.ts';
@@ -21,7 +21,7 @@ export type ResultadoInvitacion = {
 
 export const load: PageServerLoad = async () => ({
 	usuarios: await listarUsuarios(db, new Date()),
-	form: await superValidate(zod4(esquemaAlta))
+	form: await superValidate(valoresIniciales, zod4(esquemaAlta), { errors: false })
 });
 
 export const actions: Actions = {
