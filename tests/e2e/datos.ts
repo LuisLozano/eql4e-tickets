@@ -41,3 +41,17 @@ export const ALTAS = {
 		email: 'alta.escritorio@ejemplo.invalid'
 	}
 } as const;
+
+/** Socios ya activos que envían tickets (se crean en preparar.ts con CONTRASENA_TESORERO). */
+export const REMITENTES = {
+	movil: {
+		nombre: 'Remitente Móvil',
+		telefono: '+34699000031',
+		email: 'remitente.movil@ejemplo.invalid'
+	},
+	escritorio: {
+		nombre: 'Remitente Escritorio',
+		telefono: '+34699000032',
+		email: 'remitente.escritorio@ejemplo.invalid'
+	}
+} as const;

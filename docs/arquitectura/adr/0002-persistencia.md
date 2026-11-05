@@ -32,6 +32,7 @@
   - Tipo real por *magic bytes* (librería `file-type`).
   - Las imágenes se **recodifican con `sharp`** a WebP, con el lado mayor de 2000 px como máximo. Esto elimina los EXIF/GPS (RNF-16) aunque el cliente no haya comprimido, y neutraliza ficheros manipulados.
   - Los PDF se guardan tal cual, con un límite de 10 MB.
+  - *Cambio 2026-11-05*: **HEIC se rechaza** con un mensaje que explica cómo adjuntar la foto. El `sharp` precompilado no decodifica HEIC (solo AVIF), así que no se le podrían quitar los metadatos (RNF-16). En la práctica iOS convierte a JPEG al adjuntar desde el navegador, y el móvil intentará convertirlo al comprimir (PR4b).
 - **Orden de escritura:** primero el fichero, después la transacción de base de datos. Si la transacción falla, se borra el fichero. Una tarea diaria elimina los ficheros huérfanos (sin fila asociada y con más de 24 h).
 
 ## Alternativas descartadas

@@ -25,11 +25,13 @@ eql4e-tickets/
 │   │   ├── componentes/            # UI propia + shadcn-svelte (ui/)
 │   │   ├── esquemas/               # Zod compartido cliente/servidor
 │   │   ├── cliente/                # compresión de imágenes, borrador IndexedDB
-│   │   ├── formato.ts              # importes, fechas (Intl es-ES)
+│   │   ├── formato.ts              # importes, fechas (Intl es-ES), hoy en Madrid
+│   │   ├── importe.ts              # «23,45» → céntimos
 │   │   └── server/
 │   │       ├── dominio/
 │   │       │   ├── auth/           # sesiones, contraseñas, códigos, limitador
 │   │       │   ├── ticket/
+│   │       │   │   ├── crear.ts    # enviar ticket (HU-S01) y el puerto Almacen
 │   │       │   │   ├── estados.ts  # tabla de transiciones (pura)
 │   │       │   │   ├── permisos.ts # R-01, R-04 (puro)
 │   │       │   │   └── servicio.ts # casos de uso con transacción
@@ -39,9 +41,9 @@ eql4e-tickets/
 │   │       │   └── purga/
 │   │       ├── infra/
 │   │       │   ├── db/             # esquema Drizzle, cliente, semilla
-│   │       │   ├── almacenamiento.ts
+│   │       │   ├── almacenamiento/ # disco.ts (volumen) y app.ts (lee RUTA_FICHEROS)
 │   │       │   ├── correo/         # cliente.ts (SMTP | consola) y app.ts (lee el entorno)
-│   │       │   ├── imagenes.ts
+│   │       │   ├── ficheros.ts     # tipo real (file-type) y recodificación (sharp)
 │   │       │   └── planificador.ts
 │   ├── env.ts                      # variables de entorno validadas con Zod (defineEnvVars de SvelteKit 3)
 │   ├── lib/server/web/             # ayudas de la capa SvelteKit: cookie de sesión, limitadores, enlaces
@@ -65,6 +67,7 @@ eql4e-tickets/
   - `infra/db/cliente.ts`: `crearConexion(url)`, sin leer variables de entorno.
   - `infra/db/app.ts`: la conexión de la app (lee `$app/env/private`). Solo la importan rutas y hooks.
   - El correo sigue el mismo patrón: `infra/correo/cliente.ts` (`crearCorreo(config)`) e `infra/correo/app.ts`. El dominio no envía correos: devuelve el código y la ruta construye el enlace y envía.
+  - El almacenamiento, igual: el dominio define el puerto `Almacen` (`ticket/crear.ts`) y lo recibe por parámetro; `infra/almacenamiento/disco.ts` lo implementa.
   - ESLint lo impone: el dominio puede importar `infra/db/esquema.ts` y `infra/db/tipos.ts` (sin efectos), pero no `app.ts`, `cliente.ts` ni el resto de `infra/`.
 - **Migraciones**: se edita `esquema.ts`, `pnpm db:generate` escribe el SQL en `drizzle/`, se **revisa** y se sube junto con el esquema. La CI falla si el esquema y las migraciones no coinciden. No se usa `drizzle-kit push`, porque desincroniza la base de las migraciones. Los datos iniciales y los *triggers* van en migraciones `--custom`.
 - **Estados del ticket**: `src/lib/estados.ts` (compartido con el navegador) y el `pgEnum` del esquema deben coincidir; una comprobación de tipos en `esquema.ts` falla si no.
