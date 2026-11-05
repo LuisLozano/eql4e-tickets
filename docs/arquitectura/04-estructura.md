@@ -44,6 +44,7 @@ eql4e-tickets/
 │   │       │   ├── imagenes.ts
 │   │       │   └── planificador.ts
 │   ├── env.ts                      # variables de entorno validadas con Zod (defineEnvVars de SvelteKit 3)
+│   ├── lib/server/web/             # ayudas de la capa SvelteKit: cookie de sesión, limitadores
 │   └── routes/                     # ver 03-rutas.md
 ├── static/                         # iconos PWA
 ├── tests/
@@ -80,6 +81,7 @@ eql4e-tickets/
 | `BODY_SIZE_LIMIT` | `60M` | Subida de ficheros |
 | `ADDRESS_HEADER` / `XFF_DEPTH` | `X-Forwarded-For` / `1` | IP real detrás de Caddy. Fijadas en `compose.yaml` |
 | `TEST_DATABASE_URL` | `postgres://eql4e:eql4e@127.0.0.1:5436/postgres` | Solo en local: pruebas de integración sin Testcontainers |
+| `URL_PUBLICA` | `https://tickets-eql4e.ddns.net` | Enlaces de activación del log y de los correos. Fijada en `compose.yaml` |
 | `RUTA_FICHEROS` | `/data/ficheros` | Volumen |
 | `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` / `SMTP_FROM` | `smtp.gmail.com` / `587` / … | ADR-0004 |
 | `CORREO_MODO` | `smtp` \| `consola` | Desarrollo sin envío real |

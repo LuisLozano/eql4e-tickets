@@ -9,6 +9,7 @@ services:
     env_file: .env
     environment:
       DATABASE_URL: postgres://eql4e:${POSTGRES_PASSWORD}@db:5432/eql4e
+      URL_PUBLICA: https://tickets-eql4e.ddns.net
       # Detrás de Caddy: IP real del cliente y protocolo original (para CSRF).
       ADDRESS_HEADER: X-Forwarded-For
       XFF_DEPTH: '1'

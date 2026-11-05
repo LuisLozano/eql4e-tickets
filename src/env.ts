@@ -10,6 +10,10 @@ export const variables = defineEnvVars({
 		description: 'Conexión a PostgreSQL: postgres://usuario:clave@host:5432/base',
 		schema: z.url({ protocol: /^postgres(ql)?$/ })
 	},
+	URL_PUBLICA: {
+		description: 'Dirección pública de la app, para los enlaces de los correos y del log',
+		schema: z.url().default('http://localhost:5173')
+	},
 	RUTA_FICHEROS: {
 		description: 'Carpeta del volumen donde se guardan fotos y justificantes',
 		schema: z.string().min(1).default('/data/ficheros')

@@ -18,13 +18,16 @@
 - **Caducidad deslizante**: si quedan menos de 15 días, se renueva hasta 30.
 - **`hooks.server.ts`** valida la sesión en cada petición y deja el usuario en `event.locals.usuario`.
 - **Contraseñas**: Argon2id (`@node-rs/argon2`, con los parámetros recomendados por OWASP). Mínimo 8 caracteres, comprobadas contra una lista de unas 10.000 contraseñas comunes empaquetada con la app (sin llamadas externas).
-- **Códigos de invitación y restablecimiento**: 32 bytes aleatorios, guardados como SHA-256, de un solo uso, con caducidad (7 días para la invitación, 1 hora para el restablecimiento). Generar uno nuevo invalida los anteriores del mismo usuario.
+- **Códigos de invitación y restablecimiento**: 28 caracteres base32 aleatorios (140 bits) en grupos de 4 (`K7QF-9TXB-…`, como en los bocetos), guardados como SHA-256, de un solo uso, con caducidad (7 días para la invitación, 1 hora para el restablecimiento). Generar uno nuevo invalida los anteriores del mismo usuario. Se aceptan escritos en minúsculas y sin guiones. Se consumen con una sola sentencia `UPDATE … RETURNING`, así que dos peticiones simultáneas no pueden usar el mismo.
 - **CSRF**: la comprobación de `Origin` que SvelteKit trae activada por defecto en las *form actions*, más `SameSite=Lax`. No hace falta un token CSRF adicional.
 - **Fuerza bruta**:
-  - Contador de intentos fallidos y `bloqueado_hasta` en la tabla `usuario` (5 intentos, 15 minutos).
-  - Además, un limitador **en memoria** por IP en el inicio de sesión, la activación y el restablecimiento. Es suficiente con una sola instancia; si se escalara, pasaría a PostgreSQL.
+  - Contador de intentos fallidos y `bloqueado_hasta` en la tabla `usuario`: al **quinto fallo seguido** la cuenta se bloquea 15 minutos y el contador vuelve a cero; un acierto también lo pone a cero. *Simplificación respecto a HU-A02*: no se exige que los 5 fallos ocurran dentro de 15 minutos, para no guardar la hora de cada intento. Es más estricto, no menos.
+  - Además, un limitador **en memoria** por IP en el inicio de sesión (20 intentos cada 15 minutos), la activación (10) y el restablecimiento. Es suficiente con una sola instancia; si se escalara, pasaría a PostgreSQL.
+  - Si el teléfono no existe, se verifica la contraseña contra un hash ficticio para que la respuesta tarde lo mismo y no delate qué teléfonos están dados de alta.
   - La IP real se obtiene de la cabecera de Caddy (`ADDRESS_HEADER=X-Forwarded-For`, `XFF_DEPTH=1`).
-- **Invalidación**: cambiar la contraseña, dar de baja al usuario o restablecer el acceso borra sus sesiones.
+- **Invalidación**: cambiar la contraseña, dar de baja al usuario o restablecer el acceso borra sus sesiones. Una sesión de un usuario que ya no está activo se rechaza y se borra al usarla.
+- **Tesorero inicial (R-06)**: el *hook* `init` de `hooks.server.ts` lo crea al arrancar si no hay ningún tesorero activo y escribe el enlace de activación en el log. Ver el [manual de despliegue](../../../deploy/README.md).
+- **Cabeceras**: `Referrer-Policy`, `X-Frame-Options`, `X-Content-Type-Options` y `Permissions-Policy` en `hooks.server.ts`. La CSP con *nonce* queda pendiente para cuando haya más páginas.
 
 ### Autorización
 

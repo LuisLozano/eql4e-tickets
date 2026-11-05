@@ -144,7 +144,17 @@ Lo que se añade es el contenido de [Caddyfile.snippet](Caddyfile.snippet), sin 
    cp /home/luis/salazar/https/Caddyfile.antes-eql4e /home/luis/salazar/https/Caddyfile && sudo docker exec salazar-https-caddy-1 caddy reload --config /etc/caddy/Caddyfile --adapter caddyfile
    ```
 
-### 4.4 Comprobación
+### 4.4 Activar el tesorero inicial
+
+En el primer arranque no hay ningún tesorero, así que la app crea uno con datos ficticios (R-06) y escribe en el log un enlace para activarlo:
+
+```bash
+cd /opt/eql4e-tickets && sudo docker compose logs app | grep -A 8 'TESORERO INICIAL'
+```
+
+Abre el enlace, escribe el teléfono `600 000 000` y elige una contraseña. El enlace vale 7 días; si caduca, reinicia la app (`sudo docker compose restart app`) y saldrá uno nuevo. Mientras no haya un tesorero activo, cada arranque genera un enlace nuevo e invalida el anterior.
+
+### 4.5 Comprobación
 
 ```bash
 curl -s https://tickets-eql4e.ddns.net/salud && curl -s -o /dev/null -w 'yaroki: %{http_code}\n' https://yaroki.ddns.net/
