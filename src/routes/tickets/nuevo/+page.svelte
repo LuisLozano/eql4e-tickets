@@ -137,12 +137,7 @@
 <main class="mx-auto flex max-w-xl flex-col gap-6 px-4 py-8">
 	<h1 class="font-display text-3xl font-bold">Nuevo ticket</h1>
 
-	{#if sinEnviar}
-		<Aviso>
-			No se ha podido enviar. Comprueba la conexión y vuelve a intentarlo: el ticket se ha guardado
-			en este dispositivo.
-		</Aviso>
-	{:else if recuperado}
+	{#if recuperado && !sinEnviar}
 		<Aviso tipo="atencion">
 			<div class="flex flex-wrap items-center justify-between gap-2">
 				<span>Hemos recuperado el ticket que no llegaste a enviar.</span>
@@ -319,6 +314,13 @@
 			{/if}
 		</div>
 
+		<!-- Junto al botón: en el móvil es donde se está mirando al pulsar «Enviar». -->
+		{#if sinEnviar}
+			<Aviso>
+				No se ha podido enviar. Comprueba la conexión y vuelve a intentarlo: el ticket se ha
+				guardado en este dispositivo.
+			</Aviso>
+		{/if}
 		<Boton type="submit" anchoCompleto disabled={$submitting}>
 			{$submitting ? 'Enviando…' : 'Enviar ticket'}
 		</Boton>
