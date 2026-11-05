@@ -33,3 +33,11 @@ const dia = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Madrid' });
 export function hoyEnMadrid(ahora = new Date()): string {
 	return dia.format(ahora);
 }
+
+const tamano = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 1 });
+
+/** 4404019 → "4,2 MB"; 389120 → "380 KB" */
+export function formatoTamano(bytes: number): string {
+	if (bytes >= 1024 * 1024) return `${tamano.format(bytes / 1024 / 1024)} MB`;
+	return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
