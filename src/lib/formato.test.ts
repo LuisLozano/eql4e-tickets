@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatoFecha, formatoImporte, formatoNumeroTicket } from './formato';
+import { formatoFecha, formatoImporte, formatoNumeroTicket, hoyEnMadrid } from './formato';
 
 // Intl separa el número del símbolo con un espacio duro (U+00A0).
 const nbsp = ' ';
@@ -25,5 +25,13 @@ describe('formatoFecha', () => {
 describe('formatoNumeroTicket', () => {
 	it('rellena con ceros hasta seis cifras', () => {
 		expect(formatoNumeroTicket(150)).toBe('T-000150');
+	});
+});
+
+describe('hoyEnMadrid', () => {
+	it('usa la hora de Madrid, no la UTC', () => {
+		expect(hoyEnMadrid(new Date('2026-11-05T22:59:00Z'))).toBe('2026-11-05');
+		expect(hoyEnMadrid(new Date('2026-11-05T23:00:00Z'))).toBe('2026-11-06');
+		expect(hoyEnMadrid(new Date('2026-07-01T22:00:00Z'))).toBe('2026-07-02');
 	});
 });

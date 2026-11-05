@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 import { hash } from '@node-rs/argon2';
 import postgres from 'postgres';
 import { migrar } from '../../scripts/migrar.js';
-import { ALTAS, CONCEPTOS, CONTRASENA_TESORERO, SOCIOS, TESOREROS } from './datos.ts';
+import { ALTAS, CONCEPTOS, CONTRASENA_TESORERO, REMITENTES, SOCIOS, TESOREROS } from './datos.ts';
 
 const sha256 = (texto: string) => createHash('sha256').update(texto).digest('hex');
 
@@ -20,8 +20,11 @@ export default async function preparar() {
 		for (const u of [
 			...Object.values(ALTAS),
 			...Object.values(SOCIOS),
-			...Object.values(TESOREROS)
+			...Object.values(TESOREROS),
+			...Object.values(REMITENTES)
 		]) {
+			// Antes, sus tickets (el historial y los ficheros se borran en cascada).
+			await sql`delete from ticket where socio_id in (select id from usuario where telefono = ${u.telefono} or email = ${u.email})`;
 			await sql`delete from usuario where telefono = ${u.telefono} or email = ${u.email}`;
 		}
 
@@ -44,6 +47,11 @@ export default async function preparar() {
 			await sql`
 				insert into usuario (nombre, telefono, email, password_hash, estado, es_socio, es_tesorero)
 				values (${t.nombre}, ${t.telefono}, ${t.email}, ${passwordHash}, 'activo', false, true)`;
+		}
+		for (const r of Object.values(REMITENTES)) {
+			await sql`
+				insert into usuario (nombre, telefono, email, password_hash, estado, es_socio, es_tesorero)
+				values (${r.nombre}, ${r.telefono}, ${r.email}, ${passwordHash}, 'activo', true, false)`;
 		}
 	} finally {
 		await sql.end();

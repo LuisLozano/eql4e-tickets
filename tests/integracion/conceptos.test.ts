@@ -107,7 +107,9 @@ describe('reordenar conceptos', () => {
 			const antes = await listarConceptos(tx);
 			expect(await moverConcepto(tx, antes[0].id, 'subir')).toEqual({ ok: true });
 			expect(await moverConcepto(tx, antes.at(-1)!.id, 'bajar')).toEqual({ ok: true });
-			expect(await listarConceptos(tx)).toEqual(antes);
+			// Solo el orden: otros ficheros de pruebas crean tickets a la vez y cambian los recuentos.
+			const ids = (lista: typeof antes) => lista.map((c) => c.id);
+			expect(ids(await listarConceptos(tx))).toEqual(ids(antes));
 		}));
 
 	it('deshace los empates de orden', () =>

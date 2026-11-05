@@ -26,3 +26,10 @@ export function formatoFecha(valor: Date): string {
 export function formatoNumeroTicket(numero: number): string {
 	return `T-${String(numero).padStart(6, '0')}`;
 }
+
+const dia = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Madrid' });
+
+/** La fecha de hoy en Madrid, como la usa un `<input type="date">`: "2026-11-05". */
+export function hoyEnMadrid(ahora = new Date()): string {
+	return dia.format(ahora);
+}

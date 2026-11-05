@@ -28,7 +28,9 @@ export default defineConfig({
 		env: {
 			PORT: String(puerto),
 			PROTOCOL_HEADER: 'x-forwarded-proto',
-			URL_PUBLICA: `http://localhost:${puerto}`
+			URL_PUBLICA: `http://localhost:${puerto}`,
+			BODY_SIZE_LIMIT: '60M',
+			RUTA_FICHEROS: 'test-results/ficheros'
 		}
 	}
 });
