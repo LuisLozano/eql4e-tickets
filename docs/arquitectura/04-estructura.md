@@ -34,17 +34,17 @@ eql4e-tickets/
 │   │       │   │   ├── permisos.ts # R-01, R-04 (puro)
 │   │       │   │   └── servicio.ts # casos de uso con transacción
 │   │       │   ├── pago/
-│   │       │   ├── usuario/
+│   │       │   ├── usuario/        # alta, listado, texto de la invitación
 │   │       │   ├── concepto/
 │   │       │   └── purga/
 │   │       ├── infra/
 │   │       │   ├── db/             # esquema Drizzle, cliente, semilla
 │   │       │   ├── almacenamiento.ts
-│   │       │   ├── correo.ts
+│   │       │   ├── correo/         # cliente.ts (SMTP | consola) y app.ts (lee el entorno)
 │   │       │   ├── imagenes.ts
 │   │       │   └── planificador.ts
 │   ├── env.ts                      # variables de entorno validadas con Zod (defineEnvVars de SvelteKit 3)
-│   ├── lib/server/web/             # ayudas de la capa SvelteKit: cookie de sesión, limitadores
+│   ├── lib/server/web/             # ayudas de la capa SvelteKit: cookie de sesión, limitadores, enlaces
 │   └── routes/                     # ver 03-rutas.md
 ├── static/                         # iconos PWA
 ├── tests/
@@ -64,6 +64,7 @@ eql4e-tickets/
 - **La conexión se pasa como parámetro, no se importa.** No existe `@Transactional`: una transacción es un *callback* (`db.transaction(async (tx) => …)`) y dentro solo vale `tx`. Por eso los servicios de dominio reciben `conexion: Conexion` (`Db | Tx`, en `infra/db/tipos.ts`) como primer argumento, y así pueden formar parte de la transacción de quien los llama. También permite que las pruebas de integración usen su propia base de datos y que los scripts no dependan de SvelteKit.
   - `infra/db/cliente.ts`: `crearConexion(url)`, sin leer variables de entorno.
   - `infra/db/app.ts`: la conexión de la app (lee `$app/env/private`). Solo la importan rutas y hooks.
+  - El correo sigue el mismo patrón: `infra/correo/cliente.ts` (`crearCorreo(config)`) e `infra/correo/app.ts`. El dominio no envía correos: devuelve el código y la ruta construye el enlace y envía.
   - ESLint lo impone: el dominio puede importar `infra/db/esquema.ts` y `infra/db/tipos.ts` (sin efectos), pero no `app.ts`, `cliente.ts` ni el resto de `infra/`.
 - **Migraciones**: se edita `esquema.ts`, `pnpm db:generate` escribe el SQL en `drizzle/`, se **revisa** y se sube junto con el esquema. La CI falla si el esquema y las migraciones no coinciden. No se usa `drizzle-kit push`, porque desincroniza la base de las migraciones. Los datos iniciales y los *triggers* van en migraciones `--custom`.
 - **Estados del ticket**: `src/lib/estados.ts` (compartido con el navegador) y el `pgEnum` del esquema deben coincidir; una comprobación de tipos en `esquema.ts` falla si no.

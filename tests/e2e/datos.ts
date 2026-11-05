@@ -15,3 +15,29 @@ export const SOCIOS = {
 } as const;
 
 export type Perfil = keyof typeof SOCIOS;
+
+/** Tesoreros activos, con contraseña conocida, para las pruebas de gestión. */
+export const TESOREROS = {
+	movil: {
+		nombre: 'Tesorera Móvil',
+		telefono: '+34699000011',
+		email: 'tesorera.movil@ejemplo.invalid'
+	},
+	escritorio: {
+		nombre: 'Tesorero Escritorio',
+		telefono: '+34699000012',
+		email: 'tesorero.escritorio@ejemplo.invalid'
+	}
+} as const;
+
+export const CONTRASENA_TESORERO = 'contraseña del tesorero e2e';
+
+/** Socios que da de alta cada tesorero en las pruebas (se borran antes de empezar). */
+export const ALTAS = {
+	movil: { nombre: 'Alta Móvil', telefono: '+34699000021', email: 'alta.movil@ejemplo.invalid' },
+	escritorio: {
+		nombre: 'Alta Escritorio',
+		telefono: '+34699000022',
+		email: 'alta.escritorio@ejemplo.invalid'
+	}
+} as const;

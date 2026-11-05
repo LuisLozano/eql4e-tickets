@@ -10,7 +10,10 @@
 		data.usuario
 			? [
 					...(data.usuario.esTesorero
-						? [{ href: resolve('/gestion/tickets'), texto: 'Tickets' }]
+						? [
+								{ href: resolve('/gestion/tickets'), texto: 'Tickets' },
+								{ href: resolve('/gestion/usuarios'), texto: 'Usuarios' }
+							]
 						: []),
 					...(data.usuario.esSocio ? [{ href: resolve('/tickets'), texto: 'Mis tickets' }] : [])
 				]

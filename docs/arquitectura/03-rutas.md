@@ -34,8 +34,7 @@ Leyenda de acceso: 🌐 pública · 👤 con sesión · 💼 tesorero.
 | `/gestion/tickets/[numero]` | 💼 | `load`; acciones `autorizar`, `rechazar`, `deshacer` (con `version`) | HU-T02–T04, T06 |
 | `/gestion/pagos/nuevo?socio=…` | 💼 | `load`: tickets pendientes de pago del socio; acción `default` (multipart, justificante opcional) | HU-T05 |
 | `/gestion/pagos/[id]` | 💼 | `load`: detalle del pago y sus tickets; acción `deshacer` | HU-T05, T06 |
-| `/gestion/usuarios` | 💼 | `load`: listado con estado | HU-G03 |
-| `/gestion/usuarios/nuevo` | 💼 | acción `default` (alta + email) | HU-G01 |
+| `/gestion/usuarios` | 💼 | `load`: listado con estado; acción `alta` (alta + email), con el formulario en la misma página, como en el boceto | HU-G01, G03 |
 | `/gestion/usuarios/[id]` | 💼 | acciones `guardar`, `reenviarInvitacion`, `baja`, `reactivar` | HU-G02, G03 |
 | `/gestion/conceptos` | 💼 | acciones `crear`, `renombrar`, `reordenar`, `activar`, `desactivar` | HU-G04 |
 
