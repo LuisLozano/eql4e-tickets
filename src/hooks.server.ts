@@ -4,6 +4,7 @@ import { URL_PUBLICA } from '$app/env/private';
 import { asegurarTesoreroInicial } from '#lib/server/dominio/auth/tesorero-inicial.ts';
 import { validarSesion } from '#lib/server/dominio/auth/sesiones.ts';
 import { db } from '#lib/server/infra/db/app.ts';
+import { enlaceActivacion } from '#lib/server/web/enlaces.ts';
 import { COOKIE_SESION, ponerCookieSesion, quitarCookieSesion } from '#lib/server/web/sesion.ts';
 
 /** Al arrancar: tesorero inicial si no hay ninguno activo (R-06). */
@@ -11,8 +12,6 @@ export const init: ServerInit = async () => {
 	try {
 		const inicial = await asegurarTesoreroInicial(db, new Date());
 		if (inicial) {
-			const enlace = new URL('/activar', URL_PUBLICA);
-			enlace.searchParams.set('codigo', inicial.codigo);
 			console.log(
 				[
 					'',
@@ -21,7 +20,7 @@ export const init: ServerInit = async () => {
 					`con el teléfono ${inicial.telefono} y elige tu contraseña`,
 					'(válido 7 días; se genera otro en cada arranque):',
 					'',
-					enlace.toString(),
+					enlaceActivacion(URL_PUBLICA, inicial.codigo),
 					'=========================================================',
 					''
 				].join('\n')
