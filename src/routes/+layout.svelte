@@ -12,7 +12,8 @@
 					...(data.usuario.esTesorero
 						? [
 								{ href: resolve('/gestion/tickets'), texto: 'Tickets' },
-								{ href: resolve('/gestion/usuarios'), texto: 'Usuarios' }
+								{ href: resolve('/gestion/usuarios'), texto: 'Usuarios' },
+								{ href: resolve('/gestion/conceptos'), texto: 'Conceptos' }
 							]
 						: []),
 					...(data.usuario.esSocio ? [{ href: resolve('/tickets'), texto: 'Mis tickets' }] : [])

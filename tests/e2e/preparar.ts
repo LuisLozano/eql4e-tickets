@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 import { hash } from '@node-rs/argon2';
 import postgres from 'postgres';
 import { migrar } from '../../scripts/migrar.js';
-import { ALTAS, CONTRASENA_TESORERO, REMITENTES, SOCIOS, TESOREROS } from './datos.ts';
+import { ALTAS, CONCEPTOS, CONTRASENA_TESORERO, REMITENTES, SOCIOS, TESOREROS } from './datos.ts';
 
 const sha256 = (texto: string) => createHash('sha256').update(texto).digest('hex');
 
@@ -36,6 +36,10 @@ export default async function preparar() {
 			await sql`
 				insert into codigo_acceso (usuario_id, codigo_hash, tipo, caduca_en)
 				values (${id}, ${sha256(socio.codigo.replaceAll('-', ''))}, 'activacion', now() + interval '1 day')`;
+		}
+
+		for (const c of Object.values(CONCEPTOS)) {
+			await sql`delete from concepto where nombre in (${c.nombre}, ${c.renombrado})`;
 		}
 
 		const passwordHash = await hash(CONTRASENA_TESORERO);

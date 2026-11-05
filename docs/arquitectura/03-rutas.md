@@ -36,7 +36,7 @@ Leyenda de acceso: 🌐 pública · 👤 con sesión · 💼 tesorero.
 | `/gestion/pagos/[id]` | 💼 | `load`: detalle del pago y sus tickets; acción `deshacer` | HU-T05, T06 |
 | `/gestion/usuarios` | 💼 | `load`: listado con estado; acción `alta` (alta + email), con el formulario en la misma página, como en el boceto | HU-G01, G03 |
 | `/gestion/usuarios/[id]` | 💼 | acciones `guardar`, `reenviarInvitacion`, `baja`, `reactivar` | HU-G02, G03 |
-| `/gestion/conceptos` | 💼 | acciones `crear`, `renombrar`, `reordenar`, `activar`, `desactivar` | HU-G04 |
+| `/gestion/conceptos` | 💼 | `load` con `?editar=<id>` (renombrar en su fila, también sin JavaScript); acciones `crear`, `renombrar`, `subir`, `bajar`, `activar`, `desactivar`. No hay borrado: un concepto se desactiva | HU-G04 |
 
 ## Endpoints
 

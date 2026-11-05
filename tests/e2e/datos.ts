@@ -42,6 +42,12 @@ export const ALTAS = {
 	}
 } as const;
 
+/** Conceptos que crea cada tesorero en las pruebas (se borran antes de empezar). */
+export const CONCEPTOS = {
+	movil: { nombre: 'Imprenta móvil', renombrado: 'Copistería móvil' },
+	escritorio: { nombre: 'Imprenta escritorio', renombrado: 'Copistería escritorio' }
+} as const;
+
 /** Socios ya activos que envían tickets (se crean en preparar.ts con CONTRASENA_TESORERO). */
 export const REMITENTES = {
 	movil: {

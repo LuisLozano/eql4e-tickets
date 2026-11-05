@@ -46,7 +46,7 @@ erDiagram
     }
     concepto {
         int id PK
-        text nombre UK
+        text nombre UK "único sin mayúsculas"
         int orden
         bool activo
     }
@@ -118,6 +118,7 @@ erDiagram
 | Regla | Implementación |
 |---|---|
 | Concepto obligatorio: predefinido **u** "Otro" | `CHECK ((concepto_id IS NULL) <> (concepto_otro IS NULL))` |
+| Nombre de concepto único sin distinguir mayúsculas, de 1 a 50 caracteres y distinto de «Otro» | Índice único `concepto_nombre_unico` sobre `lower(nombre)`; `CHECK` de longitud y de «otro» |
 | Importe positivo | `CHECK (importe_centimos > 0)` |
 | Un ticket pagado tiene pago, y solo él | `CHECK ((estado = 'pagado') = (pago_id IS NOT NULL))` |
 | Rechazado ⇒ motivo | `CHECK (estado <> 'rechazado' OR motivo_rechazo IS NOT NULL)` |
