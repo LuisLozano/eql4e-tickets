@@ -1,6 +1,6 @@
 // Gestión de conceptos (HU-G04). Un concepto no se borra: se desactiva, y sus tickets lo conservan.
 import { and, asc, count, eq, ne, sql } from 'drizzle-orm';
-import { concepto, ticket } from '#lib/server/infra/db/esquema.ts';
+import { claveNombre, concepto, ticket } from '#lib/server/infra/db/esquema.ts';
 import type { Conexion } from '#lib/server/infra/db/tipos.ts';
 
 /** Todos los conceptos en el orden en que los ven los socios, con su número de tickets. */
@@ -20,7 +20,8 @@ export async function listarConceptos(conexion: Conexion) {
 
 export type ConceptoListado = Awaited<ReturnType<typeof listarConceptos>>[number];
 
-const mismoNombre = (nombre: string) => eq(sql`lower(${concepto.nombre})`, nombre.toLowerCase());
+const mismoNombre = (nombre: string) =>
+	eq(claveNombre(concepto.nombre), claveNombre(sql`${nombre}`));
 
 export type ResultadoCrear = { ok: true; id: number } | { ok: false; motivo: 'duplicado' };
 

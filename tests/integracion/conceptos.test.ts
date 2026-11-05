@@ -42,9 +42,19 @@ describe('crear concepto (HU-G04)', () => {
 			expect((await nombres(tx)).slice(-2)).toEqual(['Imprenta', 'Librería']);
 		}));
 
-	it('no admite un nombre repetido, sin distinguir mayúsculas', () =>
+	it('no admite un nombre repetido, sin distinguir mayúsculas ni tildes', () =>
 		sinGuardar(async (tx) => {
-			expect(await crearConcepto(tx, 'FERRETERÍA')).toEqual({ ok: false, motivo: 'duplicado' });
+			for (const nombre of ['FERRETERÍA', 'ferreteria', 'Ferretería']) {
+				expect(await crearConcepto(tx, nombre)).toEqual({ ok: false, motivo: 'duplicado' });
+			}
+		}));
+});
+
+describe('nombres con ñ', () => {
+	it('la ñ no es una n con tilde: «Año» y «Ano» son distintos', () =>
+		sinGuardar(async (tx) => {
+			await crear(tx, 'Año');
+			expect((await crearConcepto(tx, 'Ano')).ok).toBe(true);
 		}));
 });
 
@@ -77,7 +87,7 @@ describe('renombrar concepto', () => {
 	it('no admite el nombre de otro concepto', () =>
 		sinGuardar(async (tx) => {
 			const id = await crear(tx, 'Imprenta');
-			expect(await renombrarConcepto(tx, id, 'transporte')).toEqual({
+			expect(await renombrarConcepto(tx, id, 'ALIMENTACION')).toEqual({
 				ok: false,
 				motivo: 'duplicado'
 			});

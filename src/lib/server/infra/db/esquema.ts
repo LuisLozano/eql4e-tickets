@@ -1,6 +1,6 @@
 // Esquema de la base de datos (docs/arquitectura/02-modelo-datos.md).
 // Los nombres van en camelCase en TypeScript y en snake_case en PostgreSQL (opción `casing` de Drizzle).
-import { relations, sql } from 'drizzle-orm';
+import { relations, sql, type SQLWrapper } from 'drizzle-orm';
 import {
 	bigint,
 	boolean,
@@ -117,6 +117,13 @@ export const codigoAcceso = pgTable(
 
 // --- Conceptos ---
 
+/**
+ * Clave para comparar nombres de concepto: sin mayúsculas ni tildes («Ferretería» = «ferreteria»).
+ * La ñ se mantiene: es otra letra. `translate` y `lower` son inmutables, así que valen para un índice.
+ */
+export const claveNombre = (columna: SQLWrapper) =>
+	sql`translate(lower(${columna}), 'áàâäéèêëíìîïóòôöúùûü', 'aaaaeeeeiiiioooouuuu')`;
+
 export const concepto = pgTable(
 	'concepto',
 	{
@@ -126,11 +133,11 @@ export const concepto = pgTable(
 		activo: boolean().notNull().default(true)
 	},
 	(t) => [
-		// Único sin distinguir mayúsculas: «ferretería» choca con «Ferretería».
-		uniqueIndex('concepto_nombre_unico').on(sql`lower(${t.nombre})`),
+		// Único sin distinguir mayúsculas ni tildes: «ferreteria» choca con «Ferretería».
+		uniqueIndex('concepto_nombre_unico').on(claveNombre(t.nombre)),
 		check('concepto_nombre_largo', sql`char_length(${t.nombre}) between 1 and 50`),
 		// «Otro» es la opción fija del formulario del ticket, no un concepto.
-		check('concepto_nombre_no_otro', sql`lower(${t.nombre}) <> 'otro'`)
+		check('concepto_nombre_no_otro', sql`${claveNombre(t.nombre)} <> 'otro'`)
 	]
 );
 
