@@ -13,6 +13,7 @@ import {
 	pgTable,
 	text,
 	timestamp,
+	uniqueIndex,
 	uuid,
 	type AnyPgColumn
 } from 'drizzle-orm/pg-core';
@@ -116,12 +117,22 @@ export const codigoAcceso = pgTable(
 
 // --- Conceptos ---
 
-export const concepto = pgTable('concepto', {
-	id: integer().primaryKey().generatedAlwaysAsIdentity(),
-	nombre: text().notNull().unique(),
-	orden: integer().notNull().default(0),
-	activo: boolean().notNull().default(true)
-});
+export const concepto = pgTable(
+	'concepto',
+	{
+		id: integer().primaryKey().generatedAlwaysAsIdentity(),
+		nombre: text().notNull(),
+		orden: integer().notNull().default(0),
+		activo: boolean().notNull().default(true)
+	},
+	(t) => [
+		// Único sin distinguir mayúsculas: «ferretería» choca con «Ferretería».
+		uniqueIndex('concepto_nombre_unico').on(sql`lower(${t.nombre})`),
+		check('concepto_nombre_largo', sql`char_length(${t.nombre}) between 1 and 50`),
+		// «Otro» es la opción fija del formulario del ticket, no un concepto.
+		check('concepto_nombre_no_otro', sql`lower(${t.nombre}) <> 'otro'`)
+	]
+);
 
 // --- Tickets ---
 

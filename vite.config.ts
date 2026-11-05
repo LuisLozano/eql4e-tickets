@@ -21,13 +21,15 @@ export default defineConfig({
 			provider: 'v8',
 			include: ['src/lib/**/*.ts'],
 			exclude: ['src/**/*.test.ts'],
-			// ADR-0007: 100 % de ramas en la máquina de estados, los permisos, la autenticación y el alta.
+			// ADR-0007: 100 % de ramas en la máquina de estados, los permisos, la autenticación, el alta y
+			// los conceptos.
 			// Los ficheros llegan en el Sprint 1; los umbrales se aplican en cuanto existan.
 			thresholds: {
 				'src/lib/server/dominio/ticket/estados.ts': { branches: 100 },
 				'src/lib/server/dominio/ticket/permisos.ts': { branches: 100 },
 				'src/lib/server/dominio/auth/**': { branches: 100 },
-				'src/lib/server/dominio/usuario/**': { branches: 100 }
+				'src/lib/server/dominio/usuario/**': { branches: 100 },
+				'src/lib/server/dominio/concepto/**': { branches: 100 }
 			}
 		},
 		projects: [
