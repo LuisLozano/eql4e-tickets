@@ -3,6 +3,7 @@
 	import Aviso from '#lib/componentes/Aviso.svelte';
 	import Boton from '#lib/componentes/Boton.svelte';
 	import Campo from '#lib/componentes/Campo.svelte';
+	import CampoTelefono from '#lib/componentes/CampoTelefono.svelte';
 	import { formatoFecha } from '#lib/formato.ts';
 	import { formatoTelefono } from '#lib/telefono.ts';
 	import type { PageProps } from './$types';
@@ -163,13 +164,10 @@
 					bind:value={$form.nombre}
 					errores={$errors.nombre}
 				/>
-				<Campo
+				<CampoTelefono
 					etiqueta="Teléfono"
 					name="telefono"
-					type="tel"
-					inputmode="tel"
 					autocomplete="off"
-					placeholder="612 345 678"
 					bind:value={$form.telefono}
 					errores={$errors.telefono}
 				/>
