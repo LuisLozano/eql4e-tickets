@@ -354,6 +354,17 @@ describe('reenviar invitación (HU-G02)', () => {
 	});
 });
 
+describe('usuario inexistente', () => {
+	it('baja, reactivar y reenviar no lo encuentran', async () => {
+		const tesorero = await crearUsuario(db, { esTesorero: true });
+		const nadie = '00000000-0000-4000-8000-000000000000';
+		const r = { ok: false, motivo: 'no_encontrado' };
+		expect(await darDeBaja(db, tesorero.id, nadie, ahora)).toEqual(r);
+		expect(await reactivar(db, nadie)).toEqual(r);
+		expect(await reenviarInvitacion(db, tesorero.id, nadie, ahora)).toEqual(r);
+	});
+});
+
 describe('ficha de usuario', () => {
 	it('marca los datos ficticios del tesorero inicial (R-06)', async () => {
 		const u = await crearUsuario(db);
