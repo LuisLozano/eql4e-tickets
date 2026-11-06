@@ -22,27 +22,33 @@ test('un tesorero filtra, ordena y pagina el listado global (HU-T01)', async ({ 
 	await expect(page).toHaveURL(/\/gestion\/tickets$/);
 	await expect(page.getByRole('heading', { name: 'Tickets', exact: true })).toBeVisible();
 
+	const estados = page.getByRole('navigation', { name: 'Filtrar por estado' });
+	const panel = page.locator('details');
+	const casilla = (nombre: RegExp) => estados.getByRole('link', { name: nombre });
+
+	// Por defecto, lo pendiente de autorizar. Pulsar un estado no abre el panel de filtros.
+	await expect(casilla(/Pendiente de autorizar/)).toHaveAttribute('aria-current', 'true');
+	await casilla(/Rechazado/).click();
+	await expect(page).toHaveURL(/\?estado=rechazado$/);
+	await expect(casilla(/Rechazado/)).toHaveAttribute('aria-current', 'true');
+	await expect(panel).not.toHaveAttribute('open');
+
 	// Filtrar por socio: la URL solo lleva lo puesto.
 	await page.getByText('Filtros y orden').click();
 	await page.getByLabel('Socio').selectOption({ label: socio.nombre });
 	await page.getByRole('button', { name: 'Aplicar' }).click();
-	await expect(page).toHaveURL(/\/gestion\/tickets\?socio=[0-9a-f-]{36}$/);
-
-	// Orden por defecto: pendiente de autorizar, pendiente de pago, rechazado.
-	await expect.poll(() => importes(page, perfil)).toEqual(['10,00', '7,25', '25,50']);
-	const totales = page.getByRole('navigation', { name: 'Totales por estado' });
-	await expect(totales.getByRole('listitem').last()).toContainText('Total filtrado');
-	await expect(totales.getByRole('listitem').last()).toContainText('42,75');
-	await expect(totales.getByRole('listitem').last()).toContainText('3 tickets');
-
-	// Un total por estado es un filtro rápido; pulsarlo otra vez lo quita.
-	await totales.getByRole('link', { name: /Rechazado/ }).click();
-	await expect(page).toHaveURL(/estado=rechazado/);
+	await expect(page).toHaveURL(/\/gestion\/tickets\?estado=rechazado&socio=[0-9a-f-]{36}$/);
 	await expect.poll(() => importes(page, perfil)).toEqual(['25,50']);
 	await expect(page.getByText('Otro: Floristería').locator('visible=true')).toBeVisible();
-	await totales.getByRole('link', { name: /Rechazado/ }).click();
-	await expect(page).not.toHaveURL(/estado=/);
-	await expect.poll(() => importes(page, perfil)).toHaveLength(3);
+
+	// Las casillas cuentan cada estado con los demás filtros; «Todos» los suma y los lista.
+	await expect(casilla(/Pendiente de pago/)).toContainText('7,25');
+	await expect(casilla(/Todos/)).toContainText('42,75');
+	await expect(casilla(/Todos/)).toContainText('3 tickets');
+	await casilla(/Todos/).click();
+	await expect(page).toHaveURL(/estado=todos/);
+	// Orden por defecto: pendiente de autorizar, pendiente de pago, rechazado.
+	await expect.poll(() => importes(page, perfil)).toEqual(['10,00', '7,25', '25,50']);
 
 	// Ordenar por importe: en escritorio, con las cabeceras; en el móvil, con el formulario.
 	if (perfil === 'escritorio') {

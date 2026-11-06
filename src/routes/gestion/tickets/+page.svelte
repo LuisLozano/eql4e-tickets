@@ -7,7 +7,9 @@
 	import { ESTADOS_TICKET, TEXTO_ESTADO } from '#lib/estados.ts';
 	import {
 		centimosATexto,
+		ESTADOS_POR_DEFECTO,
 		consulta,
+		estadoCambiado,
 		filtrosActivos,
 		ordenarPor,
 		type FiltrosListado,
@@ -25,7 +27,9 @@
 
 	const lista = resolve('/gestion/tickets');
 	const f = $derived(data.filtros);
+	// Filtros del panel (no el estado, que se ve en las casillas): solo con ellos se abre al cargar.
 	const activos = $derived(filtrosActivos(f));
+	const algunFiltro = $derived(activos > 0 || estadoCambiado(f));
 	/** La parte «?…» de un enlace: lo aplicado con algún cambio, y de vuelta a la página 1. */
 	const q = (cambios: Partial<FiltrosListado>) => consulta({ ...f, pagina: 1, ...cambios });
 
@@ -55,8 +59,21 @@
 		);
 		const valor = (nombre: string) => campos.find((c) => c.name === nombre)?.value;
 		const ordenPorDefecto = valor('orden') === 'estado' && valor('dir') === 'asc';
+		// Los estados: «todos» solo hace falta si no se ha marcado ninguno, y los de por defecto no se
+		// escriben.
+		const marcados = campos.filter(
+			(c) =>
+				c.name === 'estado' && c instanceof HTMLInputElement && c.type === 'checkbox' && c.checked
+		);
+		const estadoPorDefecto =
+			marcados.length === ESTADOS_POR_DEFECTO.length &&
+			marcados.every((c) => (ESTADOS_POR_DEFECTO as readonly string[]).includes(c.value));
 		const sobran = campos.filter(
-			(c) => c.value === '' || (ordenPorDefecto && (c.name === 'orden' || c.name === 'dir'))
+			(c) =>
+				c.value === '' ||
+				(ordenPorDefecto && (c.name === 'orden' || c.name === 'dir')) ||
+				(c.name === 'estado' && c.value === 'todos' && marcados.length > 0) ||
+				(estadoPorDefecto && marcados.includes(c))
 		);
 		for (const c of sobran) c.disabled = true;
 		setTimeout(() => sobran.forEach((c) => (c.disabled = false)));
@@ -73,32 +90,33 @@
 <main class="mx-auto flex max-w-5xl flex-col gap-5 px-4 py-8">
 	<h1 class="font-display text-3xl font-bold">Tickets</h1>
 
-	<!-- Totales del resultado filtrado; cada estado funciona como filtro rápido. -->
-	<nav aria-label="Totales por estado" class="-mx-4 overflow-x-auto px-4">
-		<ul class="flex gap-2">
-			{#each data.porEstado as t (t.estado)}
-				{@const solo = f.estados.length === 1 && f.estados[0] === t.estado}
+	<!--
+		Filtro rápido de estado. Cada casilla cuenta lo que hay en su estado con los demás filtros, así
+		que no cambian al pulsarlas; «Todos» suma los cinco.
+	-->
+	<nav aria-label="Filtrar por estado" class="-mx-4 overflow-x-auto px-4">
+		<ul class="flex gap-2 lg:grid lg:grid-cols-6">
+			{#each [...data.porEstado, null] as t (t?.estado ?? 'todos')}
+				{@const marcada = t ? f.estados.includes(t.estado) : f.estados.length === 0}
+				{@const cifras = t ?? data.todos}
 				<li>
 					<a
-						href="{lista}{q({ estados: solo ? [] : [t.estado] })}"
-						aria-current={solo ? 'true' : undefined}
-						class="flex min-w-36 flex-col items-start gap-1 rounded-lg border border-line bg-surface px-3 py-2 hover:bg-sunken aria-[current=true]:border-ink aria-[current=true]:ring-1 aria-[current=true]:ring-ink"
+						href="{lista}{q({ estados: t ? [t.estado] : [] })}"
+						aria-current={marcada ? 'true' : undefined}
+						class="flex h-full min-w-36 flex-col items-start gap-1 rounded-lg border border-line bg-surface px-3 py-2 hover:bg-sunken aria-[current=true]:border-ink aria-[current=true]:ring-2 aria-[current=true]:ring-ink lg:min-w-0"
 					>
-						<EstadoInsignia estado={t.estado} />
-						<span class="font-mono font-bold tabular-nums">{formatoImporte(t.centimos)}</span>
+						{#if t}
+							<EstadoInsignia estado={t.estado} corto />
+						{:else}
+							<span class="px-2.5 py-0.5 text-sm font-bold">Todos</span>
+						{/if}
+						<span class="font-mono font-bold tabular-nums">{formatoImporte(cifras.centimos)}</span>
 						<span class="text-sm text-muted"
-							>{t.tickets} {t.tickets === 1 ? 'ticket' : 'tickets'}</span
+							>{cifras.tickets} {cifras.tickets === 1 ? 'ticket' : 'tickets'}</span
 						>
 					</a>
 				</li>
 			{/each}
-			<li class="flex min-w-36 flex-col items-start gap-1 rounded-lg bg-ink px-3 py-2 text-on-ink">
-				<span class="text-sm font-bold">{activos ? 'Total filtrado' : 'Total'}</span>
-				<span class="font-mono font-bold tabular-nums">{formatoImporte(data.total.centimos)}</span>
-				<span class="text-sm opacity-80"
-					>{data.total.tickets} {data.total.tickets === 1 ? 'ticket' : 'tickets'}</span
-				>
-			</li>
 		</ul>
 	</nav>
 
@@ -124,6 +142,8 @@
 			>
 				<fieldset class="flex flex-col gap-1.5">
 					<legend class="mb-1.5 font-bold">Estado</legend>
+					<!-- Sin ningún estado marcado, todos (sin esto, volvería al de por defecto). -->
+					<input type="hidden" name="estado" value="todos" />
 					<div class="flex flex-wrap gap-2">
 						{#each ESTADOS_TICKET as e (e)}
 							<label class={claseFicha}>
@@ -199,7 +219,7 @@
 
 				<div class="flex flex-wrap items-center gap-3">
 					<Boton type="submit">Aplicar</Boton>
-					{#if activos}
+					{#if algunFiltro}
 						<a href={lista} class="min-h-11 content-center px-2 font-bold underline"
 							>Limpiar filtros</a
 						>
@@ -211,7 +231,15 @@
 
 	{#if data.filas.length === 0}
 		<p class="text-muted">
-			{activos ? 'No hay tickets con estos filtros.' : 'Todavía no hay ningún ticket.'}
+			{#if activos}
+				No hay tickets con estos filtros.
+			{:else if !estadoCambiado(f)}
+				No hay tickets pendientes de autorizar.
+			{:else if f.estados.length === 0}
+				Todavía no hay ningún ticket.
+			{:else}
+				No hay tickets en este estado.
+			{/if}
 		</p>
 	{:else}
 		<!-- Ordenador: tabla. Las cabeceras ordenan; la fila entera abre el ticket. -->

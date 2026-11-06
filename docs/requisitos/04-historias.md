@@ -81,7 +81,8 @@
 - Columnas: fecha de compra, socio, concepto, importe, estado y fecha de envío.
 - **Ordenación** por estado, concepto, socio, importe y fechas (ascendente/descendente). Por defecto: por estado (*Pend. autorizar* → *Pend. pago* → *Rechazado* → *Pagado* → *Anulado*) y, dentro de cada uno, por fecha de envío ascendente (lo más antiguo primero).
 - **Filtros** combinables: estado (varios), concepto, socio, rango de fechas e importe mínimo/máximo.
-- **Totales** del resultado filtrado: número de tickets e importe, desglosado por estado.
+- **Por defecto** se ven solo los *Pendientes de autorizar*, que es lo que hay que hacer *(decidido 2026-11-06)*; «Todos» quita el filtro de estado.
+- **Totales** por estado (número de tickets e importe) con los demás filtros aplicados, más el de todos los estados. Cada uno es un filtro rápido de estado.
 - Paginación a partir de 50 filas.
 - En ordenador se ve como tabla; en móvil, como lista de tarjetas.
 

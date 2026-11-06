@@ -3,6 +3,7 @@ import {
 	FILTROS_INICIALES,
 	centimosATexto,
 	consulta,
+	estadoCambiado,
 	filtrosActivos,
 	leerFiltros,
 	ordenarPor
@@ -37,6 +38,13 @@ describe('leerFiltros', () => {
 		});
 	});
 
+	it('sin estado, los pendientes de autorizar; «todos», ninguno filtrado', () => {
+		expect(leer('').estados).toEqual(['pendiente_autorizar']);
+		expect(leer('estado=todos').estados).toEqual([]);
+		// Si además se marca alguno (el formulario sin JavaScript envía los dos), manda el marcado.
+		expect(leer('estado=todos&estado=rechazado').estados).toEqual(['rechazado']);
+	});
+
 	it('«otro» es el concepto de texto libre', () => {
 		expect(leer('concepto=otro').concepto).toBe('otro');
 	});
@@ -64,6 +72,12 @@ describe('consulta', () => {
 		expect(consulta(leer(texto.slice(1)))).toBe(texto);
 	});
 
+	it('el estado por defecto no se escribe; ninguno es «todos»', () => {
+		expect(consulta({ ...FILTROS_INICIALES, estados: ['pendiente_autorizar'] })).toBe('');
+		expect(consulta({ ...FILTROS_INICIALES, estados: [] })).toBe('?estado=todos');
+		expect(consulta(leer('estado=todos'))).toBe('?estado=todos');
+	});
+
 	it('el orden por defecto en descendente sí se escribe', () => {
 		expect(consulta({ ...FILTROS_INICIALES, dir: 'desc' })).toBe('?orden=estado&dir=desc');
 	});
@@ -80,11 +94,19 @@ describe('centimosATexto', () => {
 });
 
 describe('filtrosActivos', () => {
-	it('cuenta los rangos una sola vez y no cuenta orden ni página', () => {
+	it('cuenta los rangos una sola vez y no cuenta estado, orden ni página', () => {
 		expect(filtrosActivos(FILTROS_INICIALES)).toBe(0);
-		expect(filtrosActivos(leer('estado=pagado&desde=2026-01-01&hasta=2026-02-01&max=5'))).toBe(3);
+		expect(filtrosActivos(leer('estado=pagado&desde=2026-01-01&hasta=2026-02-01&max=5'))).toBe(2);
 		expect(filtrosActivos(leer(`concepto=2&socio=${SOCIO}&hasta=2026-02-01&min=1`))).toBe(4);
 		expect(filtrosActivos(leer('orden=importe&pagina=4'))).toBe(0);
+	});
+});
+
+describe('estadoCambiado', () => {
+	it('solo si no es el de por defecto', () => {
+		expect(estadoCambiado(FILTROS_INICIALES)).toBe(false);
+		expect(estadoCambiado(leer('estado=todos'))).toBe(true);
+		expect(estadoCambiado(leer('estado=pendiente_autorizar&estado=pagado'))).toBe(true);
 	});
 });
 
