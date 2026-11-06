@@ -30,7 +30,7 @@ Leyenda de acceso: 🌐 pública · 👤 con sesión · 💼 tesorero.
 | Ruta | Acceso | `load` / acciones | Historia |
 |---|:-:|---|---|
 | `/gestion/tickets` | 💼 | `load` con `?estado=&concepto=&socio=&desde=&hasta=&min=&max=&orden=&dir=&pagina=` (`estado` se repite; sin `estado`, solo los pendientes de autorizar, y `estado=todos` para todos; `concepto=otro` para el texto libre; `desde`/`hasta` sobre la fecha de compra; un valor que no se entiende se ignora); por cada estado, lo que hay con los demás filtros (son el filtro rápido de estado); 50 por página | HU-T01 |
-| `/gestion/tickets.csv` | 💼 | `GET` `+server.ts`, mismos parámetros | HU-T07 |
+| `/gestion/tickets.csv` | 💼 | `GET` `+server.ts`, mismos parámetros y orden que el listado, sin paginar (botón «Exportar CSV»). Para Excel en español: `;`, coma decimal, UTF-8 con BOM y CRLF. El teléfono va sin el `+34` y los textos que empiezan por `= + - @` llevan un apóstrofo delante (inyección CSV) | HU-T07 |
 | `/gestion/tickets/[numero]` | 💼 | `load`; acciones `autorizar`, `rechazar` y `deshacer` (autorización o rechazo, con motivo), todas con `version`. Deshacer un pago se hace en `/gestion/pagos/[id]` | HU-T02–T04, T06 |
 | `/gestion/pagos` | 💼 | `load`: socios con tickets pendientes de pago (sin los del propio tesorero, R-04) y últimos pagos | HU-T05 |
 | `/gestion/pagos/nuevo?socio=…&ticket=…` | 💼 | `load`: tickets pendientes de pago del socio, todos marcados (o solo `ticket`, si se viene del detalle); acción `default` (multipart, justificante opcional; cada ticket con su versión, E-04). Vuelve a `/gestion/pagos/[id]?registrado` | HU-T05 |

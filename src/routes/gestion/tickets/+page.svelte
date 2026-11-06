@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ArrowDown, ArrowUp, ChevronDown, Lock } from '@lucide/svelte';
+	import { ArrowDown, ArrowUp, ChevronDown, Download, Lock } from '@lucide/svelte';
 	import { resolve } from '$app/paths';
 	import Boton from '#lib/componentes/Boton.svelte';
 	import Campo from '#lib/componentes/Campo.svelte';
@@ -88,7 +88,16 @@
 <svelte:head><title>Tickets · Gestión</title></svelte:head>
 
 <main class="mx-auto flex max-w-5xl flex-col gap-5 px-4 py-8">
-	<h1 class="font-display text-3xl font-bold">Tickets</h1>
+	<div class="flex flex-wrap items-center justify-between gap-3">
+		<h1 class="font-display text-3xl font-bold">Tickets</h1>
+		<!-- Lo listado con los filtros aplicados, todas las páginas (HU-T07). -->
+		<a
+			href="{resolve('/gestion/tickets.csv')}{q({})}"
+			download
+			class="inline-flex min-h-11 items-center gap-2 rounded-lg border border-line bg-surface px-4 font-bold hover:bg-sunken"
+			><Download size={20} aria-hidden="true" />Exportar CSV</a
+		>
+	</div>
 
 	<!--
 		Filtro rápido de estado. Cada casilla cuenta lo que hay en su estado con los demás filtros, así

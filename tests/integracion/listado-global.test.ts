@@ -8,6 +8,7 @@ import {
 } from '../../src/lib/listado-tickets.ts';
 import {
 	ORDEN_ESTADOS,
+	exportarListado,
 	listadoGlobal,
 	opcionesListado
 } from '../../src/lib/server/dominio/ticket/listado.ts';
@@ -313,5 +314,49 @@ describe('listado global (HU-T01)', () => {
 				{ id: conTickets.id, nombre: conTickets.nombre, deBaja: true }
 			]);
 			expect(socios.map((s) => s.id)).not.toContain(sinTickets.id);
+		}));
+});
+
+describe('exportar el listado (HU-T07)', () => {
+	it('todo lo filtrado, sin paginar y en el mismo orden, con el teléfono y el pago', () =>
+		sinGuardar(async (tx) => {
+			const c = await conceptoPropio(tx);
+			const socio = await crearUsuario(tx);
+			await tx.insert(ticket).values(
+				Array.from({ length: TAMANO_PAGINA + 1 }, (_, i) => ({
+					socioId: socio.id,
+					importeCentimos: 100,
+					fechaCompra: '2026-10-15',
+					conceptoId: c,
+					creadoEn: new Date(Date.UTC(2026, 9, 1, 0, i))
+				}))
+			);
+			const pagado = await insertar(tx, c, {
+				socioId: socio.id,
+				estado: 'pagado',
+				importeCentimos: 900
+			});
+			await insertar(tx, c, { socioId: socio.id, estado: 'anulado' });
+
+			const filtros = {
+				...TODOS,
+				concepto: c,
+				estados: ['pendiente_autorizar', 'pagado'] as EstadoTicket[]
+			};
+			const filas = await exportarListado(tx, filtros);
+			expect(filas).toHaveLength(TAMANO_PAGINA + 2);
+			expect(filas.map((f) => f.numero).slice(0, TAMANO_PAGINA)).toEqual(
+				(await listadoGlobal(tx, filtros)).filas.map((f) => f.numero)
+			);
+			expect(filas.at(-1)).toMatchObject({
+				numero: pagado,
+				telefono: socio.telefono,
+				socio: socio.nombre,
+				estado: 'pagado',
+				importeCentimos: 900,
+				fechaPago: '2026-11-01',
+				metodoPago: 'bizum'
+			});
+			expect(filas[0]).toMatchObject({ fechaPago: null, metodoPago: null });
 		}));
 });
