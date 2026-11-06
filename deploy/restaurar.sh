@@ -38,11 +38,11 @@ if [ "$simulacro" = si ]; then
 	docker exec -i "$contenedor" pg_restore -U eql4e -d eql4e --no-owner --exit-on-error \
 		<"$copia/eql4e.dump"
 	docker exec "$contenedor" psql -U eql4e -d eql4e -At -F ': ' -c "
-		select 'usuarios', count(*) from usuario
-		union all select 'tickets', count(*) from ticket
-		union all select 'pagos', count(*) from pago
-		union all select 'ficheros en la base', count(*) from ticket_fichero
-		union all select 'justificantes en la base', count(*) from pago where justificante_ruta is not null
+		select 'usuarios', count(*)::text from usuario
+		union all select 'tickets', count(*)::text from ticket
+		union all select 'pagos', count(*)::text from pago
+		union all select 'ficheros en la base', count(*)::text from ticket_fichero
+		union all select 'justificantes en la base', count(*)::text from pago where justificante_ruta is not null
 		union all select 'ticket más reciente', coalesce(max(creado_en)::text, '—') from ticket"
 	echo "ficheros en la copia: $(tar -tzf "$copia/ficheros.tar.gz" | grep -vc '/$')"
 	echo '✔ Simulacro correcto. El PostgreSQL temporal se borra al salir; producción no se ha tocado.'
