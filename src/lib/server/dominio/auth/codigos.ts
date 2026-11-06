@@ -1,6 +1,6 @@
 // Códigos de invitación y de restablecimiento (ADR-0003, RNF-14): aleatorios, de un solo uso,
 // con caducidad y guardados como SHA-256. Generar uno nuevo invalida los anteriores.
-import { and, eq, gt, isNull } from 'drizzle-orm';
+import { and, eq, gt, inArray, isNull } from 'drizzle-orm';
 import { codigoAcceso, usuario } from '#lib/server/infra/db/esquema.ts';
 import type { Conexion } from '#lib/server/infra/db/tipos.ts';
 import { generarCodigo, normalizarCodigo, sha256 } from './tokens.ts';
@@ -43,13 +43,18 @@ export async function crearCodigo(
 
 /**
  * Marca el código como usado y devuelve el id de su usuario. Nulo si no existe, es de otro tipo,
- * ya se usó, ha caducado, no corresponde a ese teléfono o el usuario no está en el estado esperado;
+ * ya se usó, ha caducado, no corresponde a ese teléfono o el usuario no está en un estado esperado;
  * el motivo no se distingue (HU-A01). Es una sola sentencia, así que dos peticiones simultáneas no
  * pueden usar el mismo código.
  */
 export async function consumirCodigo(
 	conexion: Conexion,
-	datos: { codigo: string; telefono: string; tipo: TipoCodigo; estadoUsuario: EstadoUsuario },
+	datos: {
+		codigo: string;
+		telefono: string;
+		tipo: TipoCodigo;
+		estadoUsuario: EstadoUsuario | readonly EstadoUsuario[];
+	},
 	ahora: Date
 ): Promise<string | null> {
 	const [fila] = await conexion
@@ -64,7 +69,7 @@ export async function consumirCodigo(
 				isNull(codigoAcceso.usadoEn),
 				gt(codigoAcceso.caducaEn, ahora),
 				eq(usuario.telefono, datos.telefono),
-				eq(usuario.estado, datos.estadoUsuario)
+				inArray(usuario.estado, [datos.estadoUsuario].flat())
 			)
 		)
 		.returning({ usuarioId: codigoAcceso.usuarioId });

@@ -40,7 +40,7 @@ eql4e-tickets/
 │   │       │   │   ├── permisos.ts # R-01, R-04 (puro)
 │   │       │   │   └── servicio.ts # cambiar de estado: versión (E-04), transición e historial
 │   │       │   ├── pago/       # registrar (HU-T05), deshacer (HU-T06, E-03) y consultas
-│   │       │   ├── usuario/        # alta, listado, texto de la invitación
+│   │       │   ├── usuario/        # alta, listado y ficha, gestión (editar, baja, reactivar, reenviar), texto de la invitación
 │   │       │   ├── concepto/
 │   │       │   └── purga/
 │   │       ├── infra/

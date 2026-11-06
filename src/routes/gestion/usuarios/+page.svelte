@@ -1,37 +1,19 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
-	import Aviso from '#lib/componentes/Aviso.svelte';
+	import { resolve } from '$app/paths';
 	import Boton from '#lib/componentes/Boton.svelte';
-	import Campo from '#lib/componentes/Campo.svelte';
-	import CampoTelefono from '#lib/componentes/CampoTelefono.svelte';
+	import CamposUsuario from '#lib/componentes/CamposUsuario.svelte';
+	import EnlaceActivacion from '#lib/componentes/EnlaceActivacion.svelte';
 	import { formatoFecha } from '#lib/formato.ts';
+	import type { ResultadoInvitacion } from '#lib/server/web/invitacion.ts';
 	import { formatoTelefono } from '#lib/telefono.ts';
 	import type { PageProps } from './$types';
-	import type { ResultadoInvitacion } from './+page.server.ts';
 
 	let { data }: PageProps = $props();
 	// Superforms toma el valor inicial y se actualiza solo con cada respuesta.
 	// svelte-ignore state_referenced_locally
-	const { form, errors, message, enhance, submitting } = superForm(data.form, {
-		resetForm: true,
-		onSubmit: () => {
-			copiado = false;
-		}
-	});
+	const { form, errors, message, enhance, submitting } = superForm(data.form, { resetForm: true });
 	const invitacion = $derived($message as ResultadoInvitacion | undefined);
-
-	let copiado = $state(false);
-	let campoEnlace = $state<HTMLInputElement>();
-
-	async function copiar(enlace: string) {
-		try {
-			await navigator.clipboard.writeText(enlace);
-			copiado = true;
-		} catch {
-			// Sin permiso de portapapeles: se deja seleccionado para copiarlo a mano.
-			campoEnlace?.select();
-		}
-	}
 
 	type Usuario = (typeof data.usuarios)[number];
 	const roles = (u: Usuario) =>
@@ -75,7 +57,11 @@
 							<tr
 								class="border-b border-line last:border-0 {u.estado === 'baja' ? 'text-muted' : ''}"
 							>
-								<td class="px-3 py-2 font-bold">{u.nombre}</td>
+								<td class="px-3 py-2 font-bold">
+									<a href={resolve('/gestion/usuarios/[id]', { id: u.id })} class="underline"
+										>{u.nombre}</a
+									>
+								</td>
 								<td class="px-3 py-2 font-mono whitespace-nowrap">{formatoTelefono(u.telefono)}</td>
 								<td class="px-3 py-2 break-all">{u.email}</td>
 								<td class="px-3 py-2 whitespace-nowrap">{roles(u)}</td>
@@ -101,7 +87,9 @@
 							: ''}"
 					>
 						<div class="flex flex-wrap items-center justify-between gap-2">
-							<span class="font-bold">{u.nombre}</span>
+							<a href={resolve('/gestion/usuarios/[id]', { id: u.id })} class="font-bold underline"
+								>{u.nombre}</a
+							>
 							<span class="rounded-full px-2 py-0.5 text-xs font-bold {e.clase}">{e.texto}</span>
 						</div>
 						<span class="font-mono text-sm">{formatoTelefono(u.telefono)}</span>
@@ -119,95 +107,11 @@
 			<h2 id="titulo-alta" class="font-display text-xl font-bold">Nuevo usuario</h2>
 
 			{#if invitacion}
-				{#if invitacion.envio === 'enviado'}
-					<Aviso tipo="exito">
-						Invitación enviada a {invitacion.email}. Caduca el {formatoFecha(
-							new Date(invitacion.caducaEn)
-						)}.
-					</Aviso>
-				{:else if invitacion.envio === 'desactivado'}
-					<Aviso tipo="atencion">
-						Usuario dado de alta. El envío de correos está desactivado: copia el enlace y envíaselo
-						a {invitacion.email} por otro medio.
-					</Aviso>
-				{:else}
-					<Aviso tipo="atencion">
-						Usuario dado de alta, pero no se pudo enviar el correo a {invitacion.email}. Copia el
-						enlace y envíaselo por otro medio.
-					</Aviso>
-				{/if}
-				<div class="flex flex-col gap-1.5">
-					<label for="enlace" class="font-bold">Enlace de activación</label>
-					<div class="flex gap-2">
-						<input
-							id="enlace"
-							bind:this={campoEnlace}
-							readonly
-							value={invitacion.enlace}
-							class="min-h-11 w-full min-w-0 rounded-lg border border-line bg-sunken px-3 font-mono text-sm"
-						/>
-						<Boton variante="secundario" onclick={() => copiar(invitacion.enlace)}>
-							{copiado ? 'Copiado' : 'Copiar enlace'}
-						</Boton>
-					</div>
-					<p class="text-sm text-muted">
-						Caduca el {formatoFecha(new Date(invitacion.caducaEn))}. Solo se muestra ahora.
-					</p>
-				</div>
+				<EnlaceActivacion {invitacion} hecho="Usuario dado de alta" />
 			{/if}
 
 			<form method="POST" action="?/alta" use:enhance class="flex flex-col gap-4" novalidate>
-				<Campo
-					etiqueta="Nombre"
-					name="nombre"
-					autocomplete="off"
-					bind:value={$form.nombre}
-					errores={$errors.nombre}
-				/>
-				<CampoTelefono
-					etiqueta="Teléfono"
-					name="telefono"
-					autocomplete="off"
-					bind:value={$form.telefono}
-					errores={$errors.telefono}
-				/>
-				<Campo
-					etiqueta="Email"
-					name="email"
-					type="email"
-					autocomplete="off"
-					bind:value={$form.email}
-					errores={$errors.email}
-				/>
-				<fieldset
-					class="flex flex-col gap-1.5"
-					aria-describedby={$errors.esSocio?.length ? 'roles-error' : undefined}
-				>
-					<legend class="mb-1.5 font-bold">Roles</legend>
-					<div class="flex gap-6">
-						<label class="flex min-h-11 items-center gap-2">
-							<input
-								type="checkbox"
-								name="esSocio"
-								bind:checked={$form.esSocio}
-								class="size-5 rounded border-line"
-							/>
-							Socio
-						</label>
-						<label class="flex min-h-11 items-center gap-2">
-							<input
-								type="checkbox"
-								name="esTesorero"
-								bind:checked={$form.esTesorero}
-								class="size-5 rounded border-line"
-							/>
-							Tesorero
-						</label>
-					</div>
-					{#if $errors.esSocio?.length}
-						<p id="roles-error" class="text-sm font-bold text-rj">{$errors.esSocio[0]}</p>
-					{/if}
-				</fieldset>
+				<CamposUsuario {form} errores={$errors} />
 				<Boton type="submit" anchoCompleto disabled={$submitting}>
 					Dar de alta y enviar invitación
 				</Boton>

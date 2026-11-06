@@ -22,3 +22,6 @@ export const esquemaAlta = z
 	});
 
 export const valoresIniciales = { esSocio: true, esTesorero: false };
+
+/** El mismo formulario sirve para el alta y para editar la ficha (HU-G03). */
+export type CamposUsuario = z.infer<typeof esquemaAlta>;
