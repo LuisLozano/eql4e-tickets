@@ -252,3 +252,75 @@ describe('detalleParaRevisar (HU-T02)', () => {
 		expect(await detalleParaRevisar(db, 2_000_000_000)).toBeNull();
 	});
 });
+
+describe('deshacer una autorización o un rechazo (HU-T06, D1 y D2)', () => {
+	it('vuelve a pendiente de autorizar, con el motivo en el historial', async () => {
+		const { tesorero, t } = await escena();
+		await cambiarEstado(db, tesorero, t.numero, 'autorizar', { version: 1 }, ahora);
+		expect(
+			await cambiarEstado(
+				db,
+				tesorero,
+				t.numero,
+				'deshacer_autorizacion',
+				{ version: 2, motivo: 'Lo autoricé por error' },
+				ahora
+			)
+		).toEqual({ ok: true, estado: 'pendiente_autorizar', version: 3 });
+		expect((await historialDe(t.id)).at(-1)).toMatchObject({
+			accion: 'deshacer_autorizacion',
+			estadoOrigen: 'pendiente_pago',
+			estadoDestino: 'pendiente_autorizar',
+			motivo: 'Lo autoricé por error'
+		});
+
+		await cambiarEstado(
+			db,
+			tesorero,
+			t.numero,
+			'rechazar',
+			{ version: 3, motivo: 'No se lee bien' },
+			ahora
+		);
+		expect(
+			await cambiarEstado(
+				db,
+				tesorero,
+				t.numero,
+				'deshacer_rechazo',
+				{ version: 4, motivo: 'Sí se lee' },
+				ahora
+			)
+		).toEqual({ ok: true, estado: 'pendiente_autorizar', version: 5 });
+	});
+
+	it('sin motivo no, y sobre el propio ticket tampoco (R-04)', async () => {
+		const { tesorero, socio, t } = await escena();
+		await cambiarEstado(db, tesorero, t.numero, 'autorizar', { version: 1 }, ahora);
+		expect(
+			await cambiarEstado(db, tesorero, t.numero, 'deshacer_autorizacion', { version: 2 }, ahora)
+		).toEqual({ ok: false, motivo: 'motivo' });
+		expect(
+			await cambiarEstado(
+				db,
+				socio,
+				t.numero,
+				'deshacer_autorizacion',
+				{ version: 2, motivo: 'Lo quiero cambiar' },
+				ahora
+			)
+		).toEqual({ ok: false, motivo: 'permiso' });
+
+		const suyo = await ticketDe(tesorero.id, 'pendiente_pago');
+		expect(
+			await cambiarEstado(
+				db,
+				tesorero,
+				suyo.numero,
+				'deshacer_autorizacion',
+				{ version: 1, motivo: 'Me lo deshago' },
+				ahora
+			)
+		).toEqual({ ok: false, motivo: 'propio' });
+	});
+});

@@ -8,8 +8,14 @@ import type { Conexion } from '#lib/server/infra/db/tipos.ts';
 import { TRANSICIONES, comprobarTransicion, type AccionTicket, type Actor } from './estados.ts';
 import { puedeVerTicket } from './permisos.ts';
 
-/** Las que no cambian los datos del ticket, solo su estado. Editar y reenviar van aparte. */
-export type AccionDeEstado = Exclude<AccionTicket, 'editar' | 'reenviar' | 'pagar'>;
+/**
+ * Las que no cambian los datos del ticket, solo su estado. Editar y reenviar van aparte, y pagar y
+ * deshacer el pago también: actúan sobre el Pago completo (E-02, E-03).
+ */
+export type AccionDeEstado = Exclude<
+	AccionTicket,
+	'editar' | 'reenviar' | 'pagar' | 'deshacer_pago'
+>;
 
 export type ResultadoCambio =
 	| { ok: true; estado: EstadoTicket; version: number }

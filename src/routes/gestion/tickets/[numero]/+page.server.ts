@@ -1,7 +1,12 @@
 import { error, fail, type RequestEvent } from '@sveltejs/kit';
 import { setError, superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
-import { esquemaAccion, esquemaMotivo } from '#lib/esquemas/revision.ts';
+import {
+	DESHACER_EN_TICKET,
+	esquemaAccion,
+	esquemaDeshacer,
+	esquemaMotivo
+} from '#lib/esquemas/revision.ts';
 import { detalleParaRevisar } from '#lib/server/dominio/ticket/consultas.ts';
 import { accionesPosibles } from '#lib/server/dominio/ticket/estados.ts';
 import { cambiarEstado, type ResultadoCambio } from '#lib/server/dominio/ticket/servicio.ts';
@@ -20,15 +25,24 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	const ticket = await detalleParaRevisar(db, numeroDe(params));
 	if (!ticket) error(404, 'No encontrado');
 	const actor = locals.usuario!;
+	const posibles = accionesPosibles(actor, ticket);
+	// Como mucho una: deshacer la autorización (pendiente de pago) o el rechazo (rechazado).
+	const deshacer = DESHACER_EN_TICKET.find((a) => posibles.includes(a)) ?? null;
 	return {
 		ticket,
 		yo: actor.id,
 		propio: ticket.socioId === actor.id,
-		acciones: accionesPosibles(actor, ticket).filter((a) => a === 'autorizar' || a === 'rechazar'),
+		acciones: posibles.filter((a) => a === 'autorizar' || a === 'rechazar'),
+		deshacer,
 		rechazar: await superValidate({ version: ticket.version }, zod4(esquemaMotivo), {
 			id: 'rechazar',
 			errors: false
-		})
+		}),
+		formDeshacer: await superValidate(
+			{ version: ticket.version, accion: deshacer ?? undefined },
+			zod4(esquemaDeshacer),
+			{ id: 'deshacer', errors: false }
+		)
 	};
 };
 
@@ -84,5 +98,37 @@ export const actions: Actions = {
 			return fail(409, { form, error: MENSAJE[r.motivo] });
 		}
 		return { form, aviso: 'Ticket rechazado. El socio verá el motivo.' };
+	},
+
+	deshacer: async (evento) => {
+		const yo = actor(evento);
+		const form = await superValidate(evento.request, zod4(esquemaDeshacer), { id: 'deshacer' });
+		if (!form.valid) return fail(400, { form });
+		const r = await cambiarEstado(
+			db,
+			yo,
+			numeroDe(evento.params),
+			form.data.accion,
+			form.data,
+			new Date()
+		);
+		if (!r.ok) {
+			if (r.motivo === 'no_encontrado' || r.motivo === 'permiso') error(404, 'No encontrado');
+			if (r.motivo === 'motivo') return setError(form, 'motivo', 'Explica por qué lo deshaces.');
+			return fail(409, {
+				form,
+				error:
+					r.motivo === 'propio'
+						? 'Es tu ticket: no puedes deshacer sus pasos.'
+						: 'El ticket ha cambiado: ese paso ya no se puede deshacer. Revisa cómo está ahora.'
+			});
+		}
+		return {
+			form,
+			aviso:
+				form.data.accion === 'deshacer_autorizacion'
+					? 'Autorización deshecha. Vuelve a estar pendiente de autorizar.'
+					: 'Rechazo deshecho. Vuelve a estar pendiente de autorizar.'
+		};
 	}
 };
