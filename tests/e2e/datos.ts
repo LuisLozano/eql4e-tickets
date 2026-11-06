@@ -89,3 +89,17 @@ export const REVISION = {
 		email: 'revision.escritorio@ejemplo.invalid'
 	}
 } as const;
+
+/** Socios con un ticket pendiente y otro rechazado (en preparar.ts) que anulan. */
+export const ANULAR = {
+	movil: {
+		nombre: 'Anular Móvil',
+		telefono: '+34699000061',
+		email: 'anular.movil@ejemplo.invalid'
+	},
+	escritorio: {
+		nombre: 'Anular Escritorio',
+		telefono: '+34699000062',
+		email: 'anular.escritorio@ejemplo.invalid'
+	}
+} as const;

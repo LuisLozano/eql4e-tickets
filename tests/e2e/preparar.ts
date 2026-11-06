@@ -7,6 +7,7 @@ import postgres from 'postgres';
 import { migrar } from '../../scripts/migrar.js';
 import {
 	ALTAS,
+	ANULAR,
 	CONCEPTOS,
 	CONTRASENA_TESORERO,
 	LISTADO,
@@ -32,7 +33,8 @@ export default async function preparar() {
 			...Object.values(TESOREROS),
 			...Object.values(REMITENTES),
 			...Object.values(LISTADO),
-			...Object.values(REVISION)
+			...Object.values(REVISION),
+			...Object.values(ANULAR)
 		];
 		const telefonos = usuarios.map((u) => u.telefono);
 		const emails = usuarios.map((u) => u.email);
@@ -100,6 +102,18 @@ export default async function preparar() {
 			await sql`
 				insert into ticket (socio_id, importe_centimos, fecha_compra, concepto_id)
 				select id, 900, '2026-10-05', ${concepto} from usuario where telefono = ${t.telefono}`;
+		}
+		// Un pendiente y un rechazado por socio que anula (HU-S05).
+		for (const a of Object.values(ANULAR)) {
+			const [{ id }] = await sql`
+				insert into usuario (nombre, telefono, email, password_hash, estado)
+				values (${a.nombre}, ${a.telefono}, ${a.email}, ${passwordHash}, 'activo')
+				returning id`;
+			await sql`
+				insert into ticket (socio_id, importe_centimos, fecha_compra, concepto_id, estado, motivo_rechazo)
+				values
+					(${id}, 1200, '2026-10-01', ${concepto}, 'pendiente_autorizar', null),
+					(${id}, 840, '2026-10-02', ${concepto}, 'rechazado', 'No se lee')`;
 		}
 	} finally {
 		await sql.end();

@@ -176,13 +176,55 @@ describe('autorizar y rechazar (HU-T03, T04)', () => {
 			motivo: 'no_encontrado'
 		});
 	});
+});
 
-	it('el socio anula el suyo (lo usará HU-S05)', async () => {
+describe('anular (HU-S05)', () => {
+	it('el socio anula el suyo pendiente y queda en el historial, sin motivo', async () => {
 		const { socio, t } = await escena();
 		expect(await cambiarEstado(db, socio, t.numero, 'anular', { version: 1 }, ahora)).toEqual({
 			ok: true,
 			estado: 'anulado',
 			version: 2
+		});
+		expect(await historialDe(t.id)).toEqual([
+			expect.objectContaining({
+				usuarioId: socio.id,
+				accion: 'anular',
+				estadoOrigen: 'pendiente_autorizar',
+				estadoDestino: 'anulado',
+				motivo: null
+			})
+		]);
+	});
+
+	it('también uno rechazado, que conserva el motivo del rechazo', async () => {
+		const { socio } = await escena();
+		const t = await ticketDe(socio.id, 'rechazado');
+		expect(await cambiarEstado(db, socio, t.numero, 'anular', { version: 1 }, ahora)).toMatchObject(
+			{
+				ok: true,
+				estado: 'anulado'
+			}
+		);
+		expect(await estadoDe(t.id)).toMatchObject({ estado: 'anulado', motivoRechazo: 'Borrosa' });
+	});
+
+	it('si el tesorero lo autorizó mientras tanto, no se anula (E-04)', async () => {
+		const { socio, tesorero, t } = await escena();
+		await cambiarEstado(db, tesorero, t.numero, 'autorizar', { version: 1 }, ahora);
+		expect(await cambiarEstado(db, socio, t.numero, 'anular', { version: 1 }, ahora)).toEqual({
+			ok: false,
+			motivo: 'modificado'
+		});
+		expect(await cambiarEstado(db, socio, t.numero, 'anular', { version: 2 }, ahora)).toEqual({
+			ok: false,
+			motivo: 'estado'
+		});
+		// Anulado es final.
+		const otro = await ticketDe(socio.id, 'anulado');
+		expect(await cambiarEstado(db, socio, otro.numero, 'anular', { version: 1 }, ahora)).toEqual({
+			ok: false,
+			motivo: 'estado'
 		});
 	});
 });
