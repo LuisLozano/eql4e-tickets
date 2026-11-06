@@ -11,6 +11,7 @@ import {
 	porPagar,
 	ultimosPagos
 } from '../../src/lib/server/dominio/pago/consultas.ts';
+import { deshacerPago } from '../../src/lib/server/dominio/pago/deshacer.ts';
 import { registrarPago, type DatosPago } from '../../src/lib/server/dominio/pago/registrar.ts';
 import { detalleTicket } from '../../src/lib/server/dominio/ticket/consultas.ts';
 import { almacenEnDisco } from '../../src/lib/server/infra/almacenamiento/disco.ts';
@@ -222,5 +223,98 @@ describe('lo pendiente de pago (HU-T05)', () => {
 			[tickets[0].numero, 1],
 			[tickets[1].numero, 1]
 		]);
+	});
+});
+
+describe('deshacer un pago (HU-T06, E-03)', () => {
+	async function pagado() {
+		const e = await escena();
+		const [a, b] = e.tickets;
+		const r = await registrarPago(db, almacen, e.tesorero, datos(e.socio.id, [a, b]), ahora);
+		if (!r.ok) throw new Error('no se pagó');
+		return { ...e, pagoId: r.id, a, b };
+	}
+	const despues = new Date('2026-11-07T10:00:00Z');
+
+	it('todos sus tickets vuelven a pendiente de pago y el pago queda deshecho, sin borrarse', async () => {
+		const { tesorero, socio, pagoId, a, b } = await pagado();
+		expect(
+			await deshacerPago(db, tesorero, pagoId, '  El Bizum fue a otro número  ', despues)
+		).toEqual({ ok: true, tickets: 2 });
+
+		expect(await estados([a.id, b.id])).toEqual([
+			['pendiente_pago', null, 3],
+			['pendiente_pago', null, 3]
+		]);
+		const [p] = await db.select().from(pago).where(eq(pago.id, pagoId));
+		expect(p).toMatchObject({
+			anuladoEn: despues,
+			anuladoPor: tesorero.id,
+			motivoAnulacion: 'El Bizum fue a otro número'
+		});
+		const entradas = await db
+			.select()
+			.from(historial)
+			.where(eq(historial.accion, 'deshacer_pago'))
+			.then((h) => h.filter((x) => x.pagoId === pagoId));
+		expect(entradas).toHaveLength(2);
+		expect(entradas[0]).toMatchObject({
+			usuarioId: tesorero.id,
+			estadoOrigen: 'pagado',
+			estadoDestino: 'pendiente_pago',
+			motivo: 'El Bizum fue a otro número'
+		});
+
+		// El pago sigue mostrando sus tickets, y se puede volver a pagar con los correctos.
+		expect((await detallePago(db, pagoId))!.tickets.map((t) => t.numero)).toEqual([
+			a.numero,
+			b.numero
+		]);
+		expect((await ultimosPagos(db, 100)).find((x) => x.id === pagoId)).toMatchObject({
+			tickets: 2,
+			anulado: true
+		});
+		expect((await detalleTicket(db, socio.id, a.numero))!.pago).toBeNull();
+		expect(
+			await registrarPago(
+				db,
+				almacen,
+				tesorero,
+				datos(socio.id, [{ numero: a.numero, version: 3 }]),
+				despues
+			)
+		).toMatchObject({ ok: true, importeTotalCentimos: 1200 });
+	});
+
+	it('una sola vez, con motivo, por un tesorero que no sea el socio (E-04, R-04)', async () => {
+		const { tesorero, socio, pagoId } = await pagado();
+		expect(await deshacerPago(db, tesorero, pagoId, 'no', despues)).toEqual({
+			ok: false,
+			motivo: 'motivo'
+		});
+		expect(await deshacerPago(db, socio, pagoId, 'Me lo invento', despues)).toEqual({
+			ok: false,
+			motivo: 'no_encontrado'
+		});
+		// Dos tesoreros a la vez: solo uno lo deshace.
+		const otro = { id: (await crearUsuario(db, { esTesorero: true })).id, esTesorero: true };
+		const resultados = await Promise.all(
+			[tesorero, otro].map((t) => deshacerPago(db, t, pagoId, 'Estaba repetido', despues))
+		);
+		expect(resultados.filter((r) => r.ok)).toHaveLength(1);
+		expect(resultados.find((r) => !r.ok)).toEqual({ ok: false, motivo: 'modificado' });
+
+		// Un pago al propio tesorero lo deshace otro.
+		const tesoreroSocio = {
+			id: (await crearUsuario(db, { esTesorero: true })).id,
+			esTesorero: true
+		};
+		const suyo = await ticketDe(tesoreroSocio.id, 500, 'pendiente_pago');
+		const r = await registrarPago(db, almacen, tesorero, datos(tesoreroSocio.id, [suyo]), ahora);
+		if (!r.ok) throw new Error('no se pagó');
+		expect(await deshacerPago(db, tesoreroSocio, r.id, 'Me lo deshago yo', despues)).toEqual({
+			ok: false,
+			motivo: 'propio'
+		});
 	});
 });

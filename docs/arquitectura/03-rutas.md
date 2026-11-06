@@ -31,10 +31,10 @@ Leyenda de acceso: 🌐 pública · 👤 con sesión · 💼 tesorero.
 |---|:-:|---|---|
 | `/gestion/tickets` | 💼 | `load` con `?estado=&concepto=&socio=&desde=&hasta=&min=&max=&orden=&dir=&pagina=` (`estado` se repite; sin `estado`, solo los pendientes de autorizar, y `estado=todos` para todos; `concepto=otro` para el texto libre; `desde`/`hasta` sobre la fecha de compra; un valor que no se entiende se ignora); por cada estado, lo que hay con los demás filtros (son el filtro rápido de estado); 50 por página | HU-T01 |
 | `/gestion/tickets.csv` | 💼 | `GET` `+server.ts`, mismos parámetros | HU-T07 |
-| `/gestion/tickets/[numero]` | 💼 | `load`; acciones `autorizar`, `rechazar`, `deshacer` (con `version`) | HU-T02–T04, T06 |
+| `/gestion/tickets/[numero]` | 💼 | `load`; acciones `autorizar`, `rechazar` y `deshacer` (autorización o rechazo, con motivo), todas con `version`. Deshacer un pago se hace en `/gestion/pagos/[id]` | HU-T02–T04, T06 |
 | `/gestion/pagos` | 💼 | `load`: socios con tickets pendientes de pago (sin los del propio tesorero, R-04) y últimos pagos | HU-T05 |
 | `/gestion/pagos/nuevo?socio=…&ticket=…` | 💼 | `load`: tickets pendientes de pago del socio, todos marcados (o solo `ticket`, si se viene del detalle); acción `default` (multipart, justificante opcional; cada ticket con su versión, E-04). Vuelve a `/gestion/pagos/[id]?registrado` | HU-T05 |
-| `/gestion/pagos/[id]` | 💼 | `load`: detalle del pago y sus tickets (del historial, para que sigan tras deshacerlo); acción `deshacer` (Sprint 3, HU-T06) | HU-T05, T06 |
+| `/gestion/pagos/[id]` | 💼 | `load`: detalle del pago y sus tickets (del historial, para que sigan tras deshacerlo); acción `deshacer` (con motivo; el pago completo, E-03) | HU-T05, T06 |
 | `/gestion/usuarios` | 💼 | `load`: listado con estado; acción `alta` (alta + email), con el formulario en la misma página, como en el boceto | HU-G01, G03 |
 | `/gestion/usuarios/[id]` | 💼 | acciones `guardar`, `reenviarInvitacion`, `baja`, `reactivar` | HU-G02, G03 |
 | `/gestion/conceptos` | 💼 | `load` con `?editar=<id>` (renombrar en su fila, también sin JavaScript); acciones `crear`, `renombrar`, `subir`, `bajar`, `activar`, `desactivar`. No hay borrado: un concepto se desactiva | HU-G04 |

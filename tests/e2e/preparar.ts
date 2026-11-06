@@ -8,6 +8,7 @@ import { migrar } from '../../scripts/migrar.js';
 import {
 	ALTAS,
 	ANULAR,
+	DESHACER,
 	EDICION,
 	CONCEPTOS,
 	CONTRASENA_TESORERO,
@@ -38,7 +39,8 @@ export default async function preparar() {
 			...Object.values(REVISION),
 			...Object.values(ANULAR),
 			...Object.values(EDICION),
-			...Object.values(PAGO)
+			...Object.values(PAGO),
+			...Object.values(DESHACER)
 		];
 		const telefonos = usuarios.map((u) => u.telefono);
 		const emails = usuarios.map((u) => u.email);
@@ -143,6 +145,19 @@ export default async function preparar() {
 				values
 					(${id}, 2000, '2026-10-01', ${concepto}, 'pendiente_pago'),
 					(${id}, 500, '2026-10-02', ${concepto}, 'pendiente_pago')`;
+		}
+		// Para deshacer (HU-T06): uno autorizado, otro para pagar y deshacer el pago, y uno rechazado.
+		for (const d of Object.values(DESHACER)) {
+			const [{ id }] = await sql`
+				insert into usuario (nombre, telefono, email, password_hash, estado)
+				values (${d.nombre}, ${d.telefono}, ${d.email}, ${passwordHash}, 'activo')
+				returning id`;
+			await sql`
+				insert into ticket (socio_id, importe_centimos, fecha_compra, concepto_id, estado, motivo_rechazo)
+				values
+					(${id}, 1200, '2026-10-01', ${concepto}, 'pendiente_pago', null),
+					(${id}, 400, '2026-10-02', ${concepto}, 'pendiente_pago', null),
+					(${id}, 600, '2026-10-03', ${concepto}, 'rechazado', 'No se lee')`;
 		}
 	} finally {
 		await sql.end();

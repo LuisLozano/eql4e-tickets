@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ArrowLeft, Check, Euro, Lock, X } from '@lucide/svelte';
+	import { ArrowLeft, Check, Euro, Lock, Undo2, X } from '@lucide/svelte';
 	import { superForm } from 'sveltekit-superforms';
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
@@ -27,6 +27,21 @@
 		}
 	});
 	const { form: datosRechazo, errors: erroresRechazo, enhance: enhanceRechazo } = rechazar;
+
+	// svelte-ignore state_referenced_locally
+	const deshacer = superForm(data.formDeshacer, {
+		resetForm: true,
+		onResult: async ({ result }) => {
+			if (result.type === 'success') deshaciendo = false;
+			if (result.type === 'failure' && result.status === 409) await invalidateAll();
+		}
+	});
+	const { form: datosDeshacer, errors: erroresDeshacer, enhance: enhanceDeshacer } = deshacer;
+	let deshaciendo = $state(false);
+	const TEXTO_DESHACER = {
+		deshacer_autorizacion: 'Deshacer autorización',
+		deshacer_rechazo: 'Deshacer rechazo'
+	} as const;
 
 	const pendiente = $derived(t.estado === 'pendiente_autorizar');
 	let rechazando = $state(false);
@@ -160,6 +175,56 @@
 								>
 							{/if}
 						</div>
+					{/if}
+				</section>
+			{/if}
+
+			{#if data.deshacer}
+				<section aria-label="Deshacer" class="flex flex-col gap-3">
+					{#if deshaciendo}
+						<form
+							method="POST"
+							action="?/deshacer"
+							use:enhanceDeshacer
+							class="flex flex-col gap-3 rounded-lg border border-line bg-surface p-4"
+						>
+							<input type="hidden" name="version" value={t.version} />
+							<input type="hidden" name="accion" value={data.deshacer} />
+							<div class="flex flex-col gap-1.5">
+								<label for="motivo-deshacer" class="font-bold">¿Por qué lo deshaces?</label>
+								<textarea
+									id="motivo-deshacer"
+									name="motivo"
+									rows="3"
+									maxlength={MOTIVO_MAXIMO}
+									placeholder="Ej.: lo autoricé por error, el importe no coincide"
+									aria-invalid={$erroresDeshacer.motivo ? 'true' : undefined}
+									aria-describedby="deshacer-ayuda{$erroresDeshacer.motivo
+										? ' deshacer-error'
+										: ''}"
+									bind:value={$datosDeshacer.motivo}
+									class="rounded-lg border border-line bg-surface px-3 py-2 text-ink"></textarea>
+								{#if $erroresDeshacer.motivo}
+									<p id="deshacer-error" class="text-sm font-bold text-rj">
+										{$erroresDeshacer.motivo[0]}
+									</p>
+								{/if}
+								<p id="deshacer-ayuda" class="text-sm text-muted">
+									Vuelve a Pendiente de autorizar. El motivo queda en el historial, y el socio lo
+									ve.
+								</p>
+							</div>
+							<div class="flex flex-wrap gap-2">
+								<Boton type="submit" variante="peligro"
+									><Undo2 size={20} aria-hidden="true" />{TEXTO_DESHACER[data.deshacer]}</Boton
+								>
+								<Boton variante="secundario" onclick={() => (deshaciendo = false)}>Cancelar</Boton>
+							</div>
+						</form>
+					{:else}
+						<Boton variante="secundario" class="self-start" onclick={() => (deshaciendo = true)}
+							><Undo2 size={20} aria-hidden="true" />{TEXTO_DESHACER[data.deshacer]}…</Boton
+						>
 					{/if}
 				</section>
 			{/if}

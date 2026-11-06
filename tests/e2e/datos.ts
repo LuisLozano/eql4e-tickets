@@ -131,3 +131,17 @@ export const PAGO = {
 		email: 'pago.escritorio@ejemplo.invalid'
 	}
 } as const;
+
+/** Socios (en preparar.ts) con dos pendientes de pago y uno rechazado, para deshacer pasos. */
+export const DESHACER = {
+	movil: {
+		nombre: 'Deshacer Móvil',
+		telefono: '+34699000091',
+		email: 'deshacer.movil@ejemplo.invalid'
+	},
+	escritorio: {
+		nombre: 'Deshacer Escritorio',
+		telefono: '+34699000092',
+		email: 'deshacer.escritorio@ejemplo.invalid'
+	}
+} as const;

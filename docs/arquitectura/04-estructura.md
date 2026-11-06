@@ -39,7 +39,7 @@ eql4e-tickets/
 │   │       │   │   ├── estados.ts  # tabla de transiciones, R-04 y acciones posibles (pura)
 │   │       │   │   ├── permisos.ts # R-01, R-04 (puro)
 │   │       │   │   └── servicio.ts # cambiar de estado: versión (E-04), transición e historial
-│   │       │   ├── pago/       # registrar (HU-T05) y consultas: por pagar, detalle, justificante
+│   │       │   ├── pago/       # registrar (HU-T05), deshacer (HU-T06, E-03) y consultas
 │   │       │   ├── usuario/        # alta, listado, texto de la invitación
 │   │       │   ├── concepto/
 │   │       │   └── purga/
