@@ -44,6 +44,7 @@ export const actions: Actions = {
 		}
 
 		ponerCookieSesion(cookies, resultado.token, resultado.caducaEn);
-		redirect(303, '/');
+		// Un socio llega a «Mis tickets» con la bienvenida; un tesorero, a su inicio.
+		redirect(303, resultado.esTesorero ? '/' : '/tickets?bienvenida');
 	}
 };

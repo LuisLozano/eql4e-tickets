@@ -2,7 +2,10 @@ import { expect, test } from '@playwright/test';
 import sharp from 'sharp';
 import { CONTRASENA_TESORERO, REMITENTES, TESOREROS, type Perfil } from './datos.ts';
 
-test('un socio envía un ticket con foto y PDF (HU-S01)', async ({ page }, info) => {
+test('un socio envía un ticket con foto y PDF, lo ve en su lista y en el detalle (HU-S01, S02, S03)', async ({
+	page,
+	browser
+}, info) => {
 	const socio = REMITENTES[info.project.name as Perfil];
 	const foto = await sharp({
 		create: { width: 1200, height: 1600, channels: 3, background: '#eee' }
@@ -58,6 +61,61 @@ test('un socio envía un ticket con foto y PDF (HU-S01)', async ({ page }, info)
 
 	await expect(page).toHaveURL(/\/tickets\?enviado=\d+$/);
 	await expect(page.getByText(/^Ticket T-\d{6} enviado\./)).toBeVisible();
+	const numero = (await page.getByText(/^Ticket T-\d{6} enviado\./).textContent())!.match(
+		/T-\d{6}/
+	)![0];
+
+	// Mis tickets (HU-S02): aparece arriba, con su estado, y los filtros funcionan.
+	const enLista = page
+		.getByRole('list', { name: 'Tickets' })
+		.getByRole('link')
+		.filter({ hasText: numero });
+	await expect(enLista).toContainText('Floristería');
+	await expect(enLista).toContainText('Pendiente de autorizar');
+	await page.getByRole('link', { name: 'Rechazados' }).click();
+	await expect(page.getByText('No hay tickets con este estado.')).toBeVisible();
+	await page.getByRole('link', { name: 'Pendientes' }).click();
+	await expect(page.getByRole('link', { name: 'Pendientes' })).toHaveAttribute(
+		'aria-current',
+		'page'
+	);
+
+	// Detalle (HU-S03): datos, historial, la foto se amplía y el PDF se abre aparte.
+	await enLista.click();
+	await expect(page.getByRole('heading', { name: numero })).toBeVisible();
+	await expect(page.getByText('Flores para la gala')).toBeVisible();
+	await expect(page.getByText(/^Enviado por ti$/)).toBeVisible();
+	await expect(page.getByRole('link', { name: /Ver PDF/ })).toBeVisible();
+	await page.getByRole('button', { name: 'Ampliar ticket.jpg' }).click();
+	const ampliada = page.getByRole('dialog').getByRole('img', { name: 'ticket.jpg' });
+	await expect(ampliada).toBeVisible();
+	await expect
+		.poll(() => ampliada.evaluate((img: HTMLImageElement) => img.naturalWidth))
+		.toBe(1200);
+	await page.keyboard.press('Escape');
+	await expect(page.getByRole('dialog')).toBeHidden();
+
+	// Otro socio no ve ni el ticket ni sus ficheros: 404, como si no existieran (R-01).
+	const urlDetalle = page.url();
+	const urlFichero = await page.getByRole('link', { name: /Ver PDF/ }).getAttribute('href');
+	const otro = REMITENTES[info.project.name === 'movil' ? 'escritorio' : 'movil'];
+	const ajena = await (await browser.newContext()).newPage();
+	await ajena.goto('/entrar');
+	await ajena.getByLabel('Teléfono').fill(otro.telefono.slice(3));
+	await ajena.getByLabel('Contraseña').fill(CONTRASENA_TESORERO);
+	await ajena.getByRole('button', { name: 'Entrar' }).click();
+	await expect(ajena.getByRole('heading', { name: 'Mis tickets' })).toBeVisible();
+	expect((await ajena.goto(urlDetalle))?.status()).toBe(404);
+	expect((await ajena.request.get(urlFichero!)).status()).toBe(404);
+
+	// El dueño sí lo descarga, con las cabeceras de un fichero privado.
+	const r = await page.request.get(urlFichero!);
+	expect(r.status()).toBe(200);
+	expect(r.headers()).toMatchObject({
+		'content-type': 'application/pdf',
+		'x-content-type-options': 'nosniff',
+		'cache-control': 'private, no-store'
+	});
 });
 
 test('quien solo es tesorero no puede enviar tickets (R-01: 404)', async ({ page }, info) => {
