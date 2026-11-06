@@ -145,3 +145,19 @@ export const DESHACER = {
 		email: 'deshacer.escritorio@ejemplo.invalid'
 	}
 } as const;
+
+/** Socios activos (en preparar.ts) cuya ficha edita un tesorero: datos, baja y otra contraseña. */
+export const GESTION = {
+	movil: {
+		nombre: 'Gestión Móvil',
+		telefono: '+34699000101',
+		email: 'gestion.movil@ejemplo.invalid',
+		nuevoTelefono: '+34699000111'
+	},
+	escritorio: {
+		nombre: 'Gestión Escritorio',
+		telefono: '+34699000102',
+		email: 'gestion.escritorio@ejemplo.invalid',
+		nuevoTelefono: '+34699000112'
+	}
+} as const;

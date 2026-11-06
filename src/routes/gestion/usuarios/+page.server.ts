@@ -4,20 +4,10 @@ import { zod4 } from 'sveltekit-superforms/adapters';
 import { URL_PUBLICA } from '$app/env/private';
 import { esquemaAlta, valoresIniciales } from '#lib/esquemas/usuario.ts';
 import { darDeAlta } from '#lib/server/dominio/usuario/alta.ts';
-import { mensajeInvitacion } from '#lib/server/dominio/usuario/invitacion.ts';
 import { listarUsuarios } from '#lib/server/dominio/usuario/listado.ts';
-import { correo } from '#lib/server/infra/correo/app.ts';
 import { db } from '#lib/server/infra/db/app.ts';
-import { enlaceActivacion } from '#lib/server/web/enlaces.ts';
+import { enviarInvitacion } from '#lib/server/web/invitacion.ts';
 import type { Actions, PageServerLoad } from './$types';
-
-/** Lo que ve el tesorero tras el alta. El enlace solo se puede mostrar ahora: se guarda su hash. */
-export type ResultadoInvitacion = {
-	email: string;
-	caducaEn: string;
-	enlace: string;
-	envio: 'enviado' | 'desactivado' | 'fallido';
-};
 
 export const load: PageServerLoad = async () => ({
 	usuarios: await listarUsuarios(db, new Date()),
@@ -43,24 +33,9 @@ export const actions: Actions = {
 					);
 		}
 
-		const enlace = enlaceActivacion(URL_PUBLICA, r.codigo);
-		let envio: ResultadoInvitacion['envio'] = correo.envia ? 'enviado' : 'desactivado';
-		try {
-			// Síncrono (ADR-0004): si falla, el alta ya está guardada y el tesorero copia el enlace.
-			await correo.enviar({
-				para: r.email,
-				...mensajeInvitacion({ nombre: form.data.nombre, enlace, caducaEn: r.caducaEn })
-			});
-		} catch (e) {
-			console.error(`[correo] No se pudo enviar la invitación a ${r.email}:`, e);
-			envio = 'fallido';
-		}
-
-		return message(form, {
-			email: r.email,
-			caducaEn: r.caducaEn.toISOString(),
-			enlace,
-			envio
-		} satisfies ResultadoInvitacion);
+		return message(
+			form,
+			await enviarInvitacion(URL_PUBLICA, { ...r, nombre: form.data.nombre.trim() })
+		);
 	}
 };

@@ -1,10 +1,11 @@
-// Listado de usuarios para la gestión (HU-G03, mínimo en el Sprint 1).
+// Listado de usuarios y ficha de uno para la gestión (HU-G03).
 import { and, asc, eq, gt, isNull, max } from 'drizzle-orm';
 import { codigoAcceso, usuario } from '#lib/server/infra/db/esquema.ts';
 import type { Conexion } from '#lib/server/infra/db/tipos.ts';
+import { TESORERO_INICIAL } from '../auth/tesorero-inicial.ts';
 
-/** Todos los usuarios por nombre. `invitacionCaducaEn`: la invitación vigente, si la hay. */
-export async function listarUsuarios(conexion: Conexion, ahora: Date) {
+/** Los usuarios por nombre (o solo uno). `invitacionCaducaEn`: la invitación vigente, si la hay. */
+function consulta(conexion: Conexion, ahora: Date, id?: string) {
 	const vigentes = conexion
 		.select({
 			usuarioId: codigoAcceso.usuarioId,
@@ -34,7 +35,20 @@ export async function listarUsuarios(conexion: Conexion, ahora: Date) {
 		})
 		.from(usuario)
 		.leftJoin(vigentes, eq(vigentes.usuarioId, usuario.id))
+		.where(id ? eq(usuario.id, id) : undefined)
 		.orderBy(asc(usuario.nombre));
 }
 
+export const listarUsuarios = (conexion: Conexion, ahora: Date) => consulta(conexion, ahora);
+
 export type UsuarioListado = Awaited<ReturnType<typeof listarUsuarios>>[number];
+
+/** Un usuario, con su invitación vigente y si tiene los datos ficticios del tesorero inicial. */
+export async function fichaUsuario(conexion: Conexion, id: string, ahora: Date) {
+	const [u] = await consulta(conexion, ahora, id);
+	if (!u) return null;
+	return {
+		...u,
+		ficticio: u.telefono === TESORERO_INICIAL.telefono || u.email === TESORERO_INICIAL.email
+	};
+}

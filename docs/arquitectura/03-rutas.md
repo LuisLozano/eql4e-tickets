@@ -10,7 +10,7 @@ Leyenda de acceso: 🌐 pública · 👤 con sesión · 💼 tesorero.
 |---|:-:|---|---|
 | `/entrar` | 🌐 | acción `default`: teléfono + contraseña | HU-A02 |
 | `/salir` | 👤 | acción `default` (POST, nunca GET) | HU-A03 |
-| `/activar?codigo=…` | 🌐 | acción `default`: teléfono + código + contraseña | HU-A01 |
+| `/activar?codigo=…` | 🌐 | acción `default`: teléfono + código + contraseña. Vale para un invitado y, con un código reenviado por un tesorero, para un activo: cambia la contraseña y cierra sus sesiones | HU-A01, G02 |
 | `/restablecer` | 🌐 | acción `solicitar` (envía el email) | HU-A04 |
 | `/restablecer/[codigo]` | 🌐 | acción `default`: contraseña nueva | HU-A04 |
 | `/cuenta` | 👤 | acción `cambiarContrasena` | HU-A03 |
@@ -35,8 +35,8 @@ Leyenda de acceso: 🌐 pública · 👤 con sesión · 💼 tesorero.
 | `/gestion/pagos` | 💼 | `load`: socios con tickets pendientes de pago (sin los del propio tesorero, R-04) y últimos pagos | HU-T05 |
 | `/gestion/pagos/nuevo?socio=…&ticket=…` | 💼 | `load`: tickets pendientes de pago del socio, todos marcados (o solo `ticket`, si se viene del detalle); acción `default` (multipart, justificante opcional; cada ticket con su versión, E-04). Vuelve a `/gestion/pagos/[id]?registrado` | HU-T05 |
 | `/gestion/pagos/[id]` | 💼 | `load`: detalle del pago y sus tickets (del historial, para que sigan tras deshacerlo); acción `deshacer` (con motivo; el pago completo, E-03) | HU-T05, T06 |
-| `/gestion/usuarios` | 💼 | `load`: listado con estado; acción `alta` (alta + email), con el formulario en la misma página, como en el boceto | HU-G01, G03 |
-| `/gestion/usuarios/[id]` | 💼 | acciones `guardar`, `reenviarInvitacion`, `baja`, `reactivar` | HU-G02, G03 |
+| `/gestion/usuarios` | 💼 | `load`: listado con estado (cada nombre enlaza a su ficha); acción `alta` (alta + email), con el formulario en la misma página, como en el boceto | HU-G01, G03 |
+| `/gestion/usuarios/[id]` | 💼 | `load`: la ficha, con aviso si tiene los datos ficticios del tesorero inicial (R-06); acciones `guardar` (datos y roles, R-03), `reenviar` (código nuevo de 7 días y su enlace para copiar; a un usuario activo le sirve para elegir otra contraseña), `baja` (confirmada en la página; nadie se da de baja a sí mismo; R-03, R-05) y `reactivar`. Sin control de versión: si dos tesoreros editan a la vez, gana el último | HU-G02, G03 |
 | `/gestion/conceptos` | 💼 | `load` con `?editar=<id>` (renombrar en su fila, también sin JavaScript); acciones `crear`, `renombrar`, `subir`, `bajar`, `activar`, `desactivar`. No hay borrado: un concepto se desactiva | HU-G04 |
 
 ## Endpoints

@@ -11,6 +11,7 @@ import {
 	DESHACER,
 	EDICION,
 	CONCEPTOS,
+	GESTION,
 	CONTRASENA_TESORERO,
 	LISTADO,
 	PAGO,
@@ -30,8 +31,11 @@ export default async function preparar() {
 	const sql = postgres(url, { max: 1, onnotice: () => {} });
 	try {
 		const usuarios = [
-			// Primero los dados de alta: sus códigos apuntan al tesorero que los creó.
+			// Primero los dados de alta y los de la ficha: sus códigos apuntan al tesorero que los creó.
 			...Object.values(ALTAS),
+			...Object.values(GESTION),
+			// Con el teléfono que les pone la prueba.
+			...Object.values(GESTION).map((g) => ({ telefono: g.nuevoTelefono, email: g.email })),
 			...Object.values(SOCIOS),
 			...Object.values(TESOREROS),
 			...Object.values(REMITENTES),
@@ -72,6 +76,11 @@ export default async function preparar() {
 			await sql`
 				insert into usuario (nombre, telefono, email, password_hash, estado, es_socio, es_tesorero)
 				values (${t.nombre}, ${t.telefono}, ${t.email}, ${passwordHash}, 'activo', false, true)`;
+		}
+		for (const g of Object.values(GESTION)) {
+			await sql`
+				insert into usuario (nombre, telefono, email, password_hash, estado)
+				values (${g.nombre}, ${g.telefono}, ${g.email}, ${passwordHash}, 'activo')`;
 		}
 		for (const r of Object.values(REMITENTES)) {
 			await sql`

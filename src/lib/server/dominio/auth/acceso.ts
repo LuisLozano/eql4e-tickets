@@ -87,10 +87,16 @@ export async function activarCuenta(
 	const passwordHash = await hashContrasena(datos.contrasena);
 
 	return conexion.transaction(async (tx) => {
-		// Solo vale para un usuario invitado: ni de baja (R-05) ni ya activo.
+		// Vale para un invitado y, si un tesorero le reenvió la invitación, para un activo: elige otra
+		// contraseña y la anterior deja de valer (HU-G02). Nunca para uno de baja (R-05).
 		const usuarioId = await consumirCodigo(
 			tx,
-			{ codigo: datos.codigo, telefono, tipo: 'activacion', estadoUsuario: 'invitado' },
+			{
+				codigo: datos.codigo,
+				telefono,
+				tipo: 'activacion',
+				estadoUsuario: ['invitado', 'activo']
+			},
 			ahora
 		);
 		if (!usuarioId) return { ok: false, motivo: 'codigo' } as const;
@@ -101,6 +107,8 @@ export async function activarCuenta(
 			.where(eq(usuario.id, usuarioId))
 			.returning({ esTesorero: usuario.esTesorero });
 
+		// Con la contraseña nueva se cierran las sesiones abiertas con la anterior.
+		await invalidarSesionesDe(tx, usuarioId);
 		const nueva = await crearSesion(tx, usuarioId, ahora);
 		return { ok: true, ...nueva, esTesorero: activado.esTesorero } as const;
 	});

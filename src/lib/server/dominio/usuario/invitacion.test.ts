@@ -18,4 +18,17 @@ describe('mensajeInvitacion', () => {
 		expect(m.html).toContain('href="https://t.example/activar?codigo=AAAA-BBBB&amp;x=1"');
 		expect(m.html).not.toContain('<b>&');
 	});
+
+	it('a un usuario ya activo le explica que es para elegir otra contraseña (HU-G02)', () => {
+		const r = mensajeInvitacion({
+			nombre: 'Ana',
+			enlace: 'https://t.example/activar?codigo=CCCC-DDDD',
+			caducaEn: new Date('2026-11-12T10:00:00Z'),
+			restablecer: true
+		});
+		expect(r.asunto).toBe('Elige una contraseña nueva en EQL4E Tickets');
+		expect(r.texto).toContain('la anterior dejará de valer');
+		expect(r.texto).not.toContain('Te han dado de alta');
+		expect(r.html).toContain('>Elegir contraseña</a>');
+	});
 });
