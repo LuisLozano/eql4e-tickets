@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { ArrowLeft, Ban } from '@lucide/svelte';
+	import { ArrowLeft, Ban, Pencil } from '@lucide/svelte';
 	import { tick } from 'svelte';
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { page } from '$app/state';
 	import Aviso from '#lib/componentes/Aviso.svelte';
 	import Boton from '#lib/componentes/Boton.svelte';
 	import DatosTicket from '#lib/componentes/DatosTicket.svelte';
@@ -18,6 +19,12 @@
 
 	// El rechazo vigente: la última entrada «rechazar» del historial (que va de lo último a lo primero).
 	const rechazo = $derived(t.historial.find((h) => h.accion === 'rechazar'));
+
+	const editar = $derived(data.acciones.includes('editar') || data.acciones.includes('reenviar'));
+	const puedeAnular = $derived(data.acciones.includes('anular'));
+	// Tras editar o reenviar se vuelve aquí con ?guardado o ?reenviado.
+	const guardado = $derived(page.url.searchParams.has('guardado'));
+	const reenviado = $derived(page.url.searchParams.has('reenviado'));
 
 	// Anular no tiene vuelta atrás: se confirma en la propia página (guía de diseño).
 	let confirmando = $state(false);
@@ -48,6 +55,10 @@
 
 	{#if form?.aviso}
 		<Aviso tipo="exito">{form.aviso}</Aviso>
+	{:else if reenviado}
+		<Aviso tipo="exito">Ticket reenviado. Vuelve a estar pendiente de autorizar.</Aviso>
+	{:else if guardado}
+		<Aviso tipo="exito">Cambios guardados.</Aviso>
 	{:else if form?.error}
 		<Aviso>{form.error}</Aviso>
 	{/if}
@@ -68,7 +79,7 @@
 	<FicherosTicket ficheros={t.ficheros} />
 	<DatosTicket ticket={t} />
 
-	{#if data.puedeAnular}
+	{#if editar || puedeAnular}
 		<section aria-label="Acciones" class="flex flex-col gap-3">
 			{#if confirmando}
 				<div
@@ -101,12 +112,29 @@
 					</form>
 				</div>
 			{:else}
-				<Boton variante="secundario" class="self-start" onclick={confirmar}
-					><Ban size={20} aria-hidden="true" />Anular ticket</Boton
-				>
+				<div class="flex flex-wrap gap-2">
+					{#if editar}
+						<a
+							href={resolve('/tickets/[numero]/editar', { numero: String(t.numero) })}
+							class="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-ink px-4 font-bold text-on-ink hover:opacity-90"
+							><Pencil size={20} aria-hidden="true" />{t.estado === 'rechazado'
+								? 'Corregir y reenviar'
+								: 'Editar'}</a
+						>
+					{/if}
+					{#if puedeAnular}
+						<Boton variante="secundario" onclick={confirmar}
+							><Ban size={20} aria-hidden="true" />Anular ticket</Boton
+						>
+					{/if}
+				</div>
 			{/if}
 		</section>
 	{/if}
 
-	<HistorialTicket historial={t.historial} yo={data.yo} />
+	<HistorialTicket
+		historial={t.historial}
+		yo={data.yo}
+		ficheros={[...t.ficheros, ...t.sustituidos]}
+	/>
 </main>

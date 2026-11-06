@@ -22,7 +22,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	return {
 		ticket,
 		yo: actor.id,
-		puedeAnular: accionesPosibles(actor, ticket).includes('anular')
+		acciones: accionesPosibles(actor, ticket)
 	};
 };
 

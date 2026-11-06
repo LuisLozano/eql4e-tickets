@@ -34,3 +34,14 @@ export const TEXTO_ACCION = {
 } as const;
 
 export type AccionHistorial = keyof typeof TEXTO_ACCION;
+
+/** Lo que cambió al editar o reenviar (HU-S04, S06), en `historial.cambios`: { campo: [antes, después] }. */
+export type CambiosTicket = {
+	importeCentimos?: [number, number];
+	fechaCompra?: [string, string];
+	/** Los nombres, tal como eran entonces (o el texto de «Otro»). */
+	concepto?: [string, string];
+	observaciones?: [string | null, string | null];
+	/** [quitados, añadidos]: ids de fichero, para enlazar los sustituidos desde el historial. */
+	ficheros?: [string[], string[]];
+};

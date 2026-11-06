@@ -17,7 +17,7 @@ import {
 	uuid,
 	type AnyPgColumn
 } from 'drizzle-orm/pg-core';
-import type { AccionHistorial, EstadoTicket } from '../../../estados.ts';
+import type { AccionHistorial, CambiosTicket, EstadoTicket } from '../../../estados.ts';
 
 const instante = () => timestamp({ withTimezone: true });
 const creadoEn = () => instante().notNull().defaultNow();
@@ -271,7 +271,7 @@ export const historial = pgTable(
 		estadoDestino: estadoTicket().notNull(),
 		motivo: text(),
 		/** Campos editados: { campo: [antes, después] } */
-		cambios: jsonb().$type<Record<string, [unknown, unknown]>>(),
+		cambios: jsonb().$type<CambiosTicket>(),
 		pagoId: uuid().references(() => pago.id),
 		creadoEn: creadoEn()
 	},

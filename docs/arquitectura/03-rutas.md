@@ -23,7 +23,7 @@ Leyenda de acceso: 🌐 pública · 👤 con sesión · 💼 tesorero.
 | `/tickets` | 👤 | `load`: mis tickets + totales; filtro `?estado=pendientes\|rechazado\|pagado\|anulado` («pendientes» agrupa los dos pendientes); `?enviado=<número>` y `?bienvenida` muestran un aviso | HU-S02 |
 | `/tickets/nuevo` | 👤 | acción `default` (multipart) | HU-S01 |
 | `/tickets/[numero]` | 👤 (propio; 404 si es ajeno, también para un tesorero) | `load`: detalle + ficheros vigentes + historial; acción `anular` (confirmación en la página; 409 si cambió, E-04); `reenviar` va en `/editar` | HU-S03, S05, S06 |
-| `/tickets/[numero]/editar` | 👤 (propio) | acción `default` (multipart, con `version`) | HU-S04, S06 |
+| `/tickets/[numero]/editar` | 👤 (propio; si ya no se puede editar, redirige al detalle) | `load`: datos y ficheros vigentes; acción `default` (multipart, con `version` y los ids en `quitar`). Pendiente: edita; rechazado: corrige y reenvía. Vuelve al detalle con `?guardado` o `?reenviado`; 409 si un tesorero lo cambió (E-04) | HU-S04, S06 |
 
 ## Gestión (tesorero)
 

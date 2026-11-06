@@ -96,20 +96,22 @@ async function detalle(conexion: Conexion, donde: SQL | undefined) {
 		.where(donde);
 	if (!t) return null;
 
-	const [ficheros, entradas] = await Promise.all([
+	const [todos, entradas] = await Promise.all([
 		conexion
 			.select({
 				id: ticketFichero.id,
 				nombreOriginal: ticketFichero.nombreOriginal,
-				tipoMime: ticketFichero.tipoMime
+				tipoMime: ticketFichero.tipoMime,
+				sustituidoEn: ticketFichero.sustituidoEn
 			})
 			.from(ticketFichero)
-			.where(and(eq(ticketFichero.ticketId, t.id), isNull(ticketFichero.sustituidoEn)))
+			.where(eq(ticketFichero.ticketId, t.id))
 			.orderBy(asc(ticketFichero.orden)),
 		conexion
 			.select({
 				accion: historial.accion,
 				motivo: historial.motivo,
+				cambios: historial.cambios,
 				creadoEn: historial.creadoEn,
 				usuarioId: historial.usuarioId,
 				nombre: usuario.nombre
@@ -119,7 +121,10 @@ async function detalle(conexion: Conexion, donde: SQL | undefined) {
 			.where(eq(historial.ticketId, t.id))
 			.orderBy(desc(historial.creadoEn), desc(historial.id))
 	]);
-	return { ...t, ficheros, historial: entradas };
+	const ficheros = todos.filter((f) => !f.sustituidoEn);
+	// Los sustituidos no se muestran en el ticket, pero el historial los enlaza (HU-S04).
+	const sustituidos = todos.filter((f) => f.sustituidoEn);
+	return { ...t, ficheros, sustituidos, historial: entradas };
 }
 
 /**
@@ -133,6 +138,44 @@ export function detalleTicket(conexion: Conexion, socioId: string, numero: numbe
 /** El detalle de cualquier ticket, para revisarlo (HU-T02). La ruta ya exige ser tesorero. */
 export function detalleParaRevisar(conexion: Conexion, numero: number) {
 	return detalle(conexion, eq(ticket.numero, numero));
+}
+
+/**
+ * Lo que necesita el formulario de editar (HU-S04, S06): los datos tal como se guardan y los
+ * ficheros vigentes. Nulo si no existe o es de otro (R-01).
+ */
+export async function ticketParaEditar(conexion: Conexion, socioId: string, numero: number) {
+	const [t] = await conexion
+		.select({
+			id: ticket.id,
+			numero: ticket.numero,
+			socioId: ticket.socioId,
+			estado: ticket.estado,
+			version: ticket.version,
+			importeCentimos: ticket.importeCentimos,
+			fechaCompra: ticket.fechaCompra,
+			conceptoId: ticket.conceptoId,
+			conceptoOtro: ticket.conceptoOtro,
+			concepto: concepto.nombre,
+			conceptoActivo: concepto.activo,
+			observaciones: ticket.observaciones,
+			motivoRechazo: ticket.motivoRechazo
+		})
+		.from(ticket)
+		.leftJoin(concepto, eq(concepto.id, ticket.conceptoId))
+		.where(and(eq(ticket.numero, numero), eq(ticket.socioId, socioId)));
+	if (!t) return null;
+	const ficheros = await conexion
+		.select({
+			id: ticketFichero.id,
+			nombreOriginal: ticketFichero.nombreOriginal,
+			tipoMime: ticketFichero.tipoMime,
+			tamanoBytes: ticketFichero.tamanoBytes
+		})
+		.from(ticketFichero)
+		.where(and(eq(ticketFichero.ticketId, t.id), isNull(ticketFichero.sustituidoEn)))
+		.orderBy(asc(ticketFichero.orden));
+	return { ...t, ficheros };
 }
 
 export type DetalleTicket = NonNullable<Awaited<ReturnType<typeof detalleTicket>>>;

@@ -144,7 +144,11 @@
 				</section>
 			{/if}
 
-			<HistorialTicket historial={t.historial} yo={data.yo} />
+			<HistorialTicket
+				historial={t.historial}
+				yo={data.yo}
+				ficheros={[...t.ficheros, ...t.sustituidos]}
+			/>
 		</div>
 	</div>
 </main>

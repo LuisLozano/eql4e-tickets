@@ -52,7 +52,7 @@ test('un socio envía un ticket con foto y PDF, lo ve en su lista y en el detall
 		{ name: 'factura.pdf', mimeType: 'application/pdf', buffer: pdf }
 	]);
 	await expect(
-		page.getByRole('list', { name: 'Ficheros elegidos' }).getByRole('listitem')
+		page.getByRole('list', { name: 'Ficheros del ticket' }).getByRole('listitem')
 	).toHaveCount(2);
 	await page.locator('label', { hasText: 'Otro…' }).click();
 	await page.getByLabel('¿Qué concepto?').fill('Floristería');
@@ -157,7 +157,7 @@ test('las fotos se reducen en el móvil y, si falla la red, el ticket no se pier
 		mimeType: 'application/pdf',
 		buffer: Buffer.from('%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n')
 	});
-	const lista = page.getByRole('list', { name: 'Ficheros elegidos' });
+	const lista = page.getByRole('list', { name: 'Ficheros del ticket' });
 	await expect(lista.getByRole('listitem')).toHaveCount(2);
 	await expect(lista.getByRole('listitem').first()).toContainText('IMG_0001.jpg');
 	await expect(lista.getByText(/^Reducida de [\d,]+ MB a [\d,]+ (KB|MB)$/)).toBeVisible();

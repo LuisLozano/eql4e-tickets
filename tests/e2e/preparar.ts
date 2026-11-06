@@ -8,6 +8,7 @@ import { migrar } from '../../scripts/migrar.js';
 import {
 	ALTAS,
 	ANULAR,
+	EDICION,
 	CONCEPTOS,
 	CONTRASENA_TESORERO,
 	LISTADO,
@@ -34,7 +35,8 @@ export default async function preparar() {
 			...Object.values(REMITENTES),
 			...Object.values(LISTADO),
 			...Object.values(REVISION),
-			...Object.values(ANULAR)
+			...Object.values(ANULAR),
+			...Object.values(EDICION)
 		];
 		const telefonos = usuarios.map((u) => u.telefono);
 		const emails = usuarios.map((u) => u.email);
@@ -114,6 +116,18 @@ export default async function preparar() {
 				values
 					(${id}, 1200, '2026-10-01', ${concepto}, 'pendiente_autorizar', null),
 					(${id}, 840, '2026-10-02', ${concepto}, 'rechazado', 'No se lee')`;
+		}
+		// Un pendiente y un rechazado, sin ficheros, por socio que edita (HU-S04, S06).
+		for (const e of Object.values(EDICION)) {
+			const [{ id }] = await sql`
+				insert into usuario (nombre, telefono, email, password_hash, estado)
+				values (${e.nombre}, ${e.telefono}, ${e.email}, ${passwordHash}, 'activo')
+				returning id`;
+			await sql`
+				insert into ticket (socio_id, importe_centimos, fecha_compra, concepto_id, estado, motivo_rechazo)
+				values
+					(${id}, 1500, '2026-10-01', ${concepto}, 'pendiente_autorizar', null),
+					(${id}, 990, '2026-10-02', ${concepto}, 'rechazado', 'La foto está borrosa')`;
 		}
 	} finally {
 		await sql.end();
