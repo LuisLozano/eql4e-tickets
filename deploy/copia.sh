@@ -1,6 +1,6 @@
 #!/bin/sh
 # Copia de seguridad de eql4e-tickets (ADR-0008): volcado de PostgreSQL y ficheros, en el disco externo.
-# La lanza cada noche el timer eql4e-copia.timer; a mano, desde la carpeta de despliegue:
+# La lanza cada día a las 19:30 el timer eql4e-copia.timer; a mano, desde la carpeta de despliegue:
 #   cd /opt/eql4e-tickets && sudo ./copia.sh
 set -eu
 cd "$(dirname "$0")"
@@ -20,6 +20,20 @@ nombre=$(date +%Y-%m-%d_%H%M)
 temporal="$DESTINO/.en-curso-$nombre"
 trap 'rm -rf "$temporal"' EXIT
 mkdir "$temporal"
+
+# Lanzada al arrancar el equipo (Persistent), los contenedores pueden estar todavía levantándose.
+listo=no
+for _ in $(seq 1 60); do
+	if docker compose exec -T db pg_isready -U eql4e -d eql4e -q >/dev/null 2>&1; then
+		listo=si
+		break
+	fi
+	sleep 2
+done
+if [ "$listo" = no ]; then
+	echo "✘ PostgreSQL no responde. No se ha hecho la copia." >&2
+	exit 1
+fi
 
 # Primero la base y después los ficheros: la app guarda el fichero antes de la transacción, así
 # que lo subido durante la copia como mucho sobra; nunca falta un fichero al que apunte la base.

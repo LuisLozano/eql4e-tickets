@@ -10,7 +10,7 @@ Procedimiento para instalar, actualizar y operar la aplicación en la máquina `
 | Imagen | `ghcr.io/luislozano/eql4e-tickets` (pública). La CI la publica en cada *push* a `main` con dos etiquetas: `latest` y el SHA corto del commit |
 | Contenedores | `eql4e-app-1` en `127.0.0.1:3080`; `eql4e-db-1` (PostgreSQL 18) sin puertos publicados |
 | Datos | Volúmenes `eql4e_pgdata` (base de datos) y `eql4e_ficheros` (fotos y justificantes) |
-| Copias de seguridad | Cada noche en el disco externo, `/mnt/externalHD/eql4e/backups` (apartado 5, [ADR-0008](../docs/arquitectura/adr/0008-copias.md)) |
+| Copias de seguridad | Cada día a las 19:30 en el disco externo, `/mnt/externalHD/eql4e/backups` (apartado 5, [ADR-0008](../docs/arquitectura/adr/0008-copias.md)) |
 | Proxy HTTPS | El Caddy de Salazar (`salazar-https-caddy-1`, red del host), con el Caddyfile en `/home/luis/salazar/https/Caddyfile` |
 | Dominio | `tickets-eql4e.ddns.net` (No-IP), con la misma IP que `yaroki.ddns.net` |
 
@@ -167,7 +167,7 @@ El resultado esperado es `{"estado":"ok"}` y `yaroki: 200`.
 
 ## 5. Copias de seguridad
 
-Cada noche a las 03:30, un timer de systemd ejecuta `copia.sh`, que deja en el disco externo una carpeta `AAAA-MM-DD_HHMM` con:
+Cada día a las 19:30 (antes de la copia de Salazar, a las 20:00, y del apagado programado, a las 20:20), un timer de systemd ejecuta `copia.sh`, que deja en el disco externo una carpeta `AAAA-MM-DD_HHMM` con:
 
 - `eql4e.dump`: la base de datos;
 - `ficheros.tar.gz`: las fotos y los justificantes;
@@ -229,7 +229,7 @@ Las cifras deben parecerse a lo que ves en la app. Los «ficheros en la copia» 
    ```
 2. Restáurala (cambia la fecha por la elegida):
    ```bash
-   cd /opt/eql4e-tickets && sudo ./restaurar.sh 2026-11-07_0330
+   cd /opt/eql4e-tickets && sudo ./restaurar.sh 2026-11-07_1930
    ```
 
 El script para la app, restaura la base en una sola transacción y después los ficheros, y la vuelve a arrancar con la misma imagen. Si la copia es de antes de una migración, la app la aplica al arrancar. Si la copia es de una versión **posterior** a la imagen que está en marcha (por ejemplo, después de volver atrás con `ETIQUETA`), despliega primero esa versión o una más nueva.

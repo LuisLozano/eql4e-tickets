@@ -16,7 +16,7 @@
 - **Orden**: primero la base y después los ficheros. La app guarda el fichero antes de la transacción que lo registra, así que lo que se suba durante la copia como mucho sobra; nunca falta un fichero al que apunte la base. No hace falta parar la app.
 - **Dónde**: `/mnt/externalHD/eql4e/backups/AAAA-MM-DD_HHMM/` con `eql4e.dump`, `ficheros.tar.gz` y `SHA256SUMS`. Si el destino no está en otro disco que `/` (disco desmontado), la copia falla en vez de llenar el disco del sistema.
 - **Permisos**: NTFS no guarda permisos de Unix, así que se montan para root en `fstab` (`uid=0,gid=0,umask=077`). Con `nofail`, si el disco no está, el equipo arranca igual.
-- **Cuándo**: cada noche a las 03:30 con un timer de systemd (`Persistent=true`: si el equipo estaba apagado, al arrancar).
+- **Cuándo**: cada día a las 19:30 con un timer de systemd, antes de la copia de Salazar (20:00) y del apagado programado del equipo (20:20). Con `Persistent=true`, si el equipo estaba apagado a esa hora, la copia se hace al arrancar; por eso `copia.sh` espera hasta dos minutos a que PostgreSQL esté listo.
 - **Retención**: las 7 copias más recientes y la última de cada una de las semanas anteriores, hasta 5 semanas distintas. Ninguna copia pasa de unas 5 semanas, muy por debajo de los 18 meses de RNF-22.
 - **Comprobación**: cada copia se valida al hacerla (`pg_restore --list`, `gzip -t`) y lleva sus sumas SHA-256. `restaurar.sh --simulacro` la restaura en un PostgreSQL temporal y cuenta lo que hay, sin tocar producción.
 - **Restauración**: `restaurar.sh` pide confirmación, copia antes el estado actual, para la app, restaura la base en una sola transacción y los ficheros, y la vuelve a arrancar.

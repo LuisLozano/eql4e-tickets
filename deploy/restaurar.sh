@@ -3,7 +3,7 @@
 #   sudo ./restaurar.sh --simulacro <carpeta>   la restaura en un PostgreSQL temporal y la cuenta;
 #                                               producción no se toca
 #   sudo ./restaurar.sh <carpeta>               SUSTITUYE la base y los ficheros de producción
-# <carpeta> es una de las de /mnt/externalHD/eql4e/backups, por ejemplo 2026-11-07_0330.
+# <carpeta> es una de las de /mnt/externalHD/eql4e/backups, por ejemplo 2026-11-07_1930.
 set -eu
 cd "$(dirname "$0")"
 
