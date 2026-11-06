@@ -55,3 +55,23 @@ export async function prepararFichero(
 		fichero: { nombreOriginal: nombre, tipoMime: 'image/webp', extension: 'webp', datos }
 	};
 }
+
+const PROBLEMAS: Record<Extract<ResultadoPreparar, { ok: false }>['motivo'], string> = {
+	tipo: 'solo se admiten fotos (JPEG, PNG o WebP) y PDF',
+	heic: 'las fotos HEIC no se admiten; en el iPhone, adjúntala desde «Fotos» o cambia el formato de la cámara a «Más compatible»',
+	imagen: 'la imagen está dañada o no se puede leer',
+	tamano: 'ocupa más de 10 MB'
+};
+
+/** Prepara lo subido en un formulario; en el primero que no vale, el error para el socio. */
+export async function prepararSubidos(
+	subidos: File[]
+): Promise<{ ok: true; ficheros: FicheroNuevo[] } | { ok: false; error: string }> {
+	const ficheros: FicheroNuevo[] = [];
+	for (const f of subidos) {
+		const r = await prepararFichero(f.name, new Uint8Array(await f.arrayBuffer()));
+		if (!r.ok) return { ok: false, error: `«${f.name}»: ${PROBLEMAS[r.motivo]}.` };
+		ficheros.push(r.fichero);
+	}
+	return { ok: true, ficheros };
+}

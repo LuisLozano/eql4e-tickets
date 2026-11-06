@@ -2,6 +2,8 @@
 // sus ficheros y la entrada «crear» del historial (ADR-0002).
 import { randomUUID } from 'node:crypto';
 import { asc, eq } from 'drizzle-orm';
+import { OTRO, type CamposFormulario } from '#lib/esquemas/ticket.ts';
+import { importeACentimos } from '#lib/importe.ts';
 import { concepto, historial, ticket, ticketFichero } from '#lib/server/infra/db/esquema.ts';
 import type { Conexion } from '#lib/server/infra/db/tipos.ts';
 
@@ -27,6 +29,18 @@ export type DatosTicket = {
 	conceptoOtro: string | null;
 	observaciones: string | null;
 };
+
+/** Los datos del formulario ya validado (esquemaTicket o esquemaEdicion), como se guardan. */
+export function datosDeFormulario(f: CamposFormulario): DatosTicket {
+	const otro = f.concepto === OTRO;
+	return {
+		importeCentimos: importeACentimos(f.importe)!,
+		fechaCompra: f.fechaCompra,
+		conceptoId: otro ? null : Number(f.concepto),
+		conceptoOtro: otro ? f.conceptoOtro : null,
+		observaciones: f.observaciones || null
+	};
+}
 
 export type ResultadoCrearTicket =
 	{ ok: true; id: string; numero: number } | { ok: false; motivo: 'concepto' };
@@ -56,16 +70,8 @@ export async function crearTicket(
 		if (!c?.activo) return { ok: false, motivo: 'concepto' };
 	}
 
-	// Ruta interna {año}/{mes}/{uuid}.{ext}: el nombre original nunca forma parte de ella.
-	const carpeta = ahora.toISOString().slice(0, 7).replace('-', '/');
-	const rutas = ficheros.map((f) => `${carpeta}/${randomUUID()}.${f.extension}`);
-	const guardados: string[] = [];
-
+	const { rutas, deshacer } = await guardarFicheros(almacen, ficheros, ahora);
 	try {
-		for (const [i, f] of ficheros.entries()) {
-			await almacen.guardar(rutas[i], f.datos);
-			guardados.push(rutas[i]);
-		}
 		return await conexion.transaction(async (tx) => {
 			const [nuevo] = await tx
 				.insert(ticket)
@@ -85,13 +91,37 @@ export async function crearTicket(
 				ticketId: nuevo.id,
 				usuarioId: socioId,
 				accion: 'crear',
-				estadoDestino: 'pendiente_autorizar'
+				estadoDestino: 'pendiente_autorizar',
+				creadoEn: ahora
 			});
 			return { ok: true, ...nuevo } as const;
 		});
 	} catch (e) {
-		// Sin ticket no deben quedar ficheros. Si alguno no se puede borrar, lo hará la limpieza de huérfanos.
-		await Promise.allSettled(guardados.map((ruta) => almacen.borrar(ruta)));
+		await deshacer();
 		throw e;
 	}
+}
+
+/**
+ * Guarda los ficheros en el almacén con la ruta interna {año}/{mes}/{uuid}.{ext}: el nombre original
+ * nunca forma parte de ella. `deshacer` los borra si luego no se guarda el ticket; si alguno no se
+ * puede borrar, lo hará la limpieza de huérfanos.
+ */
+export async function guardarFicheros(almacen: Almacen, ficheros: FicheroNuevo[], ahora: Date) {
+	const carpeta = ahora.toISOString().slice(0, 7).replace('-', '/');
+	const rutas = ficheros.map((f) => `${carpeta}/${randomUUID()}.${f.extension}`);
+	const guardados: string[] = [];
+	const deshacer = async () => {
+		await Promise.allSettled(guardados.map((ruta) => almacen.borrar(ruta)));
+	};
+	try {
+		for (const [i, f] of ficheros.entries()) {
+			await almacen.guardar(rutas[i], f.datos);
+			guardados.push(rutas[i]);
+		}
+	} catch (e) {
+		await deshacer();
+		throw e;
+	}
+	return { rutas, deshacer };
 }

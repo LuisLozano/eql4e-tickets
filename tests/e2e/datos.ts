@@ -103,3 +103,17 @@ export const ANULAR = {
 		email: 'anular.escritorio@ejemplo.invalid'
 	}
 } as const;
+
+/** Socios con un ticket pendiente y otro rechazado (en preparar.ts) que editan y corrigen. */
+export const EDICION = {
+	movil: {
+		nombre: 'Edición Móvil',
+		telefono: '+34699000071',
+		email: 'edicion.movil@ejemplo.invalid'
+	},
+	escritorio: {
+		nombre: 'Edición Escritorio',
+		telefono: '+34699000072',
+		email: 'edicion.escritorio@ejemplo.invalid'
+	}
+} as const;

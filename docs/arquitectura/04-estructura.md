@@ -22,9 +22,9 @@ eql4e-tickets/
 │   ├── hooks.server.ts             # sesión, guardas, cabeceras
 │   ├── app.d.ts                    # tipo de locals.usuario
 │   ├── lib/
-│   │   ├── componentes/            # UI propia + shadcn-svelte (ui/)
+│   │   ├── componentes/            # UI propia + shadcn-svelte (ui/); CamposTicket: formulario de enviar y editar
 │   │   ├── esquemas/               # Zod compartido cliente/servidor
-│   │   ├── cliente/                # compresión de fotos (web worker), borrador en IndexedDB
+│   │   ├── cliente/                # compresión de fotos (web worker), fotos elegidas (fotos.svelte.ts), borrador en IndexedDB
 │   │   ├── formato.ts              # importes, fechas (Intl es-ES), hoy en Madrid
 │   │   ├── importe.ts              # «23,45» → céntimos
 │   │   ├── listado-tickets.ts      # filtros, orden y página del listado global en la URL (HU-T01)
@@ -34,6 +34,7 @@ eql4e-tickets/
 │   │       │   ├── ticket/
 │   │       │   │   ├── consultas.ts # mis tickets, detalle y acceso a ficheros (HU-S02, S03)
 │   │       │   │   ├── crear.ts    # enviar ticket (HU-S01) y el puerto Almacen
+│   │       │   │   ├── editar.ts   # editar (HU-S04) y corregir y reenviar (HU-S06)
 │   │       │   │   ├── listado.ts  # listado global con totales (HU-T01)
 │   │       │   │   ├── estados.ts  # tabla de transiciones, R-04 y acciones posibles (pura)
 │   │       │   │   ├── permisos.ts # R-01, R-04 (puro)

@@ -113,6 +113,8 @@ erDiagram
   - Del tesorero: `autorizar`, `rechazar`, `pagar`.
   - Deshacer: `deshacer_autorizacion`, `deshacer_rechazo`, `deshacer_pago`.
 
+`historial.cambios` (tipo `CambiosTicket` en `src/lib/estados.ts`) guarda solo lo que cambió al editar o reenviar: `importeCentimos`, `fechaCompra`, `concepto` (el nombre de entonces), `observaciones` y `ficheros: [quitados, añadidos]` con ids de fichero, para enlazar los sustituidos. Nulo si se reenvía sin cambios.
+
 ## Restricciones e índices relevantes
 
 | Regla | Implementación |
