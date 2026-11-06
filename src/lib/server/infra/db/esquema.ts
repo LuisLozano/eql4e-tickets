@@ -18,6 +18,7 @@ import {
 	type AnyPgColumn
 } from 'drizzle-orm/pg-core';
 import type { AccionHistorial, CambiosTicket, EstadoTicket } from '../../../estados.ts';
+import type { MetodoPago } from '../../../pagos.ts';
 
 const instante = () => timestamp({ withTimezone: true });
 const creadoEn = () => instante().notNull().defaultNow();
@@ -40,6 +41,7 @@ export const estadosCoinciden: Iguales<(typeof estadoTicket.enumValues)[number],
 	true;
 
 export const metodoPago = pgEnum('metodo_pago', ['bizum', 'transferencia', 'efectivo', 'otro']);
+export const metodosCoinciden: Iguales<(typeof metodoPago.enumValues)[number], MetodoPago> = true;
 export const accionHistorial = pgEnum('accion_historial', [
 	'crear',
 	'editar',

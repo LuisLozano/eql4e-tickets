@@ -88,7 +88,8 @@ async function detalle(conexion: Conexion, donde: SQL | undefined) {
 			observaciones: ticket.observaciones,
 			estado: ticket.estado,
 			motivoRechazo: ticket.motivoRechazo,
-			version: ticket.version
+			version: ticket.version,
+			pagoId: ticket.pagoId
 		})
 		.from(ticket)
 		.innerJoin(usuario, eq(usuario.id, ticket.socioId))
@@ -112,19 +113,49 @@ async function detalle(conexion: Conexion, donde: SQL | undefined) {
 				accion: historial.accion,
 				motivo: historial.motivo,
 				cambios: historial.cambios,
+				metodoPago: pago.metodo,
 				creadoEn: historial.creadoEn,
 				usuarioId: historial.usuarioId,
 				nombre: usuario.nombre
 			})
 			.from(historial)
 			.innerJoin(usuario, eq(usuario.id, historial.usuarioId))
+			.leftJoin(pago, eq(pago.id, historial.pagoId))
 			.where(eq(historial.ticketId, t.id))
 			.orderBy(desc(historial.creadoEn), desc(historial.id))
 	]);
 	const ficheros = todos.filter((f) => !f.sustituidoEn);
 	// Los sustituidos no se muestran en el ticket, pero el historial los enlaza (HU-S04).
 	const sustituidos = todos.filter((f) => f.sustituidoEn);
-	return { ...t, ficheros, sustituidos, historial: entradas };
+	return {
+		...t,
+		ficheros,
+		sustituidos,
+		historial: entradas,
+		pago: await pagoDe(conexion, t.pagoId)
+	};
+}
+
+/** El pago de un ticket pagado: cuándo, cómo, cuánto y con cuántos tickets (HU-S03). */
+async function pagoDe(conexion: Conexion, pagoId: string | null) {
+	if (!pagoId) return null;
+	const [p] = await conexion
+		.select({
+			id: pago.id,
+			fechaPago: pago.fechaPago,
+			metodo: pago.metodo,
+			importeTotalCentimos: pago.importeTotalCentimos,
+			conJustificante: sql<boolean>`${pago.justificanteRuta} is not null`,
+			// Con el id como valor: en una consulta de una sola tabla, Drizzle no pone el nombre de la
+			// tabla en las columnas, y `id` sería el del ticket de la subconsulta.
+			tickets:
+				sql<number>`(select count(*) from ${ticket} where ${ticket.pagoId} = ${pagoId})`.mapWith(
+					Number
+				)
+		})
+		.from(pago)
+		.where(eq(pago.id, pagoId));
+	return p ?? null;
 }
 
 /**

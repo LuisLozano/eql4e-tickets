@@ -2,11 +2,13 @@
 	import { resolve } from '$app/paths';
 	import { TEXTO_ACCION, type AccionHistorial, type CambiosTicket } from '#lib/estados.ts';
 	import { formatoDia, formatoFechaHora, formatoImporte } from '#lib/formato.ts';
+	import { TEXTO_METODO, type MetodoPago } from '#lib/pagos.ts';
 
 	type Entrada = {
 		accion: AccionHistorial;
 		motivo: string | null;
 		cambios: CambiosTicket | null;
+		metodoPago: MetodoPago | null;
 		creadoEn: Date;
 		usuarioId: string;
 		nombre: string;
@@ -39,7 +41,7 @@
 				<span
 					><span class="font-bold">{TEXTO_ACCION[h.accion]}</span> por {h.usuarioId === yo
 						? 'ti'
-						: h.nombre}</span
+						: h.nombre}{h.metodoPago ? ` · ${TEXTO_METODO[h.metodoPago]}` : ''}</span
 				>
 				{#if h.motivo}
 					<span class="break-words">«{h.motivo}»</span>
