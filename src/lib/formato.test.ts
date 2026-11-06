@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+	formatoDia,
 	formatoFecha,
+	formatoFechaHora,
 	formatoImporte,
 	formatoNumeroTicket,
 	formatoTamano,
@@ -50,5 +52,18 @@ describe('formatoTamano', () => {
 		[100, '1 KB']
 	])('%i → %s', (bytes, esperado) => {
 		expect(formatoTamano(bytes)).toBe(esperado);
+	});
+});
+
+describe('formatoFechaHora', () => {
+	it('en hora de Madrid, invierno y verano', () => {
+		expect(formatoFechaHora(new Date('2026-11-06T06:15:00Z'))).toBe('06/11/2026 07:15');
+		expect(formatoFechaHora(new Date('2026-07-01T22:30:00Z'))).toBe('02/07/2026 00:30');
+	});
+});
+
+describe('formatoDia', () => {
+	it('da la vuelta a la fecha ISO', () => {
+		expect(formatoDia('2026-11-02')).toBe('02/11/2026');
 	});
 });

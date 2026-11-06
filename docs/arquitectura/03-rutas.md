@@ -20,9 +20,9 @@ Leyenda de acceso: 🌐 pública · 👤 con sesión · 💼 tesorero.
 | Ruta | Acceso | `load` / acciones | Historia |
 |---|:-:|---|---|
 | `/` | 👤 | Redirige a `/tickets` (socio) o a `/gestion/tickets` (tesorero) | — |
-| `/tickets` | 👤 | `load`: mis tickets + totales; filtro `?estado=` | HU-S02 |
+| `/tickets` | 👤 | `load`: mis tickets + totales; filtro `?estado=pendientes\|rechazado\|pagado\|anulado` («pendientes» agrupa los dos pendientes); `?enviado=<número>` y `?bienvenida` muestran un aviso | HU-S02 |
 | `/tickets/nuevo` | 👤 | acción `default` (multipart) | HU-S01 |
-| `/tickets/[numero]` | 👤 (propio) | `load`: detalle + historial; acciones `anular`, `reenviar` | HU-S03, S05, S06 |
+| `/tickets/[numero]` | 👤 (propio; 404 si es ajeno, también para un tesorero) | `load`: detalle + ficheros vigentes + historial; acciones `anular`, `reenviar` (Sprint 2) | HU-S03, S05, S06 |
 | `/tickets/[numero]/editar` | 👤 (propio) | acción `default` (multipart, con `version`) | HU-S04, S06 |
 
 ## Gestión (tesorero)
@@ -42,7 +42,7 @@ Leyenda de acceso: 🌐 pública · 👤 con sesión · 💼 tesorero.
 
 | Ruta | Acceso | Descripción |
 |---|:-:|---|
-| `GET /ficheros/[id]` | 👤 propio o 💼 | Fichero de ticket. 404 si no hay permiso (R-01). `Cache-Control: private, no-store` |
+| `GET /ficheros/[id]` | 👤 propio o 💼 | Fichero de ticket. 404 si no hay permiso (R-01). `Content-Disposition: inline` con el nombre original (extensión real), `X-Content-Type-Options: nosniff`, `Cache-Control: private, no-store` |
 | `GET /justificantes/[pagoId]` | 👤 propio o 💼 | Justificante de pago |
 | `GET /salud` | 🌐 (local) | `200` si la base de datos responde. Para el `healthcheck` de Docker |
 

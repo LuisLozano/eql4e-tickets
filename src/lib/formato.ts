@@ -17,6 +17,26 @@ export function formatoImporte(centimos: number): string {
 	return euros.format(centimos / 100);
 }
 
+const fechaHora = new Intl.DateTimeFormat('es-ES', {
+	day: '2-digit',
+	month: '2-digit',
+	year: 'numeric',
+	hour: '2-digit',
+	minute: '2-digit',
+	timeZone: 'Europe/Madrid'
+});
+
+/** → "06/11/2026 07:15" (hora de Madrid) */
+export function formatoFechaHora(valor: Date): string {
+	return fechaHora.format(valor).replace(',', '');
+}
+
+/** "2026-11-02" (columna `date`) → "02/11/2026", sin pasar por zonas horarias. */
+export function formatoDia(dia: string): string {
+	const [anio, mes, d] = dia.split('-');
+	return `${d}/${mes}/${anio}`;
+}
+
 /** → "04/11/2026" */
 export function formatoFecha(valor: Date): string {
 	return fecha.format(valor);
