@@ -30,7 +30,7 @@
 ## Fiabilidad y operación
 
 - **RNF-30** Despliegue con **Docker Compose** en esta máquina, sin interferir con la aplicación existente. Se publica solo a través de Caddy; los contenedores no exponen puertos hacia fuera.
-- **RNF-31** Los datos (base de datos y ficheros) viven en volúmenes persistentes y documentados, preparados para las copias de seguridad (la política se decide más adelante, pero **antes de la puesta en producción**).
+- **RNF-31** Los datos (base de datos y ficheros) viven en volúmenes persistentes y documentados, preparados para las copias de seguridad. Política decidida en [ADR-0008](../arquitectura/adr/0008-copias.md): copia diaria en un disco externo, 5 semanas de retención.
 - **RNF-32** Migraciones de base de datos versionadas y automáticas al desplegar.
 - **RNF-33** Registros (logs) estructurados por la salida estándar, sin datos sensibles (ni contraseñas, ni códigos, ni contenido de ficheros).
 - **RNF-34** Endpoint de salud para Docker (`healthcheck`).

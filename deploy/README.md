@@ -6,10 +6,11 @@ Procedimiento para instalar, actualizar y operar la aplicación en la máquina `
 
 | Pieza | Dónde |
 |---|---|
-| Carpeta de despliegue | `/opt/eql4e-tickets`: `compose.yaml`, `desplegar.sh`, `.env.example` y `.env` (permisos 600) |
+| Carpeta de despliegue | `/opt/eql4e-tickets`: `compose.yaml`, `desplegar.sh`, `copia.sh`, `restaurar.sh`, `.env.example` y `.env` (permisos 600) |
 | Imagen | `ghcr.io/luislozano/eql4e-tickets` (pública). La CI la publica en cada *push* a `main` con dos etiquetas: `latest` y el SHA corto del commit |
 | Contenedores | `eql4e-app-1` en `127.0.0.1:3080`; `eql4e-db-1` (PostgreSQL 18) sin puertos publicados |
 | Datos | Volúmenes `eql4e_pgdata` (base de datos) y `eql4e_ficheros` (fotos y justificantes) |
+| Copias de seguridad | Cada noche en el disco externo, `/mnt/externalHD/eql4e/backups` (apartado 5, [ADR-0008](../docs/arquitectura/adr/0008-copias.md)) |
 | Proxy HTTPS | El Caddy de Salazar (`salazar-https-caddy-1`, red del host), con el Caddyfile en `/home/luis/salazar/https/Caddyfile` |
 | Dominio | `tickets-eql4e.ddns.net` (No-IP), con la misma IP que `yaroki.ddns.net` |
 
@@ -34,14 +35,16 @@ cd /home/luis/desarrollo/eql4e && git switch main && git pull --ff-only
 ```
 
 ```bash
-for f in compose.yaml desplegar.sh .env.example; do diff -q /home/luis/desarrollo/eql4e/deploy/$f /opt/eql4e-tickets/$f; done
+for f in compose.yaml desplegar.sh copia.sh restaurar.sh .env.example eql4e-copia.service eql4e-copia.timer; do diff -q /home/luis/desarrollo/eql4e/deploy/$f /opt/eql4e-tickets/$f; done
 ```
 
 Si sale alguna diferencia, cópialos (el `.env` no se toca):
 
 ```bash
-sudo cp /home/luis/desarrollo/eql4e/deploy/{compose.yaml,desplegar.sh,.env.example} /opt/eql4e-tickets/
+sudo cp /home/luis/desarrollo/eql4e/deploy/{compose.yaml,desplegar.sh,copia.sh,restaurar.sh,.env.example,eql4e-copia.service,eql4e-copia.timer} /opt/eql4e-tickets/
 ```
+
+Si han cambiado las unidades de systemd (`eql4e-copia.*`), reinstálalas como en el apartado 5.1.
 
 Si ha cambiado `.env.example`, revisa qué variables nuevas hay y añádelas a mano en el `.env`:
 
@@ -67,7 +70,7 @@ Ejecuta estos comandos desde `/opt/eql4e-tickets`.
 | Comprobar desde fuera | `curl -s https://tickets-eql4e.ddns.net/salud` → `{"estado":"ok"}` |
 | Log de Caddy (certificados, errores del proxy) | `sudo docker logs --since 30m salazar-https-caddy-1` |
 
-> **Nunca** ejecutes `docker compose down -v` ni `docker volume rm eql4e_…`: borran la base de datos y los ficheros, y todavía no hay copias de seguridad (pendiente antes de usar la app en serio).
+> **Nunca** ejecutes `docker compose down -v` ni `docker volume rm eql4e_…`: borran la base de datos y los ficheros. Solo quedaría lo que haya en la última copia de seguridad (apartado 5).
 
 ## 3. Volver a una versión anterior
 
@@ -83,7 +86,7 @@ Cada imagen lleva como etiqueta el SHA corto de su commit. Los SHA están en `gi
    ```
 3. Cuando el problema esté corregido en `main`, vuelve a `ETIQUETA=latest` y despliega otra vez.
 
-**Cuidado con las migraciones.** Solo avanzan. Si la versión mala aplicó una migración que la anterior no entiende, volver atrás no basta: hay que restaurar una copia de la base de datos.
+**Cuidado con las migraciones.** Solo avanzan. Si la versión mala aplicó una migración que la anterior no entiende, volver atrás no basta: hay que restaurar una copia de seguridad (apartado 5.4) hecha antes de desplegar la versión mala.
 
 Para que volver atrás siga siendo posible, las migraciones se escriben **compatibles con la versión anterior**. Para quitar o renombrar una columna se hace en dos despliegues: primero se añade la nueva y el código deja de usar la vieja; en un despliegue posterior se borra la vieja.
 
@@ -102,7 +105,7 @@ Este apartado ya se hizo el 2026-11-04. Sirve si hay que reinstalar en esta máq
 Copia los ficheros de despliegue:
 
 ```bash
-sudo mkdir -p /opt/eql4e-tickets && sudo cp /home/luis/desarrollo/eql4e/deploy/{compose.yaml,desplegar.sh,.env.example} /opt/eql4e-tickets/
+sudo mkdir -p /opt/eql4e-tickets && sudo cp /home/luis/desarrollo/eql4e/deploy/{compose.yaml,desplegar.sh,copia.sh,restaurar.sh,.env.example,eql4e-copia.service,eql4e-copia.timer} /opt/eql4e-tickets/
 ```
 
 Crea el `.env` con una contraseña aleatoria para PostgreSQL. La contraseña no se muestra en pantalla y queda solo en el `.env`:
@@ -162,7 +165,78 @@ curl -s https://tickets-eql4e.ddns.net/salud && curl -s -o /dev/null -w 'yaroki:
 
 El resultado esperado es `{"estado":"ok"}` y `yaroki: 200`.
 
-## 5. Problemas frecuentes
+## 5. Copias de seguridad
+
+Cada noche a las 03:30, un timer de systemd ejecuta `copia.sh`, que deja en el disco externo una carpeta `AAAA-MM-DD_HHMM` con:
+
+- `eql4e.dump`: la base de datos;
+- `ficheros.tar.gz`: las fotos y los justificantes;
+- `SHA256SUMS`: las sumas para comprobar que no se han estropeado.
+
+Se guardan las 7 copias más recientes y la última de cada semana anterior, hasta 5 semanas. Las decisiones están en [ADR-0008](../docs/arquitectura/adr/0008-copias.md).
+
+### 5.1 Instalación (una sola vez)
+
+1. Monta el disco externo solo para root y con `nofail`, para que el equipo arranque aunque no esté conectado. En `/etc/fstab`, cambia las opciones de su línea, de `defaults` a `defaults,nofail,uid=0,gid=0,umask=077`. La línea queda así:
+   ```
+   UUID=26BEF288BEF24FB3 /mnt/externalHD ntfs defaults,nofail,uid=0,gid=0,umask=077 0 0
+   ```
+   ```bash
+   sudo nano /etc/fstab
+   ```
+2. Vuelve a montarlo y comprueba que ya no lo puede leer cualquiera (tiene que salir `drwx------ … root root`):
+   ```bash
+   sudo systemctl daemon-reload && sudo umount /mnt/externalHD && sudo mount /mnt/externalHD && ls -ld /mnt/externalHD
+   ```
+3. Copia los scripts y las unidades a la carpeta de despliegue, si no lo hiciste al actualizar (apartado 1), e instala el timer:
+   ```bash
+   sudo cp /opt/eql4e-tickets/eql4e-copia.{service,timer} /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now eql4e-copia.timer
+   ```
+4. Haz la primera copia a mano y después un simulacro (apartado 5.3):
+   ```bash
+   sudo systemctl start eql4e-copia && sudo journalctl -u eql4e-copia -n 20 --no-pager
+   ```
+
+### 5.2 Comprobar que se están haciendo
+
+| Para | Comando |
+|---|---|
+| Cuándo toca la siguiente | `systemctl list-timers eql4e-copia.timer` |
+| Si la última salió bien | `systemctl status eql4e-copia` |
+| Su salida | `sudo journalctl -u eql4e-copia -n 30 --no-pager` |
+| Las copias que hay | `sudo ls -l /mnt/externalHD/eql4e/backups` |
+| Hacer una ahora | `cd /opt/eql4e-tickets && sudo ./copia.sh` |
+
+Si el disco no está conectado o montado, la copia falla con «no está en el disco externo» y no escribe nada en el disco del sistema. Nadie recibe un aviso: mira el estado de vez en cuando.
+
+### 5.3 Simulacro (una vez al mes)
+
+Restaura una copia en un PostgreSQL temporal, sin tocar producción, y cuenta usuarios, tickets, pagos y ficheros. Sirve para saber que las copias se pueden restaurar antes de necesitarlo:
+
+```bash
+cd /opt/eql4e-tickets && sudo ./restaurar.sh --simulacro "$(sudo ls /mnt/externalHD/eql4e/backups | tail -1)"
+```
+
+Las cifras deben parecerse a lo que ves en la app. Los «ficheros en la copia» deben ser al menos los «ficheros en la base» más los «justificantes en la base».
+
+### 5.4 Restaurar en producción
+
+**Sustituye** la base de datos y los ficheros por los de la copia: lo guardado después se pierde. Antes de empezar, el script pide escribir `eql4e` y hace una copia del estado actual, por si hay que volver a él.
+
+1. Elige la copia:
+   ```bash
+   sudo ls /mnt/externalHD/eql4e/backups
+   ```
+2. Restáurala (cambia la fecha por la elegida):
+   ```bash
+   cd /opt/eql4e-tickets && sudo ./restaurar.sh 2026-11-07_0330
+   ```
+
+El script para la app, restaura la base en una sola transacción y después los ficheros, y la vuelve a arrancar con la misma imagen. Si la copia es de antes de una migración, la app la aplica al arrancar. Si la copia es de una versión **posterior** a la imagen que está en marcha (por ejemplo, después de volver atrás con `ETIQUETA`), despliega primero esa versión o una más nueva.
+
+Si el disco del sistema se ha perdido entero: haz la instalación desde cero (apartado 4, sin activar el tesorero inicial), monta el disco externo (5.1) y restaura la última copia.
+
+## 6. Problemas frecuentes
 
 | Síntoma | Causa probable | Qué hacer |
 |---|---|---|
