@@ -17,6 +17,8 @@ import { conexionDePrueba } from './conexion.ts';
 import { crearUsuario } from './datos.ts';
 
 const { db } = conexionDePrueba();
+// Sin filtro de estado (el de por defecto, solo pendientes de autorizar, se prueba aparte).
+const TODOS: FiltrosListado = { ...FILTROS_INICIALES, estados: [] };
 
 // Cada prueba trabaja en una transacción que se deshace, con un concepto propio: el listado es
 // global y los demás ficheros de pruebas crean tickets a la vez.
@@ -84,7 +86,7 @@ async function insertar(tx: Conexion, conceptoId: number, d: Datos) {
 }
 
 const numeros = async (tx: Conexion, f: Partial<FiltrosListado>) =>
-	(await listadoGlobal(tx, { ...FILTROS_INICIALES, ...f })).filas.map((t) => t.numero);
+	(await listadoGlobal(tx, { ...TODOS, ...f })).filas.map((t) => t.numero);
 
 describe('listado global (HU-T01)', () => {
 	it('ORDEN_ESTADOS tiene todos los estados', () => {
@@ -228,7 +230,7 @@ describe('listado global (HU-T01)', () => {
 			const c = await conceptoPropio(tx);
 			const baja = await crearUsuario(tx, { estado: 'baja' });
 			await insertar(tx, c, { socioId: baja.id, conceptoOtro: 'Floristería' });
-			const { filas } = await listadoGlobal(tx, { ...FILTROS_INICIALES, socio: baja.id });
+			const { filas } = await listadoGlobal(tx, { ...TODOS, socio: baja.id });
 			expect(filas).toEqual([
 				expect.objectContaining({
 					socioId: baja.id,
@@ -258,17 +260,31 @@ describe('listado global (HU-T01)', () => {
 			);
 			await insertar(tx, c, { socioId: socio.id, estado: 'rechazado', importeCentimos: 250 });
 
-			const primera = await listadoGlobal(tx, { ...FILTROS_INICIALES, concepto: c });
+			const primera = await listadoGlobal(tx, { ...TODOS, concepto: c });
 			expect(primera.filas).toHaveLength(TAMANO_PAGINA);
+			// Los cinco estados siempre, también con cero, en el orden de lo que requiere acción.
 			expect(primera.porEstado).toEqual([
 				{ estado: 'pendiente_autorizar', tickets: TAMANO_PAGINA + 2, centimos: 5200 },
-				{ estado: 'rechazado', tickets: 1, centimos: 250 }
+				{ estado: 'pendiente_pago', tickets: 0, centimos: 0 },
+				{ estado: 'rechazado', tickets: 1, centimos: 250 },
+				{ estado: 'pagado', tickets: 0, centimos: 0 },
+				{ estado: 'anulado', tickets: 0, centimos: 0 }
 			]);
 			expect(primera.total).toEqual({ tickets: TAMANO_PAGINA + 3, centimos: 5450 });
+			expect(primera.todos).toEqual(primera.total);
+
+			// Por defecto, solo pendientes de autorizar; las casillas por estado no cambian.
+			const pendientes = await listadoGlobal(tx, { ...FILTROS_INICIALES, concepto: c });
+			expect(pendientes.porEstado).toEqual(primera.porEstado);
+			expect(pendientes.total).toEqual({ tickets: TAMANO_PAGINA + 2, centimos: 5200 });
+			expect(pendientes.todos).toEqual(primera.total);
+			expect(pendientes.filas.every((f) => f.estado === 'pendiente_autorizar')).toBe(true);
+			const rechazados = await listadoGlobal(tx, { ...TODOS, concepto: c, estados: ['rechazado'] });
+			expect(rechazados).toMatchObject({ total: { tickets: 1, centimos: 250 }, paginas: 1 });
 			expect(primera).toMatchObject({ pagina: 1, paginas: 2 });
 
 			// Fuera de rango se queda en la última.
-			const ultima = await listadoGlobal(tx, { ...FILTROS_INICIALES, concepto: c, pagina: 9 });
+			const ultima = await listadoGlobal(tx, { ...TODOS, concepto: c, pagina: 9 });
 			expect(ultima).toMatchObject({ pagina: 2, paginas: 2 });
 			expect(ultima.filas.map((f) => f.estado)).toEqual([
 				'pendiente_autorizar',
@@ -276,8 +292,9 @@ describe('listado global (HU-T01)', () => {
 				'rechazado'
 			]);
 
-			const vacio = await listadoGlobal(tx, { ...FILTROS_INICIALES, concepto: c, min: 99_999 });
-			expect(vacio).toMatchObject({ filas: [], porEstado: [], pagina: 1, paginas: 1 });
+			const vacio = await listadoGlobal(tx, { ...TODOS, concepto: c, min: 99_999 });
+			expect(vacio).toMatchObject({ filas: [], pagina: 1, paginas: 1 });
+			expect(vacio.porEstado.every((t) => t.tickets === 0)).toBe(true);
 			expect(vacio.total).toEqual({ tickets: 0, centimos: 0 });
 		}));
 

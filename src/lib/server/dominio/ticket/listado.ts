@@ -48,8 +48,9 @@ function condiciones(f: FiltrosListado) {
 export type TotalEstado = { estado: EstadoTicket; tickets: number; centimos: number };
 
 /**
- * Una página del listado y los totales de todo el resultado filtrado, por estado (en el orden de
- * ORDEN_ESTADOS, solo los que tienen tickets). Una página fuera de rango se lleva a la última.
+ * Una página del listado, el total de lo listado y, por cada estado (en el orden de ORDEN_ESTADOS,
+ * también con cero), lo que hay con los demás filtros: las casillas de los totales son el filtro
+ * rápido de estado, así que no dependen de él. Una página fuera de rango se lleva a la última.
  */
 export async function listadoGlobal(conexion: Conexion, f: FiltrosListado) {
 	const donde = condiciones(f);
@@ -61,15 +62,18 @@ export async function listadoGlobal(conexion: Conexion, f: FiltrosListado) {
 			centimos: sql<number>`coalesce(sum(${ticket.importeCentimos}), 0)`.mapWith(Number)
 		})
 		.from(ticket)
-		.where(donde)
+		.where(condiciones({ ...f, estados: [] }))
 		.groupBy(ticket.estado);
-	const porEstado: TotalEstado[] = ORDEN_ESTADOS.flatMap(
-		(e) => filasTotales.find((t) => t.estado === e) ?? []
+	const porEstado: TotalEstado[] = ORDEN_ESTADOS.map(
+		(estado) => filasTotales.find((t) => t.estado === estado) ?? { estado, tickets: 0, centimos: 0 }
 	);
-	const total = {
-		tickets: porEstado.reduce((s, t) => s + t.tickets, 0),
-		centimos: porEstado.reduce((s, t) => s + t.centimos, 0)
-	};
+	const listados = porEstado.filter((t) => !f.estados.length || f.estados.includes(t.estado));
+	const suma = (lista: TotalEstado[]) => ({
+		tickets: lista.reduce((s, t) => s + t.tickets, 0),
+		centimos: lista.reduce((s, t) => s + t.centimos, 0)
+	});
+	const total = suma(listados);
+	const todos = suma(porEstado);
 	const paginas = Math.max(1, Math.ceil(total.tickets / TAMANO_PAGINA));
 	const pagina = Math.min(f.pagina, paginas);
 
@@ -96,7 +100,7 @@ export async function listadoGlobal(conexion: Conexion, f: FiltrosListado) {
 		.limit(TAMANO_PAGINA)
 		.offset((pagina - 1) * TAMANO_PAGINA);
 
-	return { filas, porEstado, total, pagina, paginas };
+	return { filas, porEstado, total, todos, pagina, paginas };
 }
 
 export type FilaListado = Awaited<ReturnType<typeof listadoGlobal>>['filas'][number];
