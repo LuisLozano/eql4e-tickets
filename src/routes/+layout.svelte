@@ -12,6 +12,7 @@
 					...(data.usuario.esTesorero
 						? [
 								{ href: resolve('/gestion/tickets'), texto: 'Tickets' },
+								{ href: resolve('/gestion/pagos'), texto: 'Pagos' },
 								{ href: resolve('/gestion/usuarios'), texto: 'Usuarios' },
 								{ href: resolve('/gestion/conceptos'), texto: 'Conceptos' }
 							]

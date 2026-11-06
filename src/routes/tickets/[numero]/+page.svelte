@@ -11,6 +11,7 @@
 	import EstadoInsignia from '#lib/componentes/EstadoInsignia.svelte';
 	import FicherosTicket from '#lib/componentes/FicherosTicket.svelte';
 	import HistorialTicket from '#lib/componentes/HistorialTicket.svelte';
+	import PagoTicket from '#lib/componentes/PagoTicket.svelte';
 	import { formatoFechaHora, formatoNumeroTicket } from '#lib/formato.ts';
 	import type { PageProps } from './$types';
 
@@ -74,6 +75,10 @@
 				<p class="text-sm text-muted">{rechazo.nombre} · {formatoFechaHora(rechazo.creadoEn)}</p>
 			{/if}
 		</section>
+	{/if}
+
+	{#if t.pago}
+		<PagoTicket pago={t.pago} />
 	{/if}
 
 	<FicherosTicket ficheros={t.ficheros} />

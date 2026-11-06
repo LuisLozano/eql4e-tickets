@@ -117,3 +117,17 @@ export const EDICION = {
 		email: 'edicion.escritorio@ejemplo.invalid'
 	}
 } as const;
+
+/** Socios con dos tickets pendientes de pago (en preparar.ts) que un tesorero paga. */
+export const PAGO = {
+	movil: {
+		nombre: 'Pago Móvil',
+		telefono: '+34699000081',
+		email: 'pago.movil@ejemplo.invalid'
+	},
+	escritorio: {
+		nombre: 'Pago Escritorio',
+		telefono: '+34699000082',
+		email: 'pago.escritorio@ejemplo.invalid'
+	}
+} as const;

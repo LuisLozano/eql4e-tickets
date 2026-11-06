@@ -12,6 +12,7 @@ import {
 	CONCEPTOS,
 	CONTRASENA_TESORERO,
 	LISTADO,
+	PAGO,
 	REMITENTES,
 	REVISION,
 	SOCIOS,
@@ -36,7 +37,8 @@ export default async function preparar() {
 			...Object.values(LISTADO),
 			...Object.values(REVISION),
 			...Object.values(ANULAR),
-			...Object.values(EDICION)
+			...Object.values(EDICION),
+			...Object.values(PAGO)
 		];
 		const telefonos = usuarios.map((u) => u.telefono);
 		const emails = usuarios.map((u) => u.email);
@@ -44,6 +46,7 @@ export default async function preparar() {
 		// Sus tickets (con su historial y ficheros, en cascada) y lo que hicieron en tickets de otros.
 		await sql`delete from ticket where socio_id in (${suyos})`;
 		await sql`delete from historial where usuario_id in (${suyos})`;
+		await sql`delete from pago where socio_id in (${suyos}) or registrado_por in (${suyos})`;
 		for (const u of usuarios) {
 			await sql`delete from usuario where telefono = ${u.telefono} or email = ${u.email}`;
 		}
@@ -128,6 +131,18 @@ export default async function preparar() {
 				values
 					(${id}, 1500, '2026-10-01', ${concepto}, 'pendiente_autorizar', null),
 					(${id}, 990, '2026-10-02', ${concepto}, 'rechazado', 'La foto está borrosa')`;
+		}
+		// Dos pendientes de pago por socio al que se paga (HU-T05).
+		for (const p of Object.values(PAGO)) {
+			const [{ id }] = await sql`
+				insert into usuario (nombre, telefono, email, password_hash, estado)
+				values (${p.nombre}, ${p.telefono}, ${p.email}, ${passwordHash}, 'activo')
+				returning id`;
+			await sql`
+				insert into ticket (socio_id, importe_centimos, fecha_compra, concepto_id, estado)
+				values
+					(${id}, 2000, '2026-10-01', ${concepto}, 'pendiente_pago'),
+					(${id}, 500, '2026-10-02', ${concepto}, 'pendiente_pago')`;
 		}
 	} finally {
 		await sql.end();

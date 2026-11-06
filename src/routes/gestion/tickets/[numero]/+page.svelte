@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { ArrowLeft, Check, Lock, X } from '@lucide/svelte';
+	import { ArrowLeft, Check, Euro, Lock, X } from '@lucide/svelte';
 	import { superForm } from 'sveltekit-superforms';
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
@@ -10,6 +10,7 @@
 	import EstadoInsignia from '#lib/componentes/EstadoInsignia.svelte';
 	import FicherosTicket from '#lib/componentes/FicherosTicket.svelte';
 	import HistorialTicket from '#lib/componentes/HistorialTicket.svelte';
+	import PagoTicket from '#lib/componentes/PagoTicket.svelte';
 	import { MOTIVO_MAXIMO } from '#lib/esquemas/revision.ts';
 	import { formatoNumeroTicket } from '#lib/formato.ts';
 	import type { PageProps } from './$types';
@@ -68,6 +69,25 @@
 					<h2 id="titulo-motivo" class="font-bold text-rj">Motivo del rechazo</h2>
 					<p class="break-words">{t.motivoRechazo}</p>
 				</section>
+			{/if}
+
+			{#if t.pago}
+				<PagoTicket pago={t.pago} detalle />
+			{/if}
+
+			{#if t.estado === 'pendiente_pago'}
+				{#if data.propio}
+					<p class="flex items-start gap-2 rounded-lg bg-sunken px-4 py-3">
+						<Lock size={20} aria-hidden="true" class="mt-0.5 shrink-0" />
+						Es tu ticket: lo tiene que pagar otro tesorero.
+					</p>
+				{:else}
+					<a
+						href="{resolve('/gestion/pagos/nuevo')}?socio={t.socioId}&ticket={t.numero}"
+						class="inline-flex min-h-11 items-center justify-center gap-2 self-start rounded-lg bg-ink px-4 font-bold text-on-ink hover:opacity-90"
+						><Euro size={20} aria-hidden="true" />Registrar pago</a
+					>
+				{/if}
 			{/if}
 
 			{#if data.propio && pendiente}
