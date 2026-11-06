@@ -112,7 +112,9 @@ test('las fotos se reducen en el móvil y, si falla la red, el ticket no se pier
 	// Sin conexión: avisa y el formulario sigue igual.
 	await context.setOffline(true);
 	await page.getByRole('button', { name: 'Enviar ticket' }).click();
-	await expect(page.getByText(/^No se ha podido enviar\./)).toBeVisible();
+	// El aviso sale junto al botón, dentro de la pantalla: en el móvil no hay que subir a buscarlo.
+	const avisoRed = page.getByText(/^No se ha podido enviar\./);
+	await expect(avisoRed).toBeInViewport();
 	await expect(lista.getByRole('listitem')).toHaveCount(2);
 
 	// Aunque se recargue la página, el borrador vuelve.
