@@ -3,7 +3,7 @@
 import { and, asc, count, desc, eq, gte, inArray, isNull, lte, sql, type SQL } from 'drizzle-orm';
 import type { EstadoTicket } from '#lib/estados.ts';
 import { TAMANO_PAGINA, type FiltrosListado, type Orden } from '#lib/listado-tickets.ts';
-import { claveNombre, concepto, ticket, usuario } from '#lib/server/infra/db/esquema.ts';
+import { claveNombre, concepto, pago, ticket, usuario } from '#lib/server/infra/db/esquema.ts';
 import type { Conexion } from '#lib/server/infra/db/tipos.ts';
 
 /** Lo que requiere acción primero (HU-T01). */
@@ -45,6 +45,13 @@ function condiciones(f: FiltrosListado) {
 	);
 }
 
+/** Dentro de cada valor, lo más antiguo primero; el número desempata del todo. */
+const ordenDe = (f: FiltrosListado) => [
+	(f.dir === 'desc' ? desc : asc)(COLUMNA[f.orden]),
+	asc(ticket.creadoEn),
+	asc(ticket.numero)
+];
+
 export type TotalEstado = { estado: EstadoTicket; tickets: number; centimos: number };
 
 /**
@@ -77,7 +84,6 @@ export async function listadoGlobal(conexion: Conexion, f: FiltrosListado) {
 	const paginas = Math.max(1, Math.ceil(total.tickets / TAMANO_PAGINA));
 	const pagina = Math.min(f.pagina, paginas);
 
-	const sentido = f.dir === 'desc' ? desc : asc;
 	const filas = await conexion
 		.select({
 			numero: ticket.numero,
@@ -95,8 +101,7 @@ export async function listadoGlobal(conexion: Conexion, f: FiltrosListado) {
 		.innerJoin(usuario, eq(usuario.id, ticket.socioId))
 		.leftJoin(concepto, eq(concepto.id, ticket.conceptoId))
 		.where(donde)
-		// Dentro de cada valor, lo más antiguo primero; el número desempata del todo.
-		.orderBy(sentido(COLUMNA[f.orden]), asc(ticket.creadoEn), asc(ticket.numero))
+		.orderBy(...ordenDe(f))
 		.limit(TAMANO_PAGINA)
 		.offset((pagina - 1) * TAMANO_PAGINA);
 
@@ -104,6 +109,35 @@ export async function listadoGlobal(conexion: Conexion, f: FiltrosListado) {
 }
 
 export type FilaListado = Awaited<ReturnType<typeof listadoGlobal>>['filas'][number];
+
+/** Todo lo listado con esos filtros y en ese orden, sin paginar, para exportarlo (HU-T07). */
+export function exportarListado(conexion: Conexion, f: FiltrosListado) {
+	return (
+		conexion
+			.select({
+				numero: ticket.numero,
+				fechaCompra: ticket.fechaCompra,
+				creadoEn: ticket.creadoEn,
+				socio: usuario.nombre,
+				telefono: usuario.telefono,
+				concepto: concepto.nombre,
+				conceptoOtro: ticket.conceptoOtro,
+				importeCentimos: ticket.importeCentimos,
+				estado: ticket.estado,
+				fechaPago: pago.fechaPago,
+				metodoPago: pago.metodo
+			})
+			.from(ticket)
+			.innerJoin(usuario, eq(usuario.id, ticket.socioId))
+			.leftJoin(concepto, eq(concepto.id, ticket.conceptoId))
+			// Solo los pagados tienen pago: al deshacerlo, el ticket lo pierde (E-03).
+			.leftJoin(pago, eq(pago.id, ticket.pagoId))
+			.where(condiciones(f))
+			.orderBy(...ordenDe(f))
+	);
+}
+
+export type FilaExportada = Awaited<ReturnType<typeof exportarListado>>[number];
 
 /** Las opciones de los desplegables: todos los conceptos (también inactivos) y los socios con tickets. */
 export async function opcionesListado(conexion: Conexion) {
