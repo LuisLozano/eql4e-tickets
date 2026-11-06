@@ -36,7 +36,7 @@ Todo lo marcado **[M]** forma el MVP: con ello la asociación puede dejar de ges
 ## Siguientes versiones (fuera de la v1)
 
 - Notificaciones de cambio de estado (email o push).
-- Política y automatización de copias de seguridad (**obligatoria antes de producción**, aunque sea fuera del MVP funcional).
+- ~~Política y automatización de copias de seguridad~~: hecha ([ADR-0008](../arquitectura/adr/0008-copias.md)). Falta una copia fuera de casa.
 - Informes por concepto o periodo.
 - OCR para proponer automáticamente importe y fecha.
 

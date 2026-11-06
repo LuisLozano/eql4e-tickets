@@ -1,0 +1,11 @@
+# Copia de seguridad diaria de eql4e-tickets (ADR-0008). Se instala en /etc/systemd/system.
+[Unit]
+Description=Copia de seguridad de eql4e-tickets
+Requires=docker.service
+After=docker.service
+# Monta el disco externo si hace falta; si no está conectado, la copia falla (y se ve en el journal).
+RequiresMountsFor=/mnt/externalHD
+
+[Service]
+Type=oneshot
+ExecStart=/opt/eql4e-tickets/copia.sh
