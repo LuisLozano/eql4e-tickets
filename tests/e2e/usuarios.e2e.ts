@@ -13,7 +13,7 @@ test('un tesorero da de alta a un socio y el socio activa su cuenta (HU-G01, A01
 	await page.getByLabel('Teléfono').fill(tesorero.telefono.slice(3));
 	await page.getByLabel('Contraseña').fill(CONTRASENA_TESORERO);
 	await page.getByRole('button', { name: 'Entrar' }).click();
-	await expect(page.getByRole('heading', { name: 'Todos los tickets' })).toBeVisible();
+	await expect(page.getByRole('heading', { name: 'Tickets', exact: true })).toBeVisible();
 
 	await page.getByRole('link', { name: 'Usuarios' }).click();
 	await expect(page.getByRole('heading', { name: 'Usuarios', level: 1 })).toBeVisible();

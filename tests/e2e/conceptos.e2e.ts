@@ -9,7 +9,7 @@ test('un tesorero gestiona los conceptos (HU-G04)', async ({ page }, info) => {
 	await page.getByLabel('Teléfono').fill(TESOREROS[perfil].telefono.slice(3));
 	await page.getByLabel('Contraseña').fill(CONTRASENA_TESORERO);
 	await page.getByRole('button', { name: 'Entrar' }).click();
-	await expect(page.getByRole('heading', { name: 'Todos los tickets' })).toBeVisible();
+	await expect(page.getByRole('heading', { name: 'Tickets', exact: true })).toBeVisible();
 
 	await page.getByRole('link', { name: 'Conceptos' }).click();
 	await expect(page.getByRole('heading', { name: 'Conceptos', level: 1 })).toBeVisible();

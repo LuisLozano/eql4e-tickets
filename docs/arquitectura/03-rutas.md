@@ -29,7 +29,7 @@ Leyenda de acceso: 🌐 pública · 👤 con sesión · 💼 tesorero.
 
 | Ruta | Acceso | `load` / acciones | Historia |
 |---|:-:|---|---|
-| `/gestion/tickets` | 💼 | `load` con `?estado=&concepto=&socio=&desde=&hasta=&min=&max=&orden=&dir=&pagina=`; totales | HU-T01 |
+| `/gestion/tickets` | 💼 | `load` con `?estado=&concepto=&socio=&desde=&hasta=&min=&max=&orden=&dir=&pagina=` (`estado` se repite; `concepto=otro` para el texto libre; `desde`/`hasta` sobre la fecha de compra; un valor que no se entiende se ignora); totales por estado del resultado filtrado; 50 por página | HU-T01 |
 | `/gestion/tickets.csv` | 💼 | `GET` `+server.ts`, mismos parámetros | HU-T07 |
 | `/gestion/tickets/[numero]` | 💼 | `load`; acciones `autorizar`, `rechazar`, `deshacer` (con `version`) | HU-T02–T04, T06 |
 | `/gestion/pagos/nuevo?socio=…` | 💼 | `load`: tickets pendientes de pago del socio; acción `default` (multipart, justificante opcional) | HU-T05 |

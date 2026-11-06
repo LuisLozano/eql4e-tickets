@@ -123,7 +123,7 @@ test('quien solo es tesorero no puede enviar tickets (R-01: 404)', async ({ page
 	await page.getByLabel('Teléfono').fill(TESOREROS[info.project.name as Perfil].telefono.slice(3));
 	await page.getByLabel('Contraseña').fill(CONTRASENA_TESORERO);
 	await page.getByRole('button', { name: 'Entrar' }).click();
-	await expect(page.getByRole('heading', { name: 'Todos los tickets' })).toBeVisible();
+	await expect(page.getByRole('heading', { name: 'Tickets', exact: true })).toBeVisible();
 	expect((await page.goto('/tickets/nuevo'))?.status()).toBe(404);
 });
 

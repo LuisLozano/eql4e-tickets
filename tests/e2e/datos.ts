@@ -61,3 +61,17 @@ export const REMITENTES = {
 		email: 'remitente.escritorio@ejemplo.invalid'
 	}
 } as const;
+
+/** Socios con tickets ya hechos (en preparar.ts) para el listado del tesorero. */
+export const LISTADO = {
+	movil: {
+		nombre: 'Listado Móvil',
+		telefono: '+34699000041',
+		email: 'listado.movil@ejemplo.invalid'
+	},
+	escritorio: {
+		nombre: 'Listado Escritorio',
+		telefono: '+34699000042',
+		email: 'listado.escritorio@ejemplo.invalid'
+	}
+} as const;
