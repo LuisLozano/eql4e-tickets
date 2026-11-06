@@ -27,11 +27,14 @@ eql4e-tickets/
 │   │   ├── cliente/                # compresión de fotos (web worker), borrador en IndexedDB
 │   │   ├── formato.ts              # importes, fechas (Intl es-ES), hoy en Madrid
 │   │   ├── importe.ts              # «23,45» → céntimos
+│   │   ├── listado-tickets.ts      # filtros, orden y página del listado global en la URL (HU-T01)
 │   │   └── server/
 │   │       ├── dominio/
 │   │       │   ├── auth/           # sesiones, contraseñas, códigos, limitador
 │   │       │   ├── ticket/
+│   │       │   │   ├── consultas.ts # mis tickets, detalle y acceso a ficheros (HU-S02, S03)
 │   │       │   │   ├── crear.ts    # enviar ticket (HU-S01) y el puerto Almacen
+│   │       │   │   ├── listado.ts  # listado global con totales (HU-T01)
 │   │       │   │   ├── estados.ts  # tabla de transiciones (pura)
 │   │       │   │   ├── permisos.ts # R-01, R-04 (puro)
 │   │       │   │   └── servicio.ts # casos de uso con transacción

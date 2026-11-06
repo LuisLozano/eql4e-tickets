@@ -17,7 +17,7 @@
 ### HU-A02 · Iniciar sesión [M]
 **Como** usuario **quiero** entrar con mi teléfono y contraseña **para** acceder a mis funciones.
 
-- **Dado** credenciales correctas, **entonces** entro y veo la pantalla de inicio según mi rol (socio: "Mis tickets"; tesorero: "Todos los tickets").
+- **Dado** credenciales correctas, **entonces** entro y veo la pantalla de inicio según mi rol (socio: "Mis tickets"; tesorero: el listado "Tickets").
 - **Dado** credenciales incorrectas, **entonces** el error no indica cuál de los dos datos falla.
 - **Dado** 5 intentos fallidos seguidos en 15 minutos, **entonces** la cuenta se bloquea temporalmente 15 minutos.
 - La sesión dura **30 días** en el dispositivo (para no pedir la contraseña al socio en cada compra) salvo que cierre sesión.
