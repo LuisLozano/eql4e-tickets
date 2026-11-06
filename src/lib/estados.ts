@@ -18,3 +18,19 @@ export const TEXTO_ESTADO: Record<EstadoTicket, string> = {
 	rechazado: 'Rechazado',
 	anulado: 'Anulado'
 };
+
+/** Lo que se ve en el historial de un ticket por cada acción. */
+export const TEXTO_ACCION = {
+	crear: 'Enviado',
+	editar: 'Editado',
+	anular: 'Anulado',
+	reenviar: 'Corregido y reenviado',
+	autorizar: 'Autorizado',
+	rechazar: 'Rechazado',
+	pagar: 'Pagado',
+	deshacer_autorizacion: 'Autorización deshecha',
+	deshacer_rechazo: 'Rechazo deshecho',
+	deshacer_pago: 'Pago deshecho'
+} as const;
+
+export type AccionHistorial = keyof typeof TEXTO_ACCION;

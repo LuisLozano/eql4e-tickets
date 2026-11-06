@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './base.ts';
 import { CONTRASENA_TESORERO, LISTADO, TESOREROS, type Perfil } from './datos.ts';
 
 /** Los importes de las filas visibles, en orden: tabla en escritorio, tarjetas en móvil. */

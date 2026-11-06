@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './base.ts';
 import sharp from 'sharp';
 import { CONTRASENA_TESORERO, REMITENTES, TESOREROS, type Perfil } from './datos.ts';
 

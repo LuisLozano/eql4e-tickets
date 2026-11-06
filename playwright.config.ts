@@ -11,10 +11,11 @@ export default defineConfig({
 	reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
 	globalSetup: './tests/e2e/preparar.ts',
 	// localhost (y no 127.0.0.1): SvelteKit solo omite «Secure» en la cookie para http://localhost.
-	// La cabecera imita a Caddy para que el origen calculado sea http y pase la comprobación CSRF.
+	// Las cabeceras imitan a Caddy: el protocolo, para que el origen calculado sea http y pase la
+	// comprobación CSRF; la IP, que tests/e2e/base.ts cambia en cada prueba.
 	use: {
 		baseURL: `http://localhost:${puerto}`,
-		extraHTTPHeaders: { 'x-forwarded-proto': 'http' },
+		extraHTTPHeaders: { 'x-forwarded-proto': 'http', 'x-forwarded-for': '10.255.255.1' },
 		trace: 'retain-on-failure'
 	},
 	projects: [
@@ -28,6 +29,8 @@ export default defineConfig({
 		env: {
 			PORT: String(puerto),
 			PROTOCOL_HEADER: 'x-forwarded-proto',
+			ADDRESS_HEADER: 'x-forwarded-for',
+			XFF_DEPTH: '1',
 			URL_PUBLICA: `http://localhost:${puerto}`,
 			BODY_SIZE_LIMIT: '60M',
 			RUTA_FICHEROS: 'test-results/ficheros'

@@ -1,5 +1,6 @@
-// Lo que ve el socio de sus tickets (HU-S02, HU-S03) y el acceso a los ficheros (RNF-13).
-import { and, asc, desc, eq, inArray, isNull, sql } from 'drizzle-orm';
+// Lo que ve el socio de sus tickets (HU-S02, HU-S03), el detalle para revisar (HU-T02) y el acceso
+// a los ficheros (RNF-13).
+import { and, asc, desc, eq, inArray, isNull, sql, type SQL } from 'drizzle-orm';
 import type { EstadoTicket } from '#lib/estados.ts';
 import {
 	concepto,
@@ -73,25 +74,26 @@ export async function totalesSocio(conexion: Conexion, socioId: string, anio: nu
 	return totales;
 }
 
-/**
- * El detalle de un ticket del socio, con sus ficheros vigentes y el historial (lo último primero).
- * Nulo si no existe o es de otro: en la zona del socio, ni un tesorero ve los ajenos (R-01).
- */
-export async function detalleTicket(conexion: Conexion, socioId: string, numero: number) {
+/** El detalle de un ticket, con sus ficheros vigentes y el historial (lo último primero). */
+async function detalle(conexion: Conexion, donde: SQL | undefined) {
 	const [t] = await conexion
 		.select({
 			id: ticket.id,
 			numero: ticket.numero,
+			socioId: ticket.socioId,
+			socio: usuario.nombre,
 			importeCentimos: ticket.importeCentimos,
 			fechaCompra: ticket.fechaCompra,
 			concepto: nombreConcepto,
 			observaciones: ticket.observaciones,
 			estado: ticket.estado,
-			motivoRechazo: ticket.motivoRechazo
+			motivoRechazo: ticket.motivoRechazo,
+			version: ticket.version
 		})
 		.from(ticket)
+		.innerJoin(usuario, eq(usuario.id, ticket.socioId))
 		.leftJoin(concepto, eq(concepto.id, ticket.conceptoId))
-		.where(and(eq(ticket.numero, numero), eq(ticket.socioId, socioId)));
+		.where(donde);
 	if (!t) return null;
 
 	const [ficheros, entradas] = await Promise.all([
@@ -118,6 +120,19 @@ export async function detalleTicket(conexion: Conexion, socioId: string, numero:
 			.orderBy(desc(historial.creadoEn), desc(historial.id))
 	]);
 	return { ...t, ficheros, historial: entradas };
+}
+
+/**
+ * El detalle de un ticket del socio. Nulo si no existe o es de otro: en la zona del socio, ni un
+ * tesorero ve los ajenos (R-01).
+ */
+export function detalleTicket(conexion: Conexion, socioId: string, numero: number) {
+	return detalle(conexion, and(eq(ticket.numero, numero), eq(ticket.socioId, socioId)));
+}
+
+/** El detalle de cualquier ticket, para revisarlo (HU-T02). La ruta ya exige ser tesorero. */
+export function detalleParaRevisar(conexion: Conexion, numero: number) {
+	return detalle(conexion, eq(ticket.numero, numero));
 }
 
 export type DetalleTicket = NonNullable<Awaited<ReturnType<typeof detalleTicket>>>;

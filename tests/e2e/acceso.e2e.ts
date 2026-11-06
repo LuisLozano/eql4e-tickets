@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './base.ts';
 import { SOCIOS, type Perfil } from './datos.ts';
 
 const CONTRASENA = 'mi contraseña de prueba';
