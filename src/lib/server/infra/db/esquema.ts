@@ -17,7 +17,7 @@ import {
 	uuid,
 	type AnyPgColumn
 } from 'drizzle-orm/pg-core';
-import type { EstadoTicket } from '../../../estados.ts';
+import type { AccionHistorial, EstadoTicket } from '../../../estados.ts';
 
 const instante = () => timestamp({ withTimezone: true });
 const creadoEn = () => instante().notNull().defaultNow();
@@ -52,6 +52,10 @@ export const accionHistorial = pgEnum('accion_historial', [
 	'deshacer_rechazo',
 	'deshacer_pago'
 ]);
+export const accionesCoinciden: Iguales<
+	(typeof accionHistorial.enumValues)[number],
+	AccionHistorial
+> = true;
 
 // --- Usuarios y acceso ---
 

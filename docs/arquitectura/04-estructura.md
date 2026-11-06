@@ -35,9 +35,9 @@ eql4e-tickets/
 │   │       │   │   ├── consultas.ts # mis tickets, detalle y acceso a ficheros (HU-S02, S03)
 │   │       │   │   ├── crear.ts    # enviar ticket (HU-S01) y el puerto Almacen
 │   │       │   │   ├── listado.ts  # listado global con totales (HU-T01)
-│   │       │   │   ├── estados.ts  # tabla de transiciones (pura)
+│   │       │   │   ├── estados.ts  # tabla de transiciones, R-04 y acciones posibles (pura)
 │   │       │   │   ├── permisos.ts # R-01, R-04 (puro)
-│   │       │   │   └── servicio.ts # casos de uso con transacción
+│   │       │   │   └── servicio.ts # cambiar de estado: versión (E-04), transición e historial
 │   │       │   ├── pago/
 │   │       │   ├── usuario/        # alta, listado, texto de la invitación
 │   │       │   ├── concepto/
@@ -73,7 +73,8 @@ eql4e-tickets/
   - El almacenamiento, igual: el dominio define el puerto `Almacen` (`ticket/crear.ts`) y lo recibe por parámetro; `infra/almacenamiento/disco.ts` lo implementa.
   - ESLint lo impone: el dominio puede importar `infra/db/esquema.ts` y `infra/db/tipos.ts` (sin efectos), pero no `app.ts`, `cliente.ts` ni el resto de `infra/`.
 - **Migraciones**: se edita `esquema.ts`, `pnpm db:generate` escribe el SQL en `drizzle/`, se **revisa** y se sube junto con el esquema. La CI falla si el esquema y las migraciones no coinciden. No se usa `drizzle-kit push`, porque desincroniza la base de las migraciones. Los datos iniciales y los *triggers* van en migraciones `--custom`.
-- **Estados del ticket**: `src/lib/estados.ts` (compartido con el navegador) y el `pgEnum` del esquema deben coincidir; una comprobación de tipos en `esquema.ts` falla si no.
+- **Estados del ticket y acciones del historial**: `src/lib/estados.ts` (compartido con el navegador) y los `pgEnum` del esquema deben coincidir; una comprobación de tipos en `esquema.ts` falla si no.
+- **Pruebas e2e**: importan `test` y `expect` de `tests/e2e/base.ts`, que da a cada prueba su propia IP en `X-Forwarded-For` (como Caddy en producción) para que el límite de intentos de entrar por IP no salte por la suma de todas.
 - **Importaciones internas con `#lib/...`** y extensión explícita (`#lib/server/infra/db/cliente.ts`): SvelteKit 3 sustituye el alias `$lib` por *subpath imports* de Node.
 - **Compilación sin base de datos**: SvelteKit 3 valida las variables también al analizar las rutas durante `vite build`. El script `build` pone una `DATABASE_URL` ficticia si no hay otra; como no es estática, no se incrusta en el resultado (comprobado).
 - **Semilla inicial** (`pnpm db:semilla`): conceptos (Ferretería, Alimentación, Representación, Transporte) y el primer tesorero, a partir de variables de entorno (R-06).

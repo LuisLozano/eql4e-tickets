@@ -75,3 +75,17 @@ export const LISTADO = {
 		email: 'listado.escritorio@ejemplo.invalid'
 	}
 } as const;
+
+/** Socios con dos tickets pendientes (en preparar.ts) que un tesorero autoriza y rechaza. */
+export const REVISION = {
+	movil: {
+		nombre: 'Revisión Móvil',
+		telefono: '+34699000051',
+		email: 'revision.movil@ejemplo.invalid'
+	},
+	escritorio: {
+		nombre: 'Revisión Escritorio',
+		telefono: '+34699000052',
+		email: 'revision.escritorio@ejemplo.invalid'
+	}
+} as const;

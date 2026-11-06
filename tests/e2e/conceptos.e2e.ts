@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './base.ts';
 import { CONCEPTOS, CONTRASENA_TESORERO, TESOREROS, type Perfil } from './datos.ts';
 
 test('un tesorero gestiona los conceptos (HU-G04)', async ({ page }, info) => {

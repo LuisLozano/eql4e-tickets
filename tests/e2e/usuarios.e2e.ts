@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './base.ts';
 import { ALTAS, CONTRASENA_TESORERO, TESOREROS, type Perfil } from './datos.ts';
 
 test('un tesorero da de alta a un socio y el socio activa su cuenta (HU-G01, A01)', async ({
