@@ -30,6 +30,8 @@
   - `restart: unless-stopped`.
 - **Arranque**: un *entrypoint* aplica las migraciones y después arranca el servidor.
 - **Tareas programadas** (purga mensual y huérfanos diaria): dentro de la app con `croner`, protegidas con un *advisory lock* de PostgreSQL para que nunca se ejecuten dos a la vez.
+  - *Hecho en el sprint 4 (2026-11-07)*: `infra/tareas.ts`. Cada ejecución va en una transacción con `pg_try_advisory_xact_lock`: si otro proceso ya la está ejecutando, no espera, y el bloqueo se suelta solo al terminar. Las horas son de Madrid.
+  - **Huérfanos**: cada día a las 19:00, antes de la copia de las 19:30 y del apagado de las 20:20. El equipo no está encendido de noche, y croner no recupera las ejecuciones perdidas. Borra los ficheros del volumen que no nombra ningún ticket ni pago y que tienen más de 24 horas, por si una subida está en curso. Si salen más de 50, no borra ninguno y lo avisa en el log. La versión de `croner` es la 10.0.1: la 11 tenía menos de dos semanas.
 - **Imágenes**: la CI construye y publica la imagen en **GitHub Container Registry** (`ghcr.io/luislozano/eql4e-tickets`). El despliegue en la máquina es `docker compose pull && docker compose up -d`, lanzado manualmente o con un script. La máquina **no** abre ningún puerto a GitHub (no hay despliegue empujado).
 - **Configuración**: un fichero `.env` en la máquina, excluido de git, con `deploy/.env.example` documentado en el repositorio.
 - **Carpeta de despliegue**: `/opt/eql4e-tickets`, con `compose.yaml`, `desplegar.sh` y `.env` (propiedad de root, permisos 600). Separada de la copia de desarrollo para que un cambio local nunca afecte a producción.

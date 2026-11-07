@@ -1,9 +1,9 @@
 // Ficheros de tickets y justificantes en un volumen de disco (ADR-0002).
-import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { dirname, resolve, sep } from 'node:path';
-import type { Almacen } from '#lib/server/dominio/ticket/crear.ts';
+import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { dirname, join, relative, resolve, sep } from 'node:path';
+import type { AlmacenListable } from '#lib/server/dominio/ficheros/huerfanos.ts';
 
-export interface AlmacenDisco extends Almacen {
+export interface AlmacenDisco extends AlmacenListable {
 	leer(ruta: string): Promise<Uint8Array>;
 }
 
@@ -28,6 +28,22 @@ export function almacenEnDisco(raiz: string): AlmacenDisco {
 		},
 		async borrar(ruta) {
 			await rm(completa(ruta), { force: true });
+		},
+		async listar() {
+			const entradas = await readdir(base, { recursive: true, withFileTypes: true }).catch(
+				(e: NodeJS.ErrnoException) => (e.code === 'ENOENT' ? [] : Promise.reject(e))
+			);
+			return Promise.all(
+				entradas
+					.filter((e) => e.isFile())
+					.map(async (e) => {
+						const completo = join(e.parentPath, e.name);
+						return {
+							ruta: relative(base, completo).split(sep).join('/'),
+							modificadoEn: (await stat(completo)).mtime
+						};
+					})
+			);
 		}
 	};
 }
