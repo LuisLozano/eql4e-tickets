@@ -12,7 +12,32 @@ export default defineConfig({
 				runes: ({ filename }) =>
 					filename.split(/[/\\]/).includes('node_modules') ? undefined : true
 			},
-			adapter: adapter()
+			adapter: adapter(),
+			// Content-Security-Policy (ADR-0003): todo sale de la propia app, sin terceros. SvelteKit añade
+			// un nonce por respuesta a sus <script> y <style> en línea; cualquier otro script se bloquea.
+			csp: {
+				mode: 'nonce',
+				directives: {
+					'default-src': ['self'],
+					'script-src': ['self'],
+					'style-src': ['self'],
+					// Atributos style="…": el contenedor de app.html y el giro y el zoom del visor de fotos. Un
+					// atributo de estilo no ejecuta código.
+					'style-src-attr': ['unsafe-inline'],
+					// blob: para las miniaturas antes de enviar; data: por si Vite incrusta una imagen pequeña.
+					'img-src': ['self', 'blob:', 'data:'],
+					'font-src': ['self', 'data:'],
+					// El worker que comprime las fotos en el móvil es un fichero de la app.
+					'worker-src': ['self'],
+					// blob: porque Chrome, al no poder decodificar una foto en el worker, la vuelve a leer por su URL
+					// blob:. Esas URL solo las crea la propia app: no sirven para sacar datos fuera.
+					'connect-src': ['self', 'blob:'],
+					'object-src': ['none'],
+					'base-uri': ['self'],
+					'form-action': ['self'],
+					'frame-ancestors': ['none']
+				}
+			}
 		})
 	],
 	test: {
