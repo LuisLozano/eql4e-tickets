@@ -11,6 +11,7 @@ Aplicación web (PWA *responsive*) para que los socios de la asociación envíen
 | Requisitos | [docs/requisitos](docs/requisitos/README.md) |
 | Arquitectura y decisiones (ADR) | [docs/arquitectura](docs/arquitectura/README.md) |
 | Diseño y bocetos | [docs/diseno](docs/diseno/README.md) |
+| Protocolo de prueba final (manual, en producción) | [docs/pruebas/protocolo.md](docs/pruebas/protocolo.md) |
 
 ## Stack
 
