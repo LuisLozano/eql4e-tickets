@@ -9,6 +9,31 @@ test('/salud responde ok con la base de datos', async ({ request }) => {
 	expect(await respuesta.json()).toEqual({ estado: 'ok' });
 });
 
+test('las páginas llevan las cabeceras de seguridad, con una CSP con nonce', async ({ page }) => {
+	const respuesta = await page.goto('/entrar');
+	const cabeceras = respuesta!.headers();
+	const csp = cabeceras['content-security-policy'];
+	expect(csp).toContain("default-src 'self'");
+	expect(csp).toContain("frame-ancestors 'none'");
+	expect(csp).not.toContain('unsafe-eval');
+	// Un nonce distinto en cada respuesta, y el mismo en los <script> de la página.
+	const nonce = /script-src 'self' 'nonce-([^']+)'/.exec(csp)![1];
+	await expect(page.locator(`script[nonce]`).first()).toBeAttached();
+	expect(
+		await page
+			.locator('script[nonce]')
+			.first()
+			.evaluate((s) => (s as HTMLScriptElement).nonce)
+	).toBe(nonce);
+	const otra = (await page.request.get('/entrar')).headers()['content-security-policy'];
+	expect(otra).not.toContain(nonce);
+	expect(cabeceras).toMatchObject({
+		'x-frame-options': 'DENY',
+		'x-content-type-options': 'nosniff',
+		'referrer-policy': 'same-origin'
+	});
+});
+
 test('un socio activa su cuenta, sale y vuelve a entrar (HU-A01, A02, A03)', async ({
 	page
 }, info) => {

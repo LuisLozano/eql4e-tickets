@@ -51,4 +51,4 @@ Leyenda de acceso: 🌐 pública · 👤 con sesión · 💼 tesorero.
 
 - **En la URL se usa `numero`** (`/tickets/123`), no el UUID. Como el acceso se comprueba en cada petición, que sea predecible no es un problema de seguridad (R-01: 404 si no es tuyo).
 - **Todas las acciones que cambian estado envían `version`** (concurrencia optimista, E-04).
-- **Cabeceras de seguridad** en `hooks.server.ts`: `Content-Security-Policy` (`kit.csp` de SvelteKit en modo *nonce*), `Referrer-Policy: same-origin`, `Permissions-Policy: camera=(self)` y `X-Frame-Options: DENY`.
+- **Cabeceras de seguridad**: `Content-Security-Policy` con *nonce* (`kit.csp` en `vite.config.ts`, ADR-0003) y, en `hooks.server.ts`, `Referrer-Policy: same-origin`, `Permissions-Policy: camera=(self)`, `X-Frame-Options: DENY` y `X-Content-Type-Options: nosniff`.

@@ -27,7 +27,13 @@
   - La IP real se obtiene de la cabecera de Caddy (`ADDRESS_HEADER=X-Forwarded-For`, `XFF_DEPTH=1`).
 - **Invalidación**: cambiar la contraseña, dar de baja al usuario o restablecer el acceso borra sus sesiones. Una sesión de un usuario que ya no está activo se rechaza y se borra al usarla.
 - **Tesorero inicial (R-06)**: el *hook* `init` de `hooks.server.ts` lo crea al arrancar si no hay ningún tesorero activo y escribe el enlace de activación en el log. Ver el [manual de despliegue](../../../deploy/README.md).
-- **Cabeceras**: `Referrer-Policy`, `X-Frame-Options`, `X-Content-Type-Options` y `Permissions-Policy` en `hooks.server.ts`. La CSP con *nonce* queda pendiente para cuando haya más páginas.
+- **Cabeceras**: `Referrer-Policy`, `X-Frame-Options`, `X-Content-Type-Options` y `Permissions-Policy` en `hooks.server.ts`.
+- **Content-Security-Policy** *(sprint 4, 2026-11-07)*: `kit.csp` de SvelteKit en modo *nonce*, configurada en `vite.config.ts`. Todo sale de la propia app: `default-src 'self'`, sin `unsafe-eval` y con `frame-ancestors 'none'`. Las excepciones, cada una con su motivo en la configuración:
+  - `style-src-attr 'unsafe-inline'`, para los atributos `style`;
+  - `blob:` en `img-src`, para las miniaturas, y en `connect-src`, porque Chrome relee por su URL `blob:` una foto que no puede decodificar en el worker;
+  - `data:` en `img-src` y `font-src`.
+
+  Zod se configura con `jitless` en `hooks.client.ts`, para que no pruebe `new Function`. Las e2e fallan si el navegador registra cualquier bloqueo de la CSP.
 
 ### Autorización
 
