@@ -3,12 +3,35 @@ import { sequence, type Handle, type ServerInit } from '@sveltejs/kit/hooks';
 import { URL_PUBLICA } from '$app/env/private';
 import { asegurarTesoreroInicial } from '#lib/server/dominio/auth/tesorero-inicial.ts';
 import { validarSesion } from '#lib/server/dominio/auth/sesiones.ts';
+import { limpiarHuerfanos } from '#lib/server/dominio/ficheros/huerfanos.ts';
+import { almacen } from '#lib/server/infra/almacenamiento/app.ts';
 import { db } from '#lib/server/infra/db/app.ts';
+import { programar } from '#lib/server/infra/tareas.ts';
 import { enlaceActivacion } from '#lib/server/web/enlaces.ts';
 import { COOKIE_SESION, ponerCookieSesion, quitarCookieSesion } from '#lib/server/web/sesion.ts';
 
-/** Al arrancar: tesorero inicial si no hay ninguno activo (R-06). */
+/** Al arrancar: tareas programadas y tesorero inicial si no hay ninguno activo (R-06). */
 export const init: ServerInit = async () => {
+	// Cada día a las 19:00: antes de la copia de seguridad (19:30) y del apagado del equipo (20:20).
+	programar(
+		db,
+		'huerfanos',
+		'0 0 19 * * *',
+		(tx) => limpiarHuerfanos(tx, almacen, new Date()),
+		(r) => {
+			if (!r.ok) console.log('[tareas] huerfanos: otro proceso ya la está ejecutando');
+			else if (!r.resultado.ok) {
+				console.error(
+					`[tareas] huerfanos: ${r.resultado.huerfanos} ficheros sin ticket ni pago; son demasiados y no se ha borrado ninguno. Revísalo a mano.`
+				);
+			} else {
+				const { revisados, borrados } = r.resultado;
+				console.log(`[tareas] huerfanos: ${revisados} revisados, ${borrados.length} borrados`);
+				for (const ruta of borrados) console.log(`[tareas] huerfanos: borrado ${ruta}`);
+			}
+		}
+	);
+
 	try {
 		const inicial = await asegurarTesoreroInicial(db, new Date());
 		if (inicial) {

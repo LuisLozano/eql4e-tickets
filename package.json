@@ -67,6 +67,7 @@
 	"packageManager": "pnpm@12.16.1",
 	"dependencies": {
 		"@node-rs/argon2": "^2.2.2",
+		"croner": "10.0.1",
 		"drizzle-orm": "^0.45.2",
 		"file-type": "22.2.0",
 		"nodemailer": "10.1.7",
