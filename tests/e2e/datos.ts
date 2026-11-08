@@ -171,3 +171,17 @@ export const PURGA = {
 		email: 'purga.escritorio@ejemplo.invalid'
 	}
 } as const;
+
+/** Socios (en preparar.ts) con tres tickets pendientes de autorizar: autorización múltiple. */
+export const MULTIPLE = {
+	movil: {
+		nombre: 'Múltiple Móvil',
+		telefono: '+34699000131',
+		email: 'multiple.movil@ejemplo.invalid'
+	},
+	escritorio: {
+		nombre: 'Múltiple Escritorio',
+		telefono: '+34699000132',
+		email: 'multiple.escritorio@ejemplo.invalid'
+	}
+} as const;
