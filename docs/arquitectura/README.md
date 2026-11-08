@@ -19,7 +19,7 @@
 | [0002](adr/0002-persistencia.md) | PostgreSQL + Drizzle; ficheros en volumen | Aceptada |
 | [0003](adr/0003-autenticacion.md) | Sesiones propias, Argon2id, autorización en el dominio | Aceptada |
 | [0004](adr/0004-email.md) | SMTP configurable (Gmail de la asociación en producción) | Aceptada |
-| [0005](adr/0005-ui-pwa.md) | Tailwind + shadcn-svelte, Superforms + Zod, PWA solo con recursos estáticos | Aceptada |
+| [0005](adr/0005-ui-pwa.md) | Tailwind + shadcn-svelte, Superforms + Zod, PWA instalable sin service worker | Aceptada |
 | [0006](adr/0006-despliegue.md) | Compose en `127.0.0.1:3080`, bloque en Caddy, imágenes en GHCR | Aceptada (con verificaciones) |
 | [0007](adr/0007-calidad.md) | Vitest, Testcontainers, Playwright, GitHub Actions | Aceptada |
 | [0008](adr/0008-copias.md) | Copias de seguridad diarias en el disco externo, 5 semanas de retención | Aceptada |

@@ -9,6 +9,26 @@ test('/salud responde ok con la base de datos', async ({ request }) => {
 	expect(await respuesta.json()).toEqual({ estado: 'ok' });
 });
 
+test('la app se puede instalar: el manifiesto y sus iconos se sirven sin sesión', async ({
+	page
+}) => {
+	await page.goto('/entrar');
+	const href = await page.locator('link[rel="manifest"]').getAttribute('href');
+	const respuesta = await page.request.get(new URL(href!, page.url()).href);
+	expect(respuesta.status()).toBe(200);
+	const manifiesto = await respuesta.json();
+	expect(manifiesto).toMatchObject({
+		short_name: 'Tickets',
+		start_url: '/',
+		display: 'standalone'
+	});
+	for (const icono of manifiesto.icons) {
+		const imagen = await page.request.get(icono.src);
+		expect(imagen.status(), icono.src).toBe(200);
+		expect(imagen.headers()['content-type']).toBe('image/png');
+	}
+});
+
 test('las páginas llevan las cabeceras de seguridad, con una CSP con nonce', async ({ page }) => {
 	const respuesta = await page.goto('/entrar');
 	const cabeceras = respuesta!.headers();
