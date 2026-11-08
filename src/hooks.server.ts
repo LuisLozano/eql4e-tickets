@@ -4,15 +4,39 @@ import { URL_PUBLICA } from '$app/env/private';
 import { asegurarTesoreroInicial } from '#lib/server/dominio/auth/tesorero-inicial.ts';
 import { validarSesion } from '#lib/server/dominio/auth/sesiones.ts';
 import { limpiarHuerfanos } from '#lib/server/dominio/ficheros/huerfanos.ts';
+import { purgar } from '#lib/server/dominio/purga/purga.ts';
 import { almacen } from '#lib/server/infra/almacenamiento/app.ts';
 import { db } from '#lib/server/infra/db/app.ts';
 import { programar } from '#lib/server/infra/tareas.ts';
+import { hoyEnMadrid } from '#lib/formato.ts';
 import { enlaceActivacion } from '#lib/server/web/enlaces.ts';
 import { COOKIE_SESION, ponerCookieSesion, quitarCookieSesion } from '#lib/server/web/sesion.ts';
 
 /** Al arrancar: tareas programadas y tesorero inicial si no hay ninguno activo (R-06). */
 export const init: ServerInit = async () => {
-	// Cada día a las 19:00: antes de la copia de seguridad (19:30) y del apagado del equipo (20:20).
+	// Purga (HU-G05) cada día a las 18:55: así nada pasa de los 18 meses más de un día, aunque el
+	// equipo esté apagado alguna tarde. Los ficheros se borran después del COMMIT; si alguno falla,
+	// la tarea de huérfanos lo recoge. En el log, solo cifras: nada de datos personales.
+	programar(
+		db,
+		'purga',
+		'0 55 18 * * *',
+		(tx) => purgar(tx, hoyEnMadrid()),
+		async (r) => {
+			if (!r.ok) return console.log('[tareas] purga: otro proceso ya la está ejecutando');
+			const { tickets, pagos, ficheros } = r.resultado;
+			const fallidos = (await Promise.allSettled(ficheros.map((f) => almacen.borrar(f)))).filter(
+				(b) => b.status === 'rejected'
+			).length;
+			console.log(
+				`[tareas] purga: ${tickets} tickets, ${pagos} pagos y ${ficheros.length - fallidos} ficheros eliminados` +
+					(fallidos
+						? ` (${fallidos} ficheros no se pudieron borrar: los recogerá la tarea de huérfanos)`
+						: '')
+			);
+		}
+	);
+	// Huérfanos cada día a las 19:00: antes de la copia de seguridad (19:30) y del apagado (20:20).
 	programar(
 		db,
 		'huerfanos',

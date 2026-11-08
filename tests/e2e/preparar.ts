@@ -12,6 +12,7 @@ import {
 	EDICION,
 	CONCEPTOS,
 	GESTION,
+	PURGA,
 	CONTRASENA_TESORERO,
 	LISTADO,
 	PAGO,
@@ -44,7 +45,8 @@ export default async function preparar() {
 			...Object.values(ANULAR),
 			...Object.values(EDICION),
 			...Object.values(PAGO),
-			...Object.values(DESHACER)
+			...Object.values(DESHACER),
+			...Object.values(PURGA)
 		];
 		const telefonos = usuarios.map((u) => u.telefono);
 		const emails = usuarios.map((u) => u.email);
@@ -76,6 +78,15 @@ export default async function preparar() {
 			await sql`
 				insert into usuario (nombre, telefono, email, password_hash, estado, es_socio, es_tesorero)
 				values (${t.nombre}, ${t.telefono}, ${t.email}, ${passwordHash}, 'activo', false, true)`;
+		}
+		for (const p of Object.values(PURGA)) {
+			const [{ id }] = await sql`
+				insert into usuario (nombre, telefono, email, password_hash, estado)
+				values (${p.nombre}, ${p.telefono}, ${p.email}, ${passwordHash}, 'activo')
+				returning id`;
+			await sql`
+				insert into ticket (socio_id, importe_centimos, fecha_compra, concepto_otro)
+				values (${id}, 1919, '2019-03-01', 'Ticket antiguo')`;
 		}
 		for (const g of Object.values(GESTION)) {
 			await sql`

@@ -11,11 +11,18 @@ test('el socio edita un ticket pendiente y corrige y reenvía uno rechazado (HU-
 	})
 		.jpeg()
 		.toBuffer();
-	const subir = (nombre: string) =>
-		page
+	const ficheros = page.getByRole('list', { name: 'Ficheros del ticket' }).getByRole('listitem');
+	/**
+	 * Elige la foto y espera a que salga en la lista, que es cuando ya está comprimida: si se envía
+	 * antes, la página pide esperar (y en la CI, más lenta, se nota).
+	 */
+	const subir = async (nombre: string) => {
+		await page
 			.locator('input[type=file]:not([capture])')
 			.setInputFiles({ name: nombre, mimeType: 'image/jpeg', buffer: foto });
-	const ficheros = page.getByRole('list', { name: 'Ficheros del ticket' }).getByRole('listitem');
+		await expect(ficheros.filter({ hasText: nombre })).toBeVisible();
+		await expect(page.getByText(/^Preparando/)).toHaveCount(0);
+	};
 	const historial = page.getByRole('region', { name: 'Historial' });
 
 	await page.goto('/entrar');

@@ -38,6 +38,10 @@ test('un socio envía un ticket con foto y PDF, lo ve en su lista y en el detall
 		mimeType: 'image/jpeg',
 		buffer: Buffer.from('no soy una foto')
 	});
+	// Enviar antes de que esté en la lista haría que la página pidiera esperar.
+	await expect(
+		page.getByRole('list', { name: 'Ficheros del ticket' }).getByText('ticket.jpg')
+	).toBeVisible();
 	await page.getByLabel('Importe (€)').fill('23,45');
 	await page.locator('label', { hasText: 'Ferretería' }).click();
 	await enviar.click();

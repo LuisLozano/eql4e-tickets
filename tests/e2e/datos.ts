@@ -161,3 +161,13 @@ export const GESTION = {
 		nuevoTelefono: '+34699000112'
 	}
 } as const;
+
+/** Socios (en preparar.ts) con un ticket pendiente de 2019: la purga no lo borra y sale el aviso. */
+export const PURGA = {
+	movil: { nombre: 'Purga Móvil', telefono: '+34699000121', email: 'purga.movil@ejemplo.invalid' },
+	escritorio: {
+		nombre: 'Purga Escritorio',
+		telefono: '+34699000122',
+		email: 'purga.escritorio@ejemplo.invalid'
+	}
+} as const;

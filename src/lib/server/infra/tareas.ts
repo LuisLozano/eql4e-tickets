@@ -37,7 +37,8 @@ export function programar<T>(
 	nombre: string,
 	patron: string,
 	tarea: (tx: Conexion) => Promise<T>,
-	alTerminar: (resultado: ResultadoExclusiva<T>) => void
+	/** Después del COMMIT: el log y lo que deba hacerse fuera de la base de datos. */
+	alTerminar: (resultado: ResultadoExclusiva<T>) => void | Promise<void>
 ) {
 	programadas.get(nombre)?.stop();
 	const cron = new Cron(
@@ -45,7 +46,7 @@ export function programar<T>(
 		{ name: nombre, timezone: 'Europe/Madrid', protect: true },
 		async () => {
 			try {
-				alTerminar(await ejecutarEnExclusiva(conexion, nombre, tarea));
+				await alTerminar(await ejecutarEnExclusiva(conexion, nombre, tarea));
 			} catch (e) {
 				console.error(`[tareas] ${nombre}: error`, e);
 			}
