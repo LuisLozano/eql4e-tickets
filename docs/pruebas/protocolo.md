@@ -23,7 +23,7 @@ Usa teléfonos y emails que no vaya a tener nunca un socio real. Por ejemplo, `6
 
 ### Datos de prueba: copia antes y restaurar al final
 
-La app no permite borrar usuarios ni tickets. Para no dejar datos de prueba en producción, se hace una copia de seguridad antes de empezar y se restaura al terminar (caso O-04).
+La app no permite borrar usuarios ni tickets. Para no dejar datos de prueba en producción, se hace una copia de seguridad antes de empezar y se restaura al terminar (caso O-05).
 
 > **Solo si nadie más está usando la app.** Al restaurar se pierde todo lo que se haya guardado durante la prueba, también lo de los socios reales. Si ya hay datos reales, no restaures: al terminar, da de baja a T2, S1 y S2 y anula los tickets de prueba que sigan pendientes.
 
@@ -74,8 +74,8 @@ Desde el ordenador, como T1, salvo que se diga otra cosa.
 - [ ] **T-03** Abre el ticket de 13,00 de S1 (HU-T02): se ven el detalle, la foto y el historial con la edición de S-07. **Autoriza** (HU-T03): pasa a *Pendiente de pago*.
 - [ ] **T-04** **Rechaza** el de 8,50 sin motivo: no deja (HU-T04). Con el motivo `No se lee la fecha`, sí. Queda *Rechazado*.
 - [ ] **T-05** Como **S1**: el ticket rechazado muestra el motivo. **Corregir y reenviar** (HU-S06): cambia la fecha y guarda. Sale «Ticket reenviado. Vuelve a estar pendiente de autorizar.».
-- [ ] **T-06** Como **T2**, abre su propio ticket de 15,00: no tiene los botones de autorizar ni de rechazar y sale «Es tu ticket: lo tiene que autorizar o rechazar otro tesorero.» (R-04). T1 sí puede: que lo autorice.
-- [ ] **T-07** T1 autoriza el de 20,00 de S2 y el reenviado de S1.
+- [ ] **T-06** Como **T2**, abre su propio ticket de 15,00: no tiene los botones de autorizar ni de rechazar y sale «Es tu ticket: lo tiene que autorizar o rechazar otro tesorero.» (R-04). En **Tickets**, marca su casilla y la del de 20,00 de S2 y pulsa **Autorizar 2 tickets**: sale «El T-… es tuyo: lo tiene que autorizar otro tesorero. No se ha autorizado ninguno.» y los dos siguen pendientes. T1 sí puede: que lo autorice.
+- [ ] **T-07** **Autorizar varios a la vez** (HU-T03): T1, en **Tickets** (pendientes de autorizar), marca el de 20,00 de S2 y el reenviado de S1. Pulsa **Autorizar 2 tickets**: sale «2 tickets autorizados. Quedan pendientes de pago.», los dos desaparecen de la lista y el filtro de estado sigue puesto. **Marcar todos** marca todas las casillas de la página y pasa a **Desmarcar todos**.
 - [ ] **T-08** **Pagos**, en «Por pagar»: S1 tiene 2 tickets. **Pago agrupado** (HU-T05): márcalos los dos, método Transferencia, adjunta un justificante (una foto o un PDF) y pulsa **Registrar pago de …**. El total es la suma de los dos. En el detalle del pago se ven los dos tickets y **Ver justificante** lo abre.
 - [ ] **T-09** **Pago individual** de S2 (20,00) por Bizum, sin justificante.
 - [ ] **T-10** T2 intenta pagar su propio ticket: no aparece en «Por pagar» y, desde su detalle, sale «Es tu ticket: lo tiene que pagar otro tesorero.» (R-04). T1 se lo paga.
@@ -87,6 +87,7 @@ Desde el ordenador, como T1, salvo que se diga otra cosa.
   - los acentos se leen bien;
   - el teléfono sale como `600 000 001`;
   - los importes están alineados a la derecha y `=SUMA()` los suma.
+- [ ] **T-15** **Pendientes antiguos** (HU-G05): como **S1**, envía un ticket de `3,00` con una fecha de hace 19 meses. Como T1, arriba de **Tickets** sale «Hay 1 ticket pendiente con más de 18 meses…». **Verlos** filtra los pendientes hasta esa fecha y lo muestra. Recházalo con el motivo `Demasiado antiguo`: el aviso desaparece.
 
 ## G. Gestión
 
@@ -106,7 +107,7 @@ Como T1.
 - [ ] **X-02** **Dos tesoreros a la vez** (E-04): T1 y T2 abren el mismo ticket pendiente de autorizar. T1 lo autoriza y, sin recargar, T2 lo rechaza: sale «Otro tesorero ya lo ha modificado. Revisa cómo está ahora antes de seguir.» y no se rechaza.
 - [ ] **X-03** **Móvil**: todas las pantallas del socio y del tesorero se ven bien en vertical, sin desplazamiento lateral, y los botones se pulsan con el dedo.
 - [ ] **X-04** **Modo oscuro**: con el móvil en modo oscuro, la app también lo está y todo se lee bien.
-- [ ] **X-05** **Acceso directo**: en el móvil, usa «Añadir a pantalla de inicio» y abre la app desde el icono. La v1 no es una PWA instalable: no funciona sin conexión, y es lo esperado.
+- [ ] **X-05** **Instalar la app**: en Android (Chrome), menú ⋮ → **Instalar aplicación** (o «Añadir a pantalla de inicio»); en iPhone (Safari), Compartir → **Añadir a pantalla de inicio**. Sale el icono del logo con el nombre «Tickets» y, al abrirla, se ve a pantalla completa, sin la barra del navegador, y con la sesión iniciada. Sin conexión no funciona: es lo esperado (no hay modo sin conexión).
 
 ## O. Operación
 
@@ -117,16 +118,20 @@ Como T1.
   ```bash
   sudo ls /mnt/externalHD/eql4e/backups
   ```
-- [ ] **O-02** **Simulacro** con la copia de P-03 (cambia la fecha por la que apuntaste). Las cifras corresponden a antes de las pruebas:
+- [ ] **O-02** **Tareas diarias** (si la app estuvo en marcha a las 18:55 y a las 19:00): salen una línea `[tareas] purga: …` y otra `[tareas] huerfanos: … revisados, … borrados`, sin errores:
+  ```bash
+  cd /opt/eql4e-tickets && sudo docker compose logs app | grep tareas
+  ```
+- [ ] **O-03** **Simulacro** con la copia de P-03 (cambia la fecha por la que apuntaste). Las cifras corresponden a antes de las pruebas:
   ```bash
   cd /opt/eql4e-tickets && sudo ./restaurar.sh --simulacro AAAA-MM-DD_HHMM
   ```
-- [ ] **O-03** Revisa las incidencias apuntadas. Antes de restaurar, saca capturas de lo que haga falta para reproducirlas.
-- [ ] **O-04** **Restaurar** la copia de P-03 (solo si nadie más ha usado la app durante la prueba). Pide escribir `eql4e`, hace antes una copia del estado actual y termina con «✔ Restaurada la copia …».
+- [ ] **O-04** Revisa las incidencias apuntadas. Antes de restaurar, saca capturas de lo que haga falta para reproducirlas.
+- [ ] **O-05** **Restaurar** la copia de P-03 (solo si nadie más ha usado la app durante la prueba). Pide escribir `eql4e`, hace antes una copia del estado actual y termina con «✔ Restaurada la copia …».
   ```bash
   cd /opt/eql4e-tickets && sudo ./restaurar.sh AAAA-MM-DD_HHMM
   ```
-- [ ] **O-05** Tras restaurar: T1 entra con sus datos reales. En **Usuarios** ya no están T2, S1 ni S2, y en **Tickets** no queda ningún ticket de prueba.
+- [ ] **O-06** Tras restaurar: T1 entra con sus datos reales. En **Usuarios** ya no están T2, S1 ni S2, y en **Tickets** no queda ningún ticket de prueba.
 
 ## Pendiente del correo real
 
