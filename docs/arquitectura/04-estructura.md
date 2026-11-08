@@ -42,13 +42,14 @@ eql4e-tickets/
 │   │       │   ├── pago/       # registrar (HU-T05), deshacer (HU-T06, E-03) y consultas
 │   │       │   ├── usuario/        # alta, listado y ficha, gestión (editar, baja, reactivar, reenviar), texto de la invitación
 │   │       │   ├── concepto/
+│   │       │   ├── ficheros/       # huérfanos: en el disco sin ticket ni pago; puerto AlmacenListable
 │   │       │   └── purga/
 │   │       ├── infra/
 │   │       │   ├── db/             # esquema Drizzle, cliente, semilla
-│   │       │   ├── almacenamiento/ # disco.ts (volumen) y app.ts (lee RUTA_FICHEROS)
+│   │       │   ├── almacenamiento/ # disco.ts (volumen: guardar, leer, borrar, listar) y app.ts (lee RUTA_FICHEROS)
 │   │       │   ├── correo/         # cliente.ts (SMTP | consola) y app.ts (lee el entorno)
 │   │       │   ├── ficheros.ts     # tipo real (file-type) y recodificación (sharp)
-│   │       │   └── planificador.ts
+│   │       │   └── tareas.ts       # croner y advisory lock: programar y ejecutar en exclusiva (ADR-0006)
 │   ├── env.ts                      # variables de entorno validadas con Zod (defineEnvVars de SvelteKit 3)
 │   ├── lib/server/web/             # ayudas de la capa SvelteKit: cookie de sesión, limitadores, enlaces
 │   └── routes/                     # ver 03-rutas.md

@@ -68,6 +68,7 @@ Ejecuta estos comandos desde `/opt/eql4e-tickets`.
 | Reiniciar la app | `sudo docker compose restart app` |
 | Parar todo (los datos se conservan) | `sudo docker compose down` |
 | Comprobar desde fuera | `curl -s https://tickets-eql4e.ddns.net/salud` → `{"estado":"ok"}` |
+| Tareas programadas (huérfanos, cada día a las 19:00) | `sudo docker compose logs app \| grep '\[tareas\]'` |
 | Log de Caddy (certificados, errores del proxy) | `sudo docker logs --since 30m salazar-https-caddy-1` |
 
 > **Nunca** ejecutes `docker compose down -v` ni `docker volume rm eql4e_…`: borran la base de datos y los ficheros. Solo quedaría lo que haya en la última copia de seguridad (apartado 5).

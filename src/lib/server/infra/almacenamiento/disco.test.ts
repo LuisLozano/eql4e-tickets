@@ -31,6 +31,19 @@ describe('almacenEnDisco', () => {
 		await expect(almacenEnDisco(raiz).borrar('no-existe.webp')).resolves.toBeUndefined();
 	});
 
+	it('lista todos los ficheros, también en subcarpetas, con «/» y su fecha', async () => {
+		const almacen = almacenEnDisco(raiz);
+		await almacen.guardar('2026/10/a.webp', datos);
+		await almacen.guardar('2026/11/b.pdf', datos);
+		const lista = await almacen.listar();
+		expect(lista.map((f) => f.ruta).sort()).toEqual(['2026/10/a.webp', '2026/11/b.pdf']);
+		expect(lista.every((f) => f.modificadoEn instanceof Date)).toBe(true);
+	});
+
+	it('listar un almacén que aún no existe devuelve una lista vacía', async () => {
+		expect(await almacenEnDisco(join(raiz, 'no-existe')).listar()).toEqual([]);
+	});
+
 	it.each(['../fuera.webp', '/etc/passwd', '2026/../../fuera.webp', ''])(
 		'no sale del almacén con «%s»',
 		async (ruta) => {
