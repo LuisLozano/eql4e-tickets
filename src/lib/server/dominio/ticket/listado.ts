@@ -88,6 +88,8 @@ export async function listadoGlobal(conexion: Conexion, f: FiltrosListado) {
 		.select({
 			numero: ticket.numero,
 			estado: ticket.estado,
+			// Para la autorización múltiple (E-04).
+			version: ticket.version,
 			fechaCompra: ticket.fechaCompra,
 			socioId: ticket.socioId,
 			socio: usuario.nombre,

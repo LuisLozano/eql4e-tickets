@@ -2,7 +2,7 @@ import { asc, eq } from 'drizzle-orm';
 import { describe, expect, it } from 'vitest';
 import type { EstadoTicket } from '../../src/lib/estados.ts';
 import { detalleParaRevisar } from '../../src/lib/server/dominio/ticket/consultas.ts';
-import { cambiarEstado } from '../../src/lib/server/dominio/ticket/servicio.ts';
+import { autorizarVarios, cambiarEstado } from '../../src/lib/server/dominio/ticket/servicio.ts';
 import { historial, ticket } from '../../src/lib/server/infra/db/esquema.ts';
 import { conexionDePrueba } from './conexion.ts';
 import { crearUsuario } from './datos.ts';
@@ -175,6 +175,60 @@ describe('autorizar y rechazar (HU-T03, T04)', () => {
 			ok: false,
 			motivo: 'no_encontrado'
 		});
+	});
+});
+
+describe('autorización múltiple (HU-T03)', () => {
+	it('autoriza todos de una vez, cada uno con su entrada en el historial', async () => {
+		const { socio, tesorero, t } = await escena();
+		const otro = await ticketDe(socio.id);
+		const marcados = [
+			{ numero: t.numero, version: 1 },
+			{ numero: otro.numero, version: 1 },
+			// Repetido: cuenta una vez.
+			{ numero: t.numero, version: 1 }
+		];
+		expect(await autorizarVarios(db, tesorero, marcados, ahora)).toEqual({
+			ok: true,
+			autorizados: 2
+		});
+		for (const id of [t.id, otro.id]) {
+			expect(await estadoDe(id)).toMatchObject({ estado: 'pendiente_pago', version: 2 });
+			expect((await historialDe(id)).map((h) => h.accion)).toEqual(['autorizar']);
+		}
+	});
+
+	it('todos o ninguno: si uno ha cambiado o es del propio tesorero, no se autoriza ninguno', async () => {
+		const { socio, tesorero, t } = await escena();
+		const cambiado = await ticketDe(socio.id);
+		await db.update(ticket).set({ version: 2 }).where(eq(ticket.id, cambiado.id));
+		expect(
+			await autorizarVarios(
+				db,
+				tesorero,
+				[
+					{ numero: t.numero, version: 1 },
+					{ numero: cambiado.numero, version: 1 }
+				],
+				ahora
+			)
+		).toEqual({ ok: false, numero: cambiado.numero, motivo: 'modificado' });
+		expect(await estadoDe(t.id)).toMatchObject({ estado: 'pendiente_autorizar', version: 1 });
+		expect(await historialDe(t.id)).toEqual([]);
+
+		const suyo = await ticketDe(tesorero.id);
+		expect(
+			await autorizarVarios(
+				db,
+				tesorero,
+				[
+					{ numero: t.numero, version: 1 },
+					{ numero: suyo.numero, version: 1 }
+				],
+				ahora
+			)
+		).toEqual({ ok: false, numero: suyo.numero, motivo: 'propio' });
+		expect(await estadoDe(t.id)).toMatchObject({ estado: 'pendiente_autorizar' });
 	});
 });
 

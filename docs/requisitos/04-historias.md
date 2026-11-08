@@ -92,7 +92,7 @@
 
 ### HU-T03 · Autorizar ticket [M]
 - **Dado** un ticket en *Pendiente de autorizar* que no es mío (R-04), **cuando** lo autorizo, **entonces** pasa a *Pendiente de pago*.
-- **[C]** Autorización múltiple: seleccionar varios desde el listado y autorizarlos de una vez.
+- **[C]** Autorización múltiple: seleccionar varios desde el listado y autorizarlos de una vez. *(Hecho: todos o ninguno, como el pago agrupado; sin confirmación, porque se puede deshacer.)*
 
 ### HU-T04 · Rechazar ticket [M]
 - **Dado** un ticket en *Pendiente de autorizar*, **cuando** lo rechazo, **entonces** debo indicar un **motivo** (entre 5 y 500 caracteres) y pasa a *Rechazado*.

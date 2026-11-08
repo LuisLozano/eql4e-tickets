@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { ArrowDown, ArrowUp, ChevronDown, Download, Lock } from '@lucide/svelte';
+	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import Aviso from '#lib/componentes/Aviso.svelte';
 	import Boton from '#lib/componentes/Boton.svelte';
@@ -23,9 +24,10 @@
 		formatoImporte,
 		formatoNumeroTicket
 	} from '#lib/formato.ts';
+	import { ticketMarcado } from '#lib/esquemas/pago.ts';
 	import type { PageProps } from './$types';
 
-	let { data }: PageProps = $props();
+	let { data, form: resultado }: PageProps = $props();
 
 	const lista = resolve('/gestion/tickets');
 	const f = $derived(data.filtros);
@@ -80,6 +82,20 @@
 		for (const c of sobran) c.disabled = true;
 		setTimeout(() => sobran.forEach((c) => (c.disabled = false)));
 	}
+
+	// Autorización múltiple (HU-T03): solo se marcan los pendientes de autorizar que no son tuyos (R-04).
+	type Fila = (typeof data.filas)[number];
+	const marca = (t: Fila) => ticketMarcado(t.numero, t.version);
+	const autorizables = $derived(
+		data.filas.filter((t) => t.estado === 'pendiente_autorizar' && t.socioId !== data.yo)
+	);
+	let marcados = $state<string[]>([]);
+	// Los de esta página: al cambiar de filtro o de página, lo que ya no se ve no cuenta.
+	const seleccion = $derived(marcados.filter((m) => autorizables.some((t) => marca(t) === m)));
+	const todos = $derived(autorizables.length > 0 && seleccion.length === autorizables.length);
+	let autorizando = $state(false);
+	// La acción con los filtros de la vista: «?/autorizar» a secas cambiaría la URL y se perderían.
+	const accionAutorizar = $derived(`${consulta(f) ? `${consulta(f)}&` : '?'}/autorizar`);
 
 	const claseCampo =
 		'min-h-11 w-full rounded-lg border border-line bg-surface px-3 text-ink focus:outline-2 focus:outline-offset-2 focus:outline-focus';
@@ -258,6 +274,12 @@
 		{/key}
 	</details>
 
+	{#if resultado?.aviso}
+		<Aviso tipo="exito">{resultado.aviso}</Aviso>
+	{:else if resultado?.error}
+		<Aviso>{resultado.error}</Aviso>
+	{/if}
+
 	{#if data.filas.length === 0}
 		<p class="text-muted">
 			{#if activos}
@@ -271,11 +293,47 @@
 			{/if}
 		</p>
 	{:else}
+		{#if autorizables.length}
+			<form
+				id="autorizar-varios"
+				method="POST"
+				action={accionAutorizar}
+				use:enhance={() => {
+					autorizando = true;
+					return async ({ result, update }) => {
+						await update();
+						if (result.type === 'success') marcados = [];
+						autorizando = false;
+					};
+				}}
+				class="flex flex-wrap items-center gap-3"
+			>
+				<span class="text-muted" aria-live="polite"
+					>{seleccion.length === 1 ? '1 seleccionado' : `${seleccion.length} seleccionados`}</span
+				>
+				<Boton
+					variante="secundario"
+					onclick={() => (marcados = todos ? [] : autorizables.map(marca))}
+					>{todos ? 'Desmarcar todos' : 'Marcar todos'}</Boton
+				>
+				<Boton type="submit" variante="secundario" disabled={seleccion.length === 0 || autorizando}
+					>{seleccion.length > 1
+						? `Autorizar ${seleccion.length} tickets`
+						: seleccion.length === 1
+							? 'Autorizar 1 ticket'
+							: 'Autorizar seleccionados'}</Boton
+				>
+			</form>
+		{/if}
+
 		<!-- Ordenador: tabla. Las cabeceras ordenan; la fila entera abre el ticket. -->
 		<div class="hidden overflow-x-auto rounded-lg border border-line bg-surface lg:block">
 			<table class="w-full text-left">
 				<thead class="border-b border-line text-sm text-muted">
 					<tr>
+						{#if autorizables.length}
+							<th scope="col" class="w-0 py-2 pl-3"><span class="sr-only">Marcar</span></th>
+						{/if}
 						<th scope="col" class="px-3 py-2 font-bold">Nº</th>
 						{#each COLUMNAS as c (c.orden)}
 							<th
@@ -306,7 +364,23 @@
 				<tbody>
 					{#each data.filas as t (t.numero)}
 						<tr class="relative border-b border-line last:border-0 hover:bg-sunken">
-							<td class="px-3 py-2 font-mono">
+							{#if autorizables.length}
+								<td class="py-2 pl-3">
+									{#if autorizables.includes(t)}
+										<!-- Por encima del enlace que cubre la fila. -->
+										<input
+											type="checkbox"
+											name="tickets"
+											value={marca(t)}
+											form="autorizar-varios"
+											bind:group={marcados}
+											aria-label="Marcar {formatoNumeroTicket(t.numero)}"
+											class="relative z-10 size-5 rounded border-line"
+										/>
+									{/if}
+								</td>
+							{/if}
+							<td class="px-3 py-2 font-mono whitespace-nowrap">
 								<a href={detalle(t.numero)} class="after:absolute after:inset-0"
 									>{formatoNumeroTicket(t.numero)}</a
 								>
@@ -337,10 +411,25 @@
 		<!-- Móvil y tableta: tarjetas. -->
 		<ul class="flex flex-col gap-2 lg:hidden" aria-label="Tickets">
 			{#each data.filas as t (t.numero)}
-				<li>
+				<li class="flex items-stretch gap-2">
+					{#if autorizables.includes(t)}
+						<label
+							class="flex w-11 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-line bg-surface"
+						>
+							<input
+								type="checkbox"
+								name="tickets"
+								value={marca(t)}
+								form="autorizar-varios"
+								bind:group={marcados}
+								aria-label="Marcar {formatoNumeroTicket(t.numero)}"
+								class="size-5 rounded border-line"
+							/>
+						</label>
+					{/if}
 					<a
 						href={detalle(t.numero)}
-						class="flex flex-col gap-1 rounded-lg border border-line bg-surface px-4 py-3 hover:bg-sunken"
+						class="flex min-w-0 flex-1 flex-col gap-1 rounded-lg border border-line bg-surface px-4 py-3 hover:bg-sunken"
 					>
 						<span class="flex items-baseline justify-between gap-3">
 							<span class="min-w-0 font-bold break-words">

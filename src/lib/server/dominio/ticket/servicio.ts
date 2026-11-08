@@ -85,3 +85,39 @@ export async function cambiarEstado(
 		return { ok: true, estado: hasta, version: nuevo.version };
 	});
 }
+
+export type ResultadoVarios =
+	| { ok: true; autorizados: number }
+	| { ok: false; numero: number; motivo: Extract<ResultadoCambio, { ok: false }>['motivo'] };
+
+/**
+ * Autorización múltiple (HU-T03): todos o ninguno, en una sola transacción. Si uno no se puede
+ * autorizar (otro tesorero lo ha tocado, es del propio tesorero…), se deshacen los anteriores y se
+ * dice cuál ha fallado, igual que el pago agrupado.
+ */
+export async function autorizarVarios(
+	conexion: Conexion,
+	actor: Actor,
+	tickets: { numero: number; version: number }[],
+	ahora: Date
+): Promise<ResultadoVarios> {
+	class Fallo extends Error {
+		constructor(readonly resultado: Extract<ResultadoVarios, { ok: false }>) {
+			super('autorización múltiple deshecha');
+		}
+	}
+	// Repetidos fuera: un mismo ticket marcado dos veces se autoriza una.
+	const unicos = [...new Map(tickets.map((t) => [t.numero, t])).values()];
+	try {
+		return await conexion.transaction(async (tx) => {
+			for (const t of unicos) {
+				const r = await cambiarEstado(tx, actor, t.numero, 'autorizar', t, ahora);
+				if (!r.ok) throw new Fallo({ ok: false, numero: t.numero, motivo: r.motivo });
+			}
+			return { ok: true, autorizados: unicos.length } as const;
+		});
+	} catch (e) {
+		if (e instanceof Fallo) return e.resultado;
+		throw e;
+	}
+}

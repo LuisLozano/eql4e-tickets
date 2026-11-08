@@ -12,6 +12,7 @@ import {
 	EDICION,
 	CONCEPTOS,
 	GESTION,
+	MULTIPLE,
 	PURGA,
 	CONTRASENA_TESORERO,
 	LISTADO,
@@ -46,7 +47,8 @@ export default async function preparar() {
 			...Object.values(EDICION),
 			...Object.values(PAGO),
 			...Object.values(DESHACER),
-			...Object.values(PURGA)
+			...Object.values(PURGA),
+			...Object.values(MULTIPLE)
 		];
 		const telefonos = usuarios.map((u) => u.telefono);
 		const emails = usuarios.map((u) => u.email);
@@ -78,6 +80,18 @@ export default async function preparar() {
 			await sql`
 				insert into usuario (nombre, telefono, email, password_hash, estado, es_socio, es_tesorero)
 				values (${t.nombre}, ${t.telefono}, ${t.email}, ${passwordHash}, 'activo', false, true)`;
+		}
+		for (const m of Object.values(MULTIPLE)) {
+			const [{ id }] = await sql`
+				insert into usuario (nombre, telefono, email, password_hash, estado)
+				values (${m.nombre}, ${m.telefono}, ${m.email}, ${passwordHash}, 'activo')
+				returning id`;
+			await sql`
+				insert into ticket (socio_id, importe_centimos, fecha_compra, concepto_otro, creado_en)
+				values
+					(${id}, 1011, '2026-10-01', 'Varios', '2026-10-01T10:00:00Z'),
+					(${id}, 2022, '2026-10-02', 'Varios', '2026-10-02T10:00:00Z'),
+					(${id}, 3033, '2026-10-03', 'Varios', '2026-10-03T10:00:00Z')`;
 		}
 		for (const p of Object.values(PURGA)) {
 			const [{ id }] = await sql`
