@@ -7,6 +7,9 @@
 		<meta name="theme-color" content="#eef0f2" media="(prefers-color-scheme: light)" />
 		<meta name="theme-color" content="#0f1114" media="(prefers-color-scheme: dark)" />
 		<link rel="icon" href="%sveltekit.assets%/logo.png" type="image/png" />
+		<!-- PWA instalable: solo el manifiesto, sin service worker (la app necesita conexión). -->
+		<link rel="manifest" href="%sveltekit.assets%/manifest.webmanifest" />
+		<link rel="apple-touch-icon" href="%sveltekit.assets%/iconos/apple-touch-icon.png" />
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
