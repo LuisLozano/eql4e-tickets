@@ -43,7 +43,7 @@ eql4e-tickets/
 │   │       │   ├── usuario/        # alta, listado y ficha, gestión (editar, baja, reactivar, reenviar), texto de la invitación
 │   │       │   ├── concepto/
 │   │       │   ├── ficheros/       # huérfanos: en el disco sin ticket ni pago; puerto AlmacenListable
-│   │       │   └── purga/
+│   │       │   └── purga/          # tickets de más de 18 meses y aviso de pendientes antiguos (HU-G05)
 │   │       ├── infra/
 │   │       │   ├── db/             # esquema Drizzle, cliente, semilla
 │   │       │   ├── almacenamiento/ # disco.ts (volumen: guardar, leer, borrar, listar) y app.ts (lee RUTA_FICHEROS)

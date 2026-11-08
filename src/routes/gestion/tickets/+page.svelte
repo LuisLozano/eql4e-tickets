@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { ArrowDown, ArrowUp, ChevronDown, Download, Lock } from '@lucide/svelte';
 	import { resolve } from '$app/paths';
+	import Aviso from '#lib/componentes/Aviso.svelte';
 	import Boton from '#lib/componentes/Boton.svelte';
 	import Campo from '#lib/componentes/Campo.svelte';
 	import EstadoInsignia from '#lib/componentes/EstadoInsignia.svelte';
@@ -8,6 +9,7 @@
 	import {
 		centimosATexto,
 		ESTADOS_POR_DEFECTO,
+		FILTROS_INICIALES,
 		consulta,
 		estadoCambiado,
 		filtrosActivos,
@@ -98,6 +100,24 @@
 			><Download size={20} aria-hidden="true" />Exportar CSV</a
 		>
 	</div>
+
+	{#if data.antiguos.cantidad > 0}
+		<!-- La purga (HU-G05) no borra los pendientes: se resuelven antes. -->
+		<Aviso tipo="atencion">
+			{data.antiguos.cantidad === 1
+				? 'Hay 1 ticket pendiente'
+				: `Hay ${data.antiguos.cantidad} tickets pendientes`} con más de 18 meses. Los tickets se borran
+			a los 18 meses, pero los pendientes no: resuélvelos.
+			<a
+				href="{lista}{q({
+					...FILTROS_INICIALES,
+					estados: ['pendiente_autorizar', 'pendiente_pago'],
+					hasta: data.antiguos.hasta
+				})}"
+				class="underline">Verlos</a
+			>
+		</Aviso>
+	{/if}
 
 	<!--
 		Filtro rápido de estado. Cada casilla cuenta lo que hay en su estado con los demás filtros, así
