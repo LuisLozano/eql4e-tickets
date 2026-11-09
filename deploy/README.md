@@ -1,6 +1,6 @@
-# Manual de despliegue · eql4e-tickets
+# Manual de administrador · eql4e-tickets
 
-Procedimiento para instalar, actualizar y operar la aplicación en la máquina `yaroki`. Las decisiones y sus motivos están en [ADR-0006](../docs/arquitectura/adr/0006-despliegue.md).
+Procedimiento para instalar, actualizar y operar la aplicación en la máquina `yaroki`. Las decisiones y sus motivos están en [ADR-0006](../docs/arquitectura/adr/0006-despliegue.md). El PDF de este manual se genera con `pnpm manual:admin` ([docs/manual/README.md](../docs/manual/README.md)).
 
 ## Cómo está montado
 
@@ -15,6 +15,34 @@ Procedimiento para instalar, actualizar y operar la aplicación en la máquina `
 | Dominio | `tickets-eql4e.ddns.net` (No-IP), con la misma IP que `yaroki.ddns.net` |
 
 Todos los comandos de Docker van con `sudo`: `luis` no está en el grupo `docker`.
+
+### Scripts y unidades
+
+Los ficheros de `deploy/` del repositorio se copian a mano a la máquina (apartado 1, «Si el PR cambió algo de `deploy/`»); los de la imagen llegan con cada despliegue.
+
+| En el repositorio | Instalado en | Quién lo lanza | Qué hace |
+|---|---|---|---|
+| `deploy/desplegar.sh` | `/opt/eql4e-tickets/` | Tú: `sudo ./desplegar.sh` | Descarga la imagen de `ETIQUETA`, recrea los contenedores y espera a que la app esté sana; si no, enseña el log y termina con error (apartado 1) |
+| `deploy/copia.sh` | `/opt/eql4e-tickets/` | El timer, cada día a las 19:30; o tú: `sudo ./copia.sh` | Vuelca la base y los ficheros, los comprueba, los deja en los dos discos de copias y borra las antiguas (apartado 5) |
+| `deploy/restaurar.sh` | `/opt/eql4e-tickets/` | Tú: `sudo ./restaurar.sh --simulacro <copia>` o `sudo ./restaurar.sh <copia>` | Con `--simulacro`, restaura la copia en un PostgreSQL temporal y cuenta lo que hay, sin tocar producción. Sin él, sustituye la base y los ficheros de producción, tras una confirmación y una copia del estado actual (apartados 5.3 y 5.4) |
+| `deploy/eql4e-copia.service` | `/opt/eql4e-tickets/` y `/etc/systemd/system/` | El timer | Ejecuta `copia.sh` cuando Docker y los discos de copias están montados |
+| `deploy/eql4e-copia.timer` | `/opt/eql4e-tickets/` y `/etc/systemd/system/` | systemd | Lanza el servicio cada día a las 19:30 y, si el equipo estaba apagado, al arrancar |
+| `deploy/compose.yaml` | `/opt/eql4e-tickets/` | `desplegar.sh` y los comandos `docker compose` | Define los contenedores `app` y `db`, sus volúmenes y su configuración |
+| `deploy/.env.example` | `/opt/eql4e-tickets/` | — | Plantilla del `.env` (apartado 7) |
+| `deploy/Caddyfile.snippet` | Dentro de `/home/luis/salazar/https/Caddyfile` | Caddy | El bloque que publica la app en `tickets-eql4e.ddns.net` (apartado 4.3) |
+| `scripts/migrar.js` | En la imagen | `docker-entrypoint.sh`, al arrancar el contenedor | Aplica las migraciones de la base que falten antes de arrancar la app |
+| `docker-entrypoint.sh` | En la imagen | Docker, al arrancar el contenedor | Lanza `migrar.js` y después la app |
+| `deploy/compose.dev.yaml` | — | Solo en desarrollo | PostgreSQL para el desarrollo y las pruebas en local (puerto 5436) |
+
+### Tareas programadas
+
+Cada día, en hora de Madrid. Las dos primeras las lanza la propia app (croner, dentro del contenedor): si la app está parada a esa hora, ese día no se hacen. La copia la lanza systemd.
+
+| Hora | Tarea | Qué hace | Dónde se ve |
+|---|---|---|---|
+| 18:55 | Purga (HU-G05) | Borra los tickets cerrados (pagados, rechazados o anulados) con más de 18 meses desde la compra, con sus ficheros e historial, y los pagos que se quedan sin tickets. Los pendientes no los toca: el tesorero los ve en un aviso | Log de la app: `[tareas] purga: …` (solo cifras) |
+| 19:00 | Huérfanos | Borra los ficheros de más de un día que no son de ningún ticket ni pago (de subidas cortadas a medias). Si son más de 50, no borra ninguno y lo avisa en el log para revisarlo a mano | Log de la app: `[tareas] huerfanos: …` |
+| 19:30 | Copia de seguridad | `copia.sh` (apartado 5) | `systemctl status eql4e-copia` y `sudo journalctl -u eql4e-copia` |
 
 ## 1. Actualizar a la última versión (lo habitual)
 
@@ -70,6 +98,19 @@ Ejecuta estos comandos desde `/opt/eql4e-tickets`.
 | Comprobar desde fuera | `curl -s https://tickets-eql4e.ddns.net/salud` → `{"estado":"ok"}` |
 | Tareas programadas (purga a las 18:55 y huérfanos a las 19:00, cada día) | `sudo docker compose logs app \| grep '\[tareas\]'` |
 | Log de Caddy (certificados, errores del proxy) | `sudo docker logs --since 30m salazar-https-caddy-1` |
+
+### 2.1 Qué buscar en el log de la app
+
+| Línea | Qué significa |
+|---|---|
+| `[migrar] Migraciones aplicadas.` | Arranque normal: la base está al día |
+| `[tareas] purga: …` y `[tareas] huerfanos: …` | Resultado de las tareas diarias. `[tareas] … error` es un fallo: va seguido del motivo |
+| `TESORERO INICIAL` | No hay ningún tesorero activo: el enlace para activar el tesorero inicial (apartado 4.4) |
+| `CORREO (modo consola, no se envía)` | Con `CORREO_MODO=consola`, un correo que no se ha enviado, con su enlace |
+| `[correo] No se pudo enviar …` | Ha fallado un envío: invitación o restablecimiento de contraseña. El motivo va detrás (apartado 7.1) |
+| `env_invalid` | Falta una variable del `.env` o no es válida; la línea dice cuál. La app no arranca |
+
+Para buscar algo concreto: `sudo docker compose logs app | grep '\[correo\]'`.
 
 > **Nunca** ejecutes `docker compose down -v` ni `docker volume rm eql4e_…`: borran la base de datos y los ficheros. Solo quedaría lo que haya en la última copia de seguridad (apartado 5).
 
@@ -257,3 +298,39 @@ Si el disco del sistema se ha perdido entero: haz la instalación desde cero (ap
 | 502 en el navegador | Caddy funciona, pero la app no responde en `127.0.0.1:3080` | `sudo docker compose ps` y el log de la app |
 | Error de certificado | El DNS no apunta a la máquina o los puertos 80 y 443 no llegan | Log de Caddy; `getent hosts tickets-eql4e.ddns.net` |
 | `docker compose pull` falla | Sin red, o la CI no llegó a publicar la imagen | Pestaña *Actions* en GitHub |
+
+## 7. Configuración (`.env`)
+
+Está en `/opt/eql4e-tickets/.env`, con permisos 600: solo lo lee root. No se guarda en git. Para cambiarlo, edítalo y vuelve a desplegar, que recrea la app con la configuración nueva:
+
+```bash
+sudo nano /opt/eql4e-tickets/.env
+```
+
+```bash
+cd /opt/eql4e-tickets && sudo ./desplegar.sh
+```
+
+| Variable | Valor | Para qué |
+|---|---|---|
+| `ETIQUETA` | `latest` | Versión de la imagen. Un SHA corto para volver atrás (apartado 3) |
+| `POSTGRES_PASSWORD` | Aleatoria, generada al instalar | Contraseña de la base de datos. **No la cambies** después del primer arranque (apartado 4.2) |
+| `CORREO_MODO` | `consola` o `smtp` | `smtp` envía los correos; `consola` solo los escribe en el log (apartado 2.1) |
+| `SMTP_HOST` | `smtp.gmail.com` | Servidor de correo |
+| `SMTP_PORT` | `587` | Puerto del servidor de correo |
+| `SMTP_USER` | La dirección de Gmail de la asociación | Usuario del servidor de correo |
+| `SMTP_PASS` | La contraseña de aplicación de Gmail | No es la clave de la cuenta (apartado 7.1) |
+| `SMTP_FROM` | `EQL4E Tickets <dirección de Gmail>` | Remitente que ven los socios |
+
+El resto de la configuración (dirección pública, cabeceras del proxy, carpeta de ficheros) está en `compose.yaml` y en la imagen, y no hace falta tocarla.
+
+### 7.1 Activar el correo
+
+Mientras `CORREO_MODO=consola`, la app no envía nada: el tesorero copia el enlace de cada invitación y en «Entrar» no se ofrece restablecer la contraseña. Para que envíe con el Gmail de la asociación ([ADR-0004](../docs/arquitectura/adr/0004-email.md)):
+
+1. En la cuenta de Google de la asociación, activa la **verificación en dos pasos**: Google solo da contraseñas de aplicación a las cuentas que la tienen.
+2. En *Cuenta de Google → Seguridad → Contraseñas de aplicaciones*, crea una para «EQL4E Tickets». Son 16 letras; se puede revocar cuando quieras sin cambiar la clave de la cuenta.
+3. En el `.env`, pon `CORREO_MODO=smtp`, `SMTP_USER`, `SMTP_PASS` (la contraseña de aplicación, sin espacios) y `SMTP_FROM`, y despliega.
+4. Prueba: un tesorero reenvía una invitación a un usuario de prueba con tu email. Si llega, en el log no sale nada; si falla, sale `[correo] No se pudo enviar …` con el motivo, y el tesorero sigue viendo el enlace para copiarlo.
+
+Si cambia la clave de la cuenta de Google, las contraseñas de aplicación se revocan: crea otra y cámbiala en el `.env`.
