@@ -19,7 +19,9 @@
 		"db:studio": "drizzle-kit studio",
 		"test:integracion": "vitest run --project integracion",
 		"test:cobertura": "vitest run --coverage",
-		"db:migrar": "node --env-file-if-exists=.env scripts/migrar.js"
+		"db:migrar": "node --env-file-if-exists=.env scripts/migrar.js",
+		"manual:capturas": "playwright test -c playwright.manual.config.ts -g capturas",
+		"manual:pdf": "playwright test -c playwright.manual.config.ts -g pdf"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",

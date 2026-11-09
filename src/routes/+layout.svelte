@@ -50,6 +50,11 @@
 			</nav>
 			<div class="ml-auto flex items-center gap-2">
 				<a
+					href={resolve('/ayuda')}
+					class="rounded-lg px-3 py-2 hover:bg-sunken"
+					aria-current={activo(resolve('/ayuda')) ? 'page' : undefined}>Ayuda</a
+				>
+				<a
 					href={resolve('/cuenta')}
 					class="rounded-lg px-3 py-2 hover:bg-sunken"
 					aria-current={activo(resolve('/cuenta')) ? 'page' : undefined}>{data.usuario.nombre}</a
