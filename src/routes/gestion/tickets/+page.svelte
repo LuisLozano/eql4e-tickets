@@ -25,9 +25,11 @@
 		formatoNumeroTicket
 	} from '#lib/formato.ts';
 	import { ticketMarcado } from '#lib/esquemas/pago.ts';
+	import { refrescoAutomatico } from '#lib/cliente/refresco.svelte.ts';
 	import type { PageProps } from './$types';
 
 	let { data, form: resultado }: PageProps = $props();
+	refrescoAutomatico();
 
 	const lista = resolve('/gestion/tickets');
 	const f = $derived(data.filtros);
