@@ -10,7 +10,7 @@ Procedimiento para instalar, actualizar y operar la aplicación en la máquina `
 | Imagen | `ghcr.io/luislozano/eql4e-tickets` (pública). La CI la publica en cada *push* a `main` con dos etiquetas: `latest` y el SHA corto del commit |
 | Contenedores | `eql4e-app-1` en `127.0.0.1:3080`; `eql4e-db-1` (PostgreSQL 18) sin puertos publicados |
 | Datos | Volúmenes `eql4e_pgdata` (base de datos) y `eql4e_ficheros` (fotos y justificantes) |
-| Copias de seguridad | Cada día a las 19:30 en el disco externo, `/mnt/externalHD/eql4e/backups` (apartado 5, [ADR-0008](../docs/arquitectura/adr/0008-copias.md)) |
+| Copias de seguridad | Cada día a las 19:30 en dos discos: el interno, `/mnt/eql4e_copias/backups`, y el externo, `/mnt/externalHD/eql4e/backups` (apartado 5, [ADR-0008](../docs/arquitectura/adr/0008-copias.md)) |
 | Proxy HTTPS | El Caddy de Salazar (`salazar-https-caddy-1`, red del host), con el Caddyfile en `/home/luis/salazar/https/Caddyfile` |
 | Dominio | `tickets-eql4e.ddns.net` (No-IP), con la misma IP que `yaroki.ddns.net` |
 
@@ -168,32 +168,42 @@ El resultado esperado es `{"estado":"ok"}` y `yaroki: 200`.
 
 ## 5. Copias de seguridad
 
-Cada día a las 19:30 (antes de la copia de Salazar, a las 20:00, y del apagado programado, a las 20:20), un timer de systemd ejecuta `copia.sh`, que deja en el disco externo una carpeta `AAAA-MM-DD_HHMM` con:
+Cada día a las 19:30 (antes de la copia de Salazar, a las 20:00, y del apagado programado, a las 20:20), un timer de systemd ejecuta `copia.sh`, que deja la misma carpeta `AAAA-MM-DD_HHMM` en dos discos distintos del sistema: el disco duro interno (`/mnt/eql4e_copias/backups`, un volumen LVM de 10 GB en `sda`) y el disco USB externo (`/mnt/externalHD/eql4e/backups`). Cada carpeta lleva:
 
 - `eql4e.dump`: la base de datos;
 - `ficheros.tar.gz`: las fotos y los justificantes;
 - `SHA256SUMS`: las sumas para comprobar que no se han estropeado.
 
-Se guardan las 7 copias más recientes y la última de cada semana anterior, hasta 5 semanas. Las decisiones están en [ADR-0008](../docs/arquitectura/adr/0008-copias.md).
+La copia se hace en el disco interno y se replica en el externo, comprobando las sumas. Si falta uno de los dos discos, la copia queda en el otro y el servicio termina con error. En cada disco se guardan las 7 copias más recientes y la última de cada semana anterior, hasta 5 semanas. Las decisiones están en [ADR-0008](../docs/arquitectura/adr/0008-copias.md).
 
 ### 5.1 Instalación (una sola vez)
 
-1. Monta el disco externo solo para root y con `nofail`, para que el equipo arranque aunque no esté conectado. En `/etc/fstab`, cambia las opciones de su línea, de `defaults` a `defaults,nofail,uid=0,gid=0,umask=077`. La línea queda así:
+1. Crea el volumen del disco interno, formatéalo y móntalo con `nofail` (hecho el 2026-11-09):
+   ```bash
+   sudo lvcreate -L 10G -n eql4e_copias containers_data && sudo mkfs.ext4 -L eql4e_copias /dev/containers_data/eql4e_copias
+   ```
+   ```bash
+   sudo mkdir /mnt/eql4e_copias && echo '/dev/containers_data/eql4e_copias  /mnt/eql4e_copias  ext4  defaults,nofail  0 2' | sudo tee -a /etc/fstab
+   ```
+   ```bash
+   sudo systemctl daemon-reload && sudo mount /mnt/eql4e_copias && sudo install -d -m 700 /mnt/eql4e_copias/backups
+   ```
+2. Monta el disco externo solo para root y con `nofail`, para que el equipo arranque aunque no esté conectado. En `/etc/fstab`, cambia las opciones de su línea, de `defaults` a `defaults,nofail,uid=0,gid=0,umask=077`. La línea queda así:
    ```
    UUID=26BEF288BEF24FB3 /mnt/externalHD ntfs defaults,nofail,uid=0,gid=0,umask=077 0 0
    ```
    ```bash
    sudo nano /etc/fstab
    ```
-2. Vuelve a montarlo y comprueba que ya no lo puede leer cualquiera (tiene que salir `drwx------ … root root`):
+3. Vuelve a montarlo y comprueba que ya no lo puede leer cualquiera (tiene que salir `drwx------ … root root`):
    ```bash
    sudo systemctl daemon-reload && sudo umount /mnt/externalHD && sudo mount /mnt/externalHD && ls -ld /mnt/externalHD
    ```
-3. Copia los scripts y las unidades a la carpeta de despliegue, si no lo hiciste al actualizar (apartado 1), e instala el timer:
+4. Copia los scripts y las unidades a la carpeta de despliegue, si no lo hiciste al actualizar (apartado 1), e instala el timer. Si ya estaba instalado y cambia `eql4e-copia.service`, repite este paso para copiarlo a `/etc/systemd/system`:
    ```bash
    sudo cp /opt/eql4e-tickets/eql4e-copia.{service,timer} /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now eql4e-copia.timer
    ```
-4. Haz la primera copia a mano y después un simulacro (apartado 5.3):
+5. Haz la primera copia a mano y después un simulacro (apartado 5.3):
    ```bash
    sudo systemctl start eql4e-copia && sudo journalctl -u eql4e-copia -n 20 --no-pager
    ```
@@ -205,28 +215,28 @@ Se guardan las 7 copias más recientes y la última de cada semana anterior, has
 | Cuándo toca la siguiente | `systemctl list-timers eql4e-copia.timer` |
 | Si la última salió bien | `systemctl status eql4e-copia` |
 | Su salida | `sudo journalctl -u eql4e-copia -n 30 --no-pager` |
-| Las copias que hay | `sudo ls -l /mnt/externalHD/eql4e/backups` |
+| Las copias que hay | `sudo ls -l /mnt/eql4e_copias/backups /mnt/externalHD/eql4e/backups` |
 | Hacer una ahora | `cd /opt/eql4e-tickets && sudo ./copia.sh` |
 
-Si el disco no está conectado o montado, la copia falla con «no está en el disco externo» y no escribe nada en el disco del sistema. Nadie recibe un aviso: mira el estado de vez en cuando.
+Si un disco no está conectado o montado, `copia.sh` dice «no está en un disco aparte del sistema» para ese disco, copia en el otro y termina con error; nunca escribe en el disco del sistema. Nadie recibe un aviso: mira el estado de vez en cuando.
 
 ### 5.3 Simulacro (una vez al mes)
 
 Restaura una copia en un PostgreSQL temporal, sin tocar producción, y cuenta usuarios, tickets, pagos y ficheros. Sirve para saber que las copias se pueden restaurar antes de necesitarlo:
 
 ```bash
-cd /opt/eql4e-tickets && sudo ./restaurar.sh --simulacro "$(sudo ls /mnt/externalHD/eql4e/backups | tail -1)"
+cd /opt/eql4e-tickets && sudo ./restaurar.sh --simulacro "$(sudo ls /mnt/eql4e_copias/backups | tail -1)"
 ```
 
-Las cifras deben parecerse a lo que ves en la app. Los «ficheros en la copia» deben ser al menos los «ficheros en la base» más los «justificantes en la base».
+Con el nombre de la copia, el script usa la del disco interno y, si falta o está estropeada, la del externo. Para probar la del externo, pasa la ruta completa (`/mnt/externalHD/eql4e/backups/AAAA-MM-DD_HHMM`). Las cifras deben parecerse a lo que ves en la app. Los «ficheros en la copia» deben ser al menos los «ficheros en la base» más los «justificantes en la base».
 
 ### 5.4 Restaurar en producción
 
-**Sustituye** la base de datos y los ficheros por los de la copia: lo guardado después se pierde. Antes de empezar, el script pide escribir `eql4e` y hace una copia del estado actual, por si hay que volver a él.
+**Sustituye** la base de datos y los ficheros por los de la copia: lo guardado después se pierde. Antes de empezar, el script pide escribir `eql4e` y hace una copia del estado actual, por si hay que volver a él. Le basta con que esa copia quede en uno de los dos discos.
 
 1. Elige la copia:
    ```bash
-   sudo ls /mnt/externalHD/eql4e/backups
+   sudo ls /mnt/eql4e_copias/backups /mnt/externalHD/eql4e/backups
    ```
 2. Restáurala (cambia la fecha por la elegida):
    ```bash
@@ -235,7 +245,7 @@ Las cifras deben parecerse a lo que ves en la app. Los «ficheros en la copia» 
 
 El script para la app, restaura la base en una sola transacción y después los ficheros, y la vuelve a arrancar con la misma imagen. Si la copia es de antes de una migración, la app la aplica al arrancar. Si la copia es de una versión **posterior** a la imagen que está en marcha (por ejemplo, después de volver atrás con `ETIQUETA`), despliega primero esa versión o una más nueva.
 
-Si el disco del sistema se ha perdido entero: haz la instalación desde cero (apartado 4, sin activar el tesorero inicial), monta el disco externo (5.1) y restaura la última copia.
+Si el disco del sistema se ha perdido entero: haz la instalación desde cero (apartado 4, sin activar el tesorero inicial), monta los discos de copias (5.1, sin volver a crear ni formatear el volumen interno) y restaura la última copia.
 
 ## 6. Problemas frecuentes
 

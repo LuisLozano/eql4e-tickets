@@ -122,12 +122,12 @@ Como T1, desde **Usuarios** o **Conceptos** en el menú superior.
 
 En un terminal de la máquina.
 
-- [ ] **O-01** **La copia diaria se ha hecho** (si el equipo estuvo encendido a las 19:30). Tiene que salir «Copia de seguridad de eql4e-tickets» terminada sin error:
+- [ ] **O-01** **La copia diaria se ha hecho** (si el equipo estuvo encendido a las 19:30). Tiene que salir «Copia de seguridad de eql4e-tickets» terminada sin error, y la misma carpeta de hoy en los dos discos:
   ```bash
   systemctl status eql4e-copia --no-pager
   ```
   ```bash
-  sudo ls /mnt/externalHD/eql4e/backups
+  sudo ls /mnt/eql4e_copias/backups /mnt/externalHD/eql4e/backups
   ```
 - [ ] **O-02** **Tareas diarias** (si la app estuvo en marcha a las 18:55 y a las 19:00): salen una línea `[tareas] purga: …` y otra `[tareas] huerfanos: … revisados, … borrados`, sin errores:
   ```bash
