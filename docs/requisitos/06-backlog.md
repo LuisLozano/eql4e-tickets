@@ -33,6 +33,22 @@ Todo lo marcado **[M]** forma el MVP: con ello la asociación puede dejar de ges
 | 22 | HU-G05 Purga de tickets de más de 18 meses | S | S4 |
 | 23 | HU-T03 Autorización múltiple | C | S4 |
 
+## Deuda pendiente
+
+### D-01 · Manuales de usuario y de administrador (documentación)
+
+Falta documentación para quien usa y quien mantiene la app. Sin sprint asignado.
+
+- **Manual de usuario**, en dos formatos con el mismo contenido:
+  - **HTML accesible desde la propia aplicación** (por ejemplo, un enlace «Ayuda» en la cabecera), sin necesidad de iniciar sesión para leerlo.
+  - **PDF**, para imprimir o enviar.
+  - Cubre al socio (activar la cuenta, enviar, editar, anular y corregir tickets, instalar la app en el móvil) y al tesorero (revisar, autorizar varios, rechazar, pagar, deshacer, exportar CSV, usuarios y conceptos).
+- **Manual de administrador**, solo en **PDF**:
+  - **Todos los scripts y unidades, con su ruta y lo que hacen**: `deploy/desplegar.sh`, `deploy/copia.sh`, `deploy/restaurar.sh` (y su `--simulacro`), `deploy/eql4e-copia.service` y `deploy/eql4e-copia.timer`, `scripts/migrar.js`, y dónde quedan instalados en la máquina (`/opt/eql4e-tickets`, `/etc/systemd/system`).
+  - Las tareas programadas de la app (purga a las 18:55, huérfanos a las 19:00) y la copia de las 19:30.
+  - Instalación, despliegue, copias y restauración, el tesorero inicial (R-06), la configuración de `.env` (correo incluido) y cómo leer los logs.
+- **Hecho cuando**: los dos PDF se generan desde el repositorio (no a mano) y el HTML se sirve en producción.
+
 ## Siguientes versiones (fuera de la v1)
 
 - Notificaciones de cambio de estado (email o push).
