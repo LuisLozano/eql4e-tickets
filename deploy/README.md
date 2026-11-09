@@ -24,7 +24,7 @@ Después de integrar un PR en `main` y de que la CI termine en verde, que es cua
 cd /opt/eql4e-tickets && sudo ./desplegar.sh
 ```
 
-El script descarga la imagen, recrea los contenedores, aplica las migraciones al arrancar y espera a que `/salud` responda. Si no responde en un minuto, muestra las últimas líneas del log y termina con error.
+El script descarga la imagen, recrea los contenedores, aplica las migraciones al arrancar y espera a que Docker marque la app como *healthy* (su comprobación de `/salud` va cada 30 s, así que tarda unos 30 segundos). Si Docker la marca *unhealthy*, el contenedor se para o no está sana en 2 minutos, muestra las últimas líneas del log y termina con error.
 
 ### Si el PR cambió algo de `deploy/`
 
