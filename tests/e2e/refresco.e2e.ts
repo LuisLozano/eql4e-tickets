@@ -31,14 +31,12 @@ test('el socio ve cómo le autorizan sus tickets sin recargar la página', async
 	await tesorero.getByRole('button', { name: 'Aplicar' }).click();
 	await expect(tesorero).toHaveURL(/socio=/);
 	const autorizar = async (importe: string) => {
-		await tesorero
-			.locator('tr, li')
-			.filter({ hasText: importe })
-			.getByRole('checkbox')
-			.locator('visible=true')
-			.check();
+		const fila = tesorero.locator('tr, li').filter({ hasText: importe });
+		await fila.getByRole('checkbox').locator('visible=true').check();
 		await tesorero.getByRole('button', { name: 'Autorizar 1 ticket' }).click();
-		await expect(tesorero.getByText('1 ticket autorizado.')).toBeVisible();
+		// Hasta que su casilla desaparece (ya no se puede autorizar), no está guardado. El aviso no
+		// sirve: tras el primer ticket ya estaba en pantalla.
+		await expect(fila.getByRole('checkbox')).toHaveCount(0);
 	};
 
 	// A los dos minutos, con la página a la vista, se actualiza sola.
