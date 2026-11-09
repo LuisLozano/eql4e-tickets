@@ -1,5 +1,5 @@
 import { and, eq } from 'drizzle-orm';
-import { beforeAll, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
 	activarCuenta,
 	BLOQUEO_MS,
@@ -399,46 +399,57 @@ describe('cambiar la contraseña (HU-A03)', () => {
 });
 
 describe('tesorero inicial (R-06)', () => {
-	// Este bloque necesita una base sin tesoreros activos: los de otras pruebas se pasan a socios.
-	beforeAll(async () => {
-		await db
-			.update(usuario)
-			.set({ esTesorero: false, esSocio: true })
-			.where(eq(usuario.esTesorero, true));
-	});
-
 	it('lo crea sin contraseña, lo reutiliza y deja de hacerlo al activarse', async () => {
-		const primero = await asegurarTesoreroInicial(db, ahora);
-		expect(primero?.telefono).toBe(TESORERO_INICIAL.telefono);
-		const [creado] = await db
-			.select()
-			.from(usuario)
-			.where(eq(usuario.telefono, TESORERO_INICIAL.telefono));
-		expect(creado).toMatchObject({
-			esTesorero: true,
-			esSocio: false,
-			estado: 'invitado',
-			passwordHash: null
-		});
+		// Necesita una base sin tesoreros activos: los de otras pruebas se pasan a socios dentro de una
+		// transacción que se deshace, con una foto fija para no ver los que crean a la vez otros
+		// ficheros de pruebas.
+		class Deshacer extends Error {}
+		await expect(
+			db.transaction(
+				async (tx) => {
+					await tx
+						.update(usuario)
+						.set({ esTesorero: false, esSocio: true })
+						.where(eq(usuario.esTesorero, true));
 
-		// En otro arranque sin activar: el mismo usuario, código nuevo y el anterior invalidado.
-		const segundo = await asegurarTesoreroInicial(db, ahora);
-		expect(segundo?.codigo).not.toBe(primero?.codigo);
-		const tesoreros = await db
-			.select()
-			.from(usuario)
-			.where(eq(usuario.telefono, TESORERO_INICIAL.telefono));
-		expect(tesoreros).toHaveLength(1);
+					const primero = await asegurarTesoreroInicial(tx, ahora);
+					expect(primero?.telefono).toBe(TESORERO_INICIAL.telefono);
+					const [creado] = await tx
+						.select()
+						.from(usuario)
+						.where(eq(usuario.telefono, TESORERO_INICIAL.telefono));
+					expect(creado).toMatchObject({
+						esTesorero: true,
+						esSocio: false,
+						estado: 'invitado',
+						passwordHash: null
+					});
 
-		const datos = { telefono: TESORERO_INICIAL.telefono, contrasena: 'la del tesorero inicial' };
-		expect(await activarCuenta(db, { ...datos, codigo: primero!.codigo }, ahora)).toMatchObject({
-			ok: false
-		});
-		expect(await activarCuenta(db, { ...datos, codigo: segundo!.codigo }, ahora)).toMatchObject({
-			ok: true,
-			esTesorero: true
-		});
+					// En otro arranque sin activar: el mismo usuario, código nuevo y el anterior invalidado.
+					const segundo = await asegurarTesoreroInicial(tx, ahora);
+					expect(segundo?.codigo).not.toBe(primero?.codigo);
+					const tesoreros = await tx
+						.select()
+						.from(usuario)
+						.where(eq(usuario.telefono, TESORERO_INICIAL.telefono));
+					expect(tesoreros).toHaveLength(1);
 
-		expect(await asegurarTesoreroInicial(db, ahora)).toBeNull();
+					const datos = {
+						telefono: TESORERO_INICIAL.telefono,
+						contrasena: 'la del tesorero inicial'
+					};
+					expect(
+						await activarCuenta(tx, { ...datos, codigo: primero!.codigo }, ahora)
+					).toMatchObject({ ok: false });
+					expect(
+						await activarCuenta(tx, { ...datos, codigo: segundo!.codigo }, ahora)
+					).toMatchObject({ ok: true, esTesorero: true });
+
+					expect(await asegurarTesoreroInicial(tx, ahora)).toBeNull();
+					throw new Deshacer();
+				},
+				{ isolationLevel: 'repeatable read' }
+			)
+		).rejects.toBeInstanceOf(Deshacer);
 	});
 });
