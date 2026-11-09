@@ -12,6 +12,8 @@ pnpm build && pnpm manual:capturas           # 1. capturas en static/ayuda/
 pnpm build && pnpm manual:pdf                # 2. PDF, con las capturas nuevas ya compiladas
 ```
 
+Las capturas usan **datos de demostración** ([tests/manual/demo.ts](../../tests/manual/demo.ts)): la socia Lucía Martín y la tesorera Marta Gil, con fotos de tickets dibujadas. El guion activa la cuenta, envía cuatro tickets y, como tesorera, paga uno, autoriza otro y rechaza un tercero, para que salgan todos los estados. Cada vez que se generan, borra y vuelve a crear esos datos.
+
 Los pasos de instalar la app en Android e iPhone llevan **ilustraciones esquemáticas** (`static/ayuda/android-*.png` e `iphone-*.png`), no capturas: esos menús los dibuja el propio móvil, no la app. Se generan con el mismo `pnpm manual:capturas` desde `tests/manual/ilustraciones.ts`. Si se consiguen capturas reales hechas en un móvil, pueden sustituirlas con el mismo nombre de fichero.
 
 ## Manual de administrador
