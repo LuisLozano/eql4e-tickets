@@ -100,15 +100,42 @@
 		<ol class="pasos">
 			<li>
 				<p>Pulsa el menú de Chrome: los <b>tres puntos ⋮</b>, arriba a la derecha.</p>
+				<figure>
+					<img
+						src="/ayuda/android-1.png"
+						alt="Ilustración: Chrome con la app abierta y los tres puntos de arriba a la derecha resaltados."
+						width="360"
+						height="640"
+						loading="lazy"
+					/>
+				</figure>
 			</li>
 			<li>
 				<p>
 					Pulsa <b>Instalar aplicación</b>. En algunos móviles se llama
 					<b>Añadir a pantalla de inicio</b>.
 				</p>
+				<figure>
+					<img
+						src="/ayuda/android-2.png"
+						alt="Ilustración: el menú de Chrome abierto, con la opción Instalar aplicación resaltada."
+						width="360"
+						height="640"
+						loading="lazy"
+					/>
+				</figure>
 			</li>
 			<li>
 				<p>Confirma con <b>Instalar</b>.</p>
+				<figure>
+					<img
+						src="/ayuda/android-3.png"
+						alt="Ilustración: el aviso «¿Instalar aplicación?» con el nombre Tickets y el botón Instalar resaltado."
+						width="360"
+						height="640"
+						loading="lazy"
+					/>
+				</figure>
 			</li>
 			<li>
 				<p>
@@ -116,6 +143,15 @@
 					Ábrela desde ahí: se ve a pantalla completa, sin la barra del navegador, y con tu sesión
 					iniciada.
 				</p>
+				<figure>
+					<img
+						src="/ayuda/android-4.png"
+						alt="Ilustración: la pantalla de inicio del móvil con el icono redondo de Tickets resaltado."
+						width="360"
+						height="640"
+						loading="lazy"
+					/>
+				</figure>
 			</li>
 		</ol>
 	</section>
@@ -132,20 +168,56 @@
 					Pulsa el botón <b>Compartir</b>: el cuadrado con una flecha hacia arriba, abajo en el
 					centro de la pantalla (arriba a la derecha en el iPad).
 				</p>
+				<figure>
+					<img
+						src="/ayuda/iphone-1.png"
+						alt="Ilustración: Safari con la app abierta y el botón Compartir, abajo en el centro, resaltado."
+						width="360"
+						height="640"
+						loading="lazy"
+					/>
+				</figure>
 			</li>
 			<li>
 				<p>
 					Desliza hacia abajo en el menú y pulsa <b>Añadir a pantalla de inicio</b>.
 				</p>
+				<figure>
+					<img
+						src="/ayuda/iphone-2.png"
+						alt="Ilustración: el menú Compartir de Safari, con la opción Añadir a pantalla de inicio resaltada."
+						width="360"
+						height="640"
+						loading="lazy"
+					/>
+				</figure>
 			</li>
 			<li>
 				<p>Deja el nombre <b>Tickets</b> y pulsa <b>Añadir</b>, arriba a la derecha.</p>
+				<figure>
+					<img
+						src="/ayuda/iphone-3.png"
+						alt="Ilustración: la pantalla «Añadir a inicio» con el nombre Tickets y el botón Añadir, arriba a la derecha, resaltado."
+						width="360"
+						height="640"
+						loading="lazy"
+					/>
+				</figure>
 			</li>
 			<li>
 				<p>
 					En la pantalla de inicio aparece el icono <b>Tickets</b>. Ábrela desde ahí: la primera vez
 					puede pedirte entrar con tu teléfono y tu contraseña.
 				</p>
+				<figure>
+					<img
+						src="/ayuda/iphone-4.png"
+						alt="Ilustración: la pantalla de inicio del iPhone con el icono de Tickets resaltado."
+						width="360"
+						height="640"
+						loading="lazy"
+					/>
+				</figure>
 			</li>
 		</ol>
 	</section>
@@ -181,8 +253,17 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
-		padding-left: 1.5rem;
-		list-style: decimal;
+		padding-left: 0;
+		list-style: none;
+		counter-reset: paso;
+	}
+	/* Numeración propia: en dos columnas (más abajo) el «li» deja de ser un elemento de lista. */
+	.pasos > li {
+		counter-increment: paso;
+	}
+	.pasos > li > p::before {
+		content: counter(paso) '. ';
+		font-weight: bold;
 	}
 	figure {
 		margin-top: 0.75rem;
@@ -193,7 +274,25 @@
 		border: 1px solid var(--color-line);
 		border-radius: 0.75rem;
 	}
+	/* En pantalla ancha y en papel, el texto del paso a la izquierda y su imagen a la derecha. */
+	@media (min-width: 40rem), print {
+		.pasos li:has(figure) {
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) 12rem;
+			gap: 1rem;
+			align-items: start;
+		}
+		.pasos figure {
+			margin-top: 0;
+		}
+		.pasos figure img {
+			width: 100%;
+		}
+	}
 	@media print {
+		.pasos li:has(figure) {
+			grid-template-columns: minmax(0, 1fr) 5.5cm;
+		}
 		li {
 			break-inside: avoid;
 		}
