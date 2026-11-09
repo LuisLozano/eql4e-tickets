@@ -1,4 +1,4 @@
-// Formularios de acceso (HU-A01–A03). La validación del servidor es la que manda:
+// Formularios de acceso (HU-A01–A04). La validación del servidor es la que manda:
 // la fortaleza de la contraseña se comprueba en el dominio (lista de contraseñas comunes).
 import { z } from 'zod';
 
@@ -30,6 +30,19 @@ export const esquemaCambiarContrasena = z
 		repetir: z.string()
 	})
 	.refine((d) => d.nueva === d.repetir, {
+		path: ['repetir'],
+		message: 'Las contraseñas no coinciden.'
+	});
+
+export const esquemaSolicitarRestablecimiento = z.object({ telefono });
+
+export const esquemaRestablecer = z
+	.object({
+		telefono,
+		contrasena: contrasenaNueva,
+		repetir: z.string()
+	})
+	.refine((d) => d.contrasena === d.repetir, {
 		path: ['repetir'],
 		message: 'Las contraseñas no coinciden.'
 	});

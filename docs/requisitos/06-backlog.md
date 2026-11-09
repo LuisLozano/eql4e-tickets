@@ -53,7 +53,7 @@ Falta documentación para quien usa y quien mantiene la app. Sin sprint asignado
 ## Siguientes versiones (fuera de la v1)
 
 - Notificaciones de cambio de estado (email o push).
-- ~~Política y automatización de copias de seguridad~~: hecha ([ADR-0008](../arquitectura/adr/0008-copias.md)). Falta una copia fuera de casa.
+- ~~Política y automatización de copias de seguridad~~: hecha ([ADR-0008](../arquitectura/adr/0008-copias.md)). Las copias van a dos discos, el interno y el externo. Falta una copia fuera de casa: **baja prioridad** (asociación pequeña; decidido el 2026-11-09).
 - Informes por concepto o periodo.
 - OCR para proponer automáticamente importe y fecha.
 

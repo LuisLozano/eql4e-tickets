@@ -3,13 +3,16 @@ import { message, superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { esquemaEntrar } from '#lib/esquemas/acceso.ts';
 import { iniciarSesion } from '#lib/server/dominio/auth/acceso.ts';
+import { correo } from '#lib/server/infra/correo/app.ts';
 import { db } from '#lib/server/infra/db/app.ts';
 import { limitadorEntrar } from '#lib/server/web/limitadores.ts';
 import { ponerCookieSesion, rutaDeVuelta } from '#lib/server/web/sesion.ts';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => ({
-	form: await superValidate(zod4(esquemaEntrar))
+	form: await superValidate(zod4(esquemaEntrar)),
+	// Sin correo, el enlace de restablecer no llegaría: no se ofrece (HU-A04).
+	correoActivo: correo.envia
 });
 
 export const actions: Actions = {

@@ -22,7 +22,7 @@
 - **CSRF**: la comprobación de `Origin` que SvelteKit trae activada por defecto en las *form actions*, más `SameSite=Lax`. No hace falta un token CSRF adicional.
 - **Fuerza bruta**:
   - Contador de intentos fallidos y `bloqueado_hasta` en la tabla `usuario`: al **quinto fallo seguido** la cuenta se bloquea 15 minutos y el contador vuelve a cero; un acierto también lo pone a cero. *Simplificación respecto a HU-A02*: no se exige que los 5 fallos ocurran dentro de 15 minutos, para no guardar la hora de cada intento. Es más estricto, no menos.
-  - Además, un limitador **en memoria** por IP en el inicio de sesión (20 intentos cada 15 minutos), la activación (10) y el restablecimiento. Es suficiente con una sola instancia; si se escalara, pasaría a PostgreSQL.
+  - Además, un limitador **en memoria** por IP en el inicio de sesión (20 intentos cada 15 minutos), la activación (10) y el restablecimiento (10 peticiones; probar códigos cuenta con la activación). Para que nadie llene de correos el buzón de un socio, pedir restablecer tiene también un límite por teléfono: 3 enlaces por hora, sin decir que se ha superado. Es suficiente con una sola instancia; si se escalara, pasaría a PostgreSQL.
   - Si el teléfono no existe, se verifica la contraseña contra un hash ficticio para que la respuesta tarde lo mismo y no delate qué teléfonos están dados de alta.
   - La IP real se obtiene de la cabecera de Caddy (`ADDRESS_HEADER=X-Forwarded-For`, `XFF_DEPTH=1`).
 - **Invalidación**: cambiar la contraseña, dar de baja al usuario o restablecer el acceso borra sus sesiones. Una sesión de un usuario que ya no está activo se rechaza y se borra al usarla.

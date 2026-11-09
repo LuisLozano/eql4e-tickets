@@ -199,3 +199,19 @@ export const REFRESCO = {
 		email: 'refresco.escritorio@ejemplo.invalid'
 	}
 } as const;
+
+/** Socios activos (en preparar.ts) con un código de restablecimiento conocido (HU-A04). */
+export const RESTABLECER = {
+	movil: {
+		nombre: 'Olvido Móvil',
+		telefono: '+34699000151',
+		email: 'olvido.movil@ejemplo.invalid',
+		codigo: 'OLVI-DOMO-VILA-AAAA-AAAA-AAAA-AAAA'
+	},
+	escritorio: {
+		nombre: 'Olvido Escritorio',
+		telefono: '+34699000152',
+		email: 'olvido.escritorio@ejemplo.invalid',
+		codigo: 'OLVI-DOES-CRIT-ORIO-AAAA-AAAA-AAAA'
+	}
+} as const;

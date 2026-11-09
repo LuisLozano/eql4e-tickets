@@ -4,7 +4,9 @@ import {
 	activarCuenta,
 	BLOQUEO_MS,
 	cambiarContrasena,
-	iniciarSesion
+	iniciarSesion,
+	restablecerContrasena,
+	solicitarRestablecimiento
 } from '../../src/lib/server/dominio/auth/acceso.ts';
 import { consumirCodigo, crearCodigo } from '../../src/lib/server/dominio/auth/codigos.ts';
 import {
@@ -395,6 +397,124 @@ describe('cambiar la contraseña (HU-A03)', () => {
 			tokenActual: 'x'
 		});
 		expect(r).toMatchObject({ ok: false, motivo: 'contrasena' });
+	});
+});
+
+describe('restablecer la contraseña (HU-A04)', () => {
+	const contrasena = 'contraseña olvidada';
+	const nueva = 'contraseña recuperada';
+
+	it('solo da código a un usuario activo, con el teléfono escrito de cualquier forma', async () => {
+		const activo = await crearUsuario(db, { contrasena });
+		const invitado = await crearUsuario(db, { estado: 'invitado' });
+		const baja = await crearUsuario(db, { estado: 'baja' });
+		const r = await solicitarRestablecimiento(
+			db,
+			{ telefono: `0034 ${activo.telefono.slice(3)}` },
+			ahora
+		);
+		expect(r).toMatchObject({ nombre: activo.nombre, email: activo.email });
+		expect(r!.caducaEn).toEqual(despues(60 * 60 * 1000));
+		for (const telefono of [invitado.telefono, baja.telefono, '+34699999998', 'abc']) {
+			expect(await solicitarRestablecimiento(db, { telefono }, ahora)).toBeNull();
+		}
+	});
+
+	it('cambia la contraseña, quita el bloqueo, cierra las sesiones y abre una nueva', async () => {
+		const u = await crearUsuario(db, { contrasena });
+		await db
+			.update(usuario)
+			.set({ intentosFallidos: 3, bloqueadoHasta: despues(BLOQUEO_MS) })
+			.where(eq(usuario.id, u.id));
+		const vieja = await crearSesion(db, u.id, ahora);
+		const { codigo } = (await solicitarRestablecimiento(db, { telefono: u.telefono }, ahora))!;
+
+		const r = await restablecerContrasena(
+			db,
+			{ telefono: u.telefono.slice(3), codigo, contrasena: nueva },
+			despues(1000)
+		);
+		expect(r).toMatchObject({ ok: true, esTesorero: false });
+		if (!r.ok) return;
+		expect(await validarSesion(db, vieja.token, ahora)).toBeNull();
+		expect((await validarSesion(db, r.token, ahora))?.usuario.id).toBe(u.id);
+		expect(await iniciarSesion(db, { telefono: u.telefono, contrasena }, ahora)).toMatchObject({
+			ok: false,
+			motivo: 'credenciales'
+		});
+		expect(
+			await iniciarSesion(db, { telefono: u.telefono, contrasena: nueva }, ahora)
+		).toMatchObject({ ok: true });
+
+		// Un solo uso.
+		expect(
+			await restablecerContrasena(db, { telefono: u.telefono, codigo, contrasena: nueva }, ahora)
+		).toEqual({ ok: false, motivo: 'codigo' });
+	});
+
+	it('el código caduca a la hora y pedir otro invalida el anterior', async () => {
+		const u = await crearUsuario(db, { contrasena });
+		const primero = (await solicitarRestablecimiento(db, { telefono: u.telefono }, ahora))!;
+		const datos = { telefono: u.telefono, contrasena: nueva };
+		expect(
+			await restablecerContrasena(db, { ...datos, codigo: primero.codigo }, despues(60 * 60 * 1000))
+		).toEqual({ ok: false, motivo: 'codigo' });
+
+		const segundo = (await solicitarRestablecimiento(db, { telefono: u.telefono }, ahora))!;
+		const tercero = (await solicitarRestablecimiento(db, { telefono: u.telefono }, ahora))!;
+		expect(await restablecerContrasena(db, { ...datos, codigo: segundo.codigo }, ahora)).toEqual({
+			ok: false,
+			motivo: 'codigo'
+		});
+		expect(
+			await restablecerContrasena(db, { ...datos, codigo: tercero.codigo }, ahora)
+		).toMatchObject({ ok: true });
+	});
+
+	it('no vale con otro teléfono, con un código de activación ni para un usuario dado de baja', async () => {
+		const u = await crearUsuario(db, { contrasena });
+		const otro = await crearUsuario(db, { contrasena });
+		const { codigo } = (await solicitarRestablecimiento(db, { telefono: u.telefono }, ahora))!;
+		expect(
+			await restablecerContrasena(db, { telefono: otro.telefono, codigo, contrasena: nueva }, ahora)
+		).toEqual({ ok: false, motivo: 'codigo' });
+
+		const activacion = await crearCodigo(
+			db,
+			{ usuarioId: u.id, tipo: 'activacion', creadoPor: null },
+			ahora
+		);
+		expect(
+			await restablecerContrasena(
+				db,
+				{ telefono: u.telefono, codigo: activacion.codigo, contrasena: nueva },
+				ahora
+			)
+		).toEqual({ ok: false, motivo: 'codigo' });
+		// Y al revés: el de restablecer no activa.
+		expect(
+			await activarCuenta(db, { telefono: u.telefono, codigo, contrasena: nueva }, ahora)
+		).toEqual({ ok: false, motivo: 'codigo' });
+
+		await db.update(usuario).set({ estado: 'baja' }).where(eq(usuario.id, u.id));
+		expect(
+			await restablecerContrasena(db, { telefono: u.telefono, codigo, contrasena: nueva }, ahora)
+		).toEqual({ ok: false, motivo: 'codigo' });
+	});
+
+	it('rechaza una contraseña común sin gastar el código', async () => {
+		const u = await crearUsuario(db, { contrasena });
+		const { codigo } = (await solicitarRestablecimiento(db, { telefono: u.telefono }, ahora))!;
+		expect(
+			await restablecerContrasena(
+				db,
+				{ telefono: u.telefono, codigo, contrasena: '12345678' },
+				ahora
+			)
+		).toMatchObject({ ok: false, motivo: 'contrasena' });
+		expect(
+			await restablecerContrasena(db, { telefono: u.telefono, codigo, contrasena: nueva }, ahora)
+		).toMatchObject({ ok: true });
 	});
 });
 

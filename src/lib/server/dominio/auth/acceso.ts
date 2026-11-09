@@ -1,10 +1,10 @@
-// Casos de uso de acceso: iniciar sesión (HU-A02), activar la cuenta (HU-A01)
-// y cambiar la contraseña (HU-A03).
+// Casos de uso de acceso: iniciar sesión (HU-A02), activar la cuenta (HU-A01), cambiar la
+// contraseña (HU-A03) y restablecerla si se ha olvidado (HU-A04).
 import { eq, sql } from 'drizzle-orm';
 import { normalizarTelefono } from '#lib/telefono.ts';
 import { usuario } from '#lib/server/infra/db/esquema.ts';
 import type { Conexion } from '#lib/server/infra/db/tipos.ts';
-import { consumirCodigo } from './codigos.ts';
+import { consumirCodigo, crearCodigo, type TipoCodigo } from './codigos.ts';
 import {
 	hashContrasena,
 	problemaContrasena,
@@ -73,9 +73,28 @@ export type ResultadoActivar =
 	| { ok: false; motivo: 'contrasena'; mensaje: string }
 	| { ok: false; motivo: 'codigo' };
 
-export async function activarCuenta(
+type DatosCodigo = { telefono: string; codigo: string; contrasena: string };
+
+export function activarCuenta(conexion: Conexion, datos: DatosCodigo, ahora: Date) {
+	// Vale para un invitado y, si un tesorero le reenvió la invitación, para un activo: elige otra
+	// contraseña y la anterior deja de valer (HU-G02). Nunca para uno de baja (R-05).
+	return contrasenaConCodigo(conexion, datos, 'activacion', ['invitado', 'activo'], ahora);
+}
+
+/** Elige una contraseña nueva con el código del correo de restablecimiento (HU-A04). */
+export function restablecerContrasena(conexion: Conexion, datos: DatosCodigo, ahora: Date) {
+	return contrasenaConCodigo(conexion, datos, 'restablecer', ['activo'], ahora);
+}
+
+/**
+ * Consume el código, guarda la contraseña nueva, quita el bloqueo por intentos fallidos, cierra las
+ * sesiones abiertas con la anterior y abre una nueva.
+ */
+async function contrasenaConCodigo(
 	conexion: Conexion,
-	datos: { telefono: string; codigo: string; contrasena: string },
+	datos: DatosCodigo,
+	tipo: TipoCodigo,
+	estadoUsuario: readonly ('invitado' | 'activo')[],
 	ahora: Date
 ): Promise<ResultadoActivar> {
 	const problema = problemaContrasena(datos.contrasena);
@@ -87,16 +106,9 @@ export async function activarCuenta(
 	const passwordHash = await hashContrasena(datos.contrasena);
 
 	return conexion.transaction(async (tx) => {
-		// Vale para un invitado y, si un tesorero le reenvió la invitación, para un activo: elige otra
-		// contraseña y la anterior deja de valer (HU-G02). Nunca para uno de baja (R-05).
 		const usuarioId = await consumirCodigo(
 			tx,
-			{
-				codigo: datos.codigo,
-				telefono,
-				tipo: 'activacion',
-				estadoUsuario: ['invitado', 'activo']
-			},
+			{ codigo: datos.codigo, telefono, tipo, estadoUsuario },
 			ahora
 		);
 		if (!usuarioId) return { ok: false, motivo: 'codigo' } as const;
@@ -107,11 +119,35 @@ export async function activarCuenta(
 			.where(eq(usuario.id, usuarioId))
 			.returning({ esTesorero: usuario.esTesorero });
 
-		// Con la contraseña nueva se cierran las sesiones abiertas con la anterior.
 		await invalidarSesionesDe(tx, usuarioId);
 		const nueva = await crearSesion(tx, usuarioId, ahora);
 		return { ok: true, ...nueva, esTesorero: activado.esTesorero } as const;
 	});
+}
+
+export type Restablecimiento = { nombre: string; email: string; codigo: string; caducaEn: Date };
+
+/**
+ * Crea un código de restablecimiento para el usuario activo con ese teléfono (HU-A04). Nulo si no
+ * existe, no es válido o no está activo; quien lo pide no debe notar la diferencia. Invalida los
+ * códigos de restablecimiento anteriores.
+ */
+export async function solicitarRestablecimiento(
+	conexion: Conexion,
+	datos: { telefono: string },
+	ahora: Date
+): Promise<Restablecimiento | null> {
+	const telefono = normalizarTelefono(datos.telefono);
+	if (!telefono) return null;
+	const [u] = await conexion.select().from(usuario).where(eq(usuario.telefono, telefono));
+	if (!u || u.estado !== 'activo') return null;
+
+	const { codigo, caducaEn } = await crearCodigo(
+		conexion,
+		{ usuarioId: u.id, tipo: 'restablecer', creadoPor: u.id },
+		ahora
+	);
+	return { nombre: u.nombre, email: u.email, codigo, caducaEn };
 }
 
 export type ResultadoCambiar =

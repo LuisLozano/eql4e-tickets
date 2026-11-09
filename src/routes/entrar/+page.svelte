@@ -43,6 +43,12 @@
 		<Boton type="submit" anchoCompleto disabled={$submitting}>Entrar</Boton>
 	</form>
 
+	{#if data.correoActivo}
+		<p class="text-center text-sm">
+			<a href={resolve('/restablecer')} class="font-bold underline">¿Has olvidado tu contraseña?</a>
+		</p>
+	{/if}
+
 	<p class="text-center text-sm text-muted">
 		¿Aún no tienes cuenta? Pide la invitación a un tesorero.
 		<a href={resolve('/ayuda')} class="font-bold underline">Ayuda</a>

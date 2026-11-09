@@ -15,6 +15,7 @@ import {
 	MULTIPLE,
 	PURGA,
 	REFRESCO,
+	RESTABLECER,
 	CONTRASENA_TESORERO,
 	LISTADO,
 	PAGO,
@@ -50,7 +51,8 @@ export default async function preparar() {
 			...Object.values(DESHACER),
 			...Object.values(PURGA),
 			...Object.values(MULTIPLE),
-			...Object.values(REFRESCO)
+			...Object.values(REFRESCO),
+			...Object.values(RESTABLECER)
 		];
 		const telefonos = usuarios.map((u) => u.telefono);
 		const emails = usuarios.map((u) => u.email);
@@ -105,6 +107,15 @@ export default async function preparar() {
 				values
 					(${id}, 1414, '2026-10-01', 'Refresco', '2026-10-01T10:00:00Z'),
 					(${id}, 2828, '2026-10-02', 'Refresco', '2026-10-02T10:00:00Z')`;
+		}
+		for (const r of Object.values(RESTABLECER)) {
+			const [{ id }] = await sql`
+				insert into usuario (nombre, telefono, email, password_hash, estado)
+				values (${r.nombre}, ${r.telefono}, ${r.email}, ${passwordHash}, 'activo')
+				returning id`;
+			await sql`
+				insert into codigo_acceso (usuario_id, codigo_hash, tipo, caduca_en, creado_por)
+				values (${id}, ${sha256(r.codigo.replaceAll('-', ''))}, 'restablecer', now() + interval '1 hour', ${id})`;
 		}
 		for (const p of Object.values(PURGA)) {
 			const [{ id }] = await sql`

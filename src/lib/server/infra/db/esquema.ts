@@ -114,7 +114,7 @@ export const codigoAcceso = pgTable(
 		tipo: tipoCodigo().notNull(),
 		caducaEn: instante().notNull(),
 		usadoEn: instante(),
-		/** Nulo cuando lo genera el sistema (tesorero inicial, R-06). */
+		/** Nulo cuando lo genera el sistema (tesorero inicial, R-06); el propio usuario si pide restablecer (HU-A04). */
 		creadoPor: uuid().references(() => usuario.id),
 		creadoEn: creadoEn()
 	},
