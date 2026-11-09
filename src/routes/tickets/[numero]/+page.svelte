@@ -13,9 +13,11 @@
 	import HistorialTicket from '#lib/componentes/HistorialTicket.svelte';
 	import PagoTicket from '#lib/componentes/PagoTicket.svelte';
 	import { formatoFechaHora, formatoNumeroTicket } from '#lib/formato.ts';
+	import { refrescoAutomatico } from '#lib/cliente/refresco.svelte.ts';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+	refrescoAutomatico();
 	const t = $derived(data.ticket);
 
 	// El rechazo vigente: la última entrada «rechazar» del historial (que va de lo último a lo primero).

@@ -185,3 +185,17 @@ export const MULTIPLE = {
 		email: 'multiple.escritorio@ejemplo.invalid'
 	}
 } as const;
+
+/** Socios (en preparar.ts) con dos tickets pendientes: ven cómo los autorizan sin recargar. */
+export const REFRESCO = {
+	movil: {
+		nombre: 'Refresco Móvil',
+		telefono: '+34699000141',
+		email: 'refresco.movil@ejemplo.invalid'
+	},
+	escritorio: {
+		nombre: 'Refresco Escritorio',
+		telefono: '+34699000142',
+		email: 'refresco.escritorio@ejemplo.invalid'
+	}
+} as const;

@@ -14,6 +14,7 @@ import {
 	GESTION,
 	MULTIPLE,
 	PURGA,
+	REFRESCO,
 	CONTRASENA_TESORERO,
 	LISTADO,
 	PAGO,
@@ -48,7 +49,8 @@ export default async function preparar() {
 			...Object.values(PAGO),
 			...Object.values(DESHACER),
 			...Object.values(PURGA),
-			...Object.values(MULTIPLE)
+			...Object.values(MULTIPLE),
+			...Object.values(REFRESCO)
 		];
 		const telefonos = usuarios.map((u) => u.telefono);
 		const emails = usuarios.map((u) => u.email);
@@ -92,6 +94,17 @@ export default async function preparar() {
 					(${id}, 1011, '2026-10-01', 'Varios', '2026-10-01T10:00:00Z'),
 					(${id}, 2022, '2026-10-02', 'Varios', '2026-10-02T10:00:00Z'),
 					(${id}, 3033, '2026-10-03', 'Varios', '2026-10-03T10:00:00Z')`;
+		}
+		for (const r of Object.values(REFRESCO)) {
+			const [{ id }] = await sql`
+				insert into usuario (nombre, telefono, email, password_hash, estado)
+				values (${r.nombre}, ${r.telefono}, ${r.email}, ${passwordHash}, 'activo')
+				returning id`;
+			await sql`
+				insert into ticket (socio_id, importe_centimos, fecha_compra, concepto_otro, creado_en)
+				values
+					(${id}, 1414, '2026-10-01', 'Refresco', '2026-10-01T10:00:00Z'),
+					(${id}, 2828, '2026-10-02', 'Refresco', '2026-10-02T10:00:00Z')`;
 		}
 		for (const p of Object.values(PURGA)) {
 			const [{ id }] = await sql`

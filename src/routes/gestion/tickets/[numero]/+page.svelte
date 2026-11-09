@@ -13,9 +13,11 @@
 	import PagoTicket from '#lib/componentes/PagoTicket.svelte';
 	import { MOTIVO_MAXIMO } from '#lib/esquemas/revision.ts';
 	import { formatoNumeroTicket } from '#lib/formato.ts';
+	import { refrescoAutomatico } from '#lib/cliente/refresco.svelte.ts';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
+	refrescoAutomatico();
 	const t = $derived(data.ticket);
 
 	// svelte-ignore state_referenced_locally

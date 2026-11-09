@@ -15,9 +15,11 @@
 	} from '#lib/formato.ts';
 	import { MOTIVO_MAXIMO } from '#lib/esquemas/revision.ts';
 	import { TEXTO_METODO } from '#lib/pagos.ts';
+	import { refrescoAutomatico } from '#lib/cliente/refresco.svelte.ts';
 	import type { PageProps } from './$types';
 
 	let { data, form: resultado }: PageProps = $props();
+	refrescoAutomatico();
 	const p = $derived(data.pago);
 	// Tras registrarlo se llega aquí con ?registrado.
 	const registrado = $derived(page.url.searchParams.has('registrado'));

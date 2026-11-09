@@ -3,9 +3,11 @@
 	import { resolve } from '$app/paths';
 	import { formatoDia, formatoImporte } from '#lib/formato.ts';
 	import { TEXTO_METODO } from '#lib/pagos.ts';
+	import { refrescoAutomatico } from '#lib/cliente/refresco.svelte.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	refrescoAutomatico();
 
 	const nuevo = resolve('/gestion/pagos/nuevo');
 	const plural = (n: number) => (n === 1 ? '1 ticket' : `${n} tickets`);

@@ -5,9 +5,11 @@
 	import Aviso from '#lib/componentes/Aviso.svelte';
 	import EstadoInsignia from '#lib/componentes/EstadoInsignia.svelte';
 	import { formatoDia, formatoImporte, formatoNumeroTicket } from '#lib/formato.ts';
+	import { refrescoAutomatico } from '#lib/cliente/refresco.svelte.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+	refrescoAutomatico();
 
 	// Tras enviar un ticket se vuelve aquí con ?enviado=<número> (HU-S01); tras activar la cuenta, con ?bienvenida.
 	const enviado = $derived(Number(page.url.searchParams.get('enviado')) || null);
