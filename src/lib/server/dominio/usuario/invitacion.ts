@@ -1,6 +1,7 @@
-// Texto del correo de invitación (HU-G01, HU-A01: el enlace abre la activación con el código).
-// Si el usuario ya estaba activo, el mismo enlace le sirve para elegir otra contraseña (HU-G02).
-import { formatoFecha } from '#lib/formato.ts';
+// Textos de los correos de acceso. La invitación (HU-G01, HU-A01: el enlace abre la activación con
+// el código); si el usuario ya estaba activo, el mismo enlace le sirve para elegir otra contraseña
+// (HU-G02). Y el restablecimiento que pide el propio usuario (HU-A04).
+import { formatoFecha, formatoFechaHora } from '#lib/formato.ts';
 
 const escapar = (texto: string) =>
 	texto.replace(
@@ -42,6 +43,35 @@ export function mensajeInvitacion(datos: {
 <p>${instruccion}</p>
 <p><a href="${escapar(datos.enlace)}">${boton}</a></p>
 <p>El enlace caduca el ${caduca}. Si caduca, pide otro a un tesorero.</p>`;
+
+	return { asunto, texto, html };
+}
+
+export function mensajeRestablecimiento(datos: { nombre: string; enlace: string; caducaEn: Date }) {
+	const asunto = 'Elige una contraseña nueva en EQL4E Tickets';
+	const intro = 'Has pedido elegir una contraseña nueva en EQL4E Tickets.';
+	const instruccion = 'Abre este enlace, escribe tu teléfono y elige la contraseña nueva:';
+	const caduca = `El enlace caduca el ${formatoFechaHora(datos.caducaEn)} y solo vale una vez.`;
+	const ignorar = 'Si no lo has pedido tú, no hagas nada: tu contraseña no cambia.';
+	const texto = [
+		`Hola, ${datos.nombre}:`,
+		'',
+		intro,
+		'',
+		instruccion,
+		'',
+		datos.enlace,
+		'',
+		caduca,
+		ignorar
+	].join('\n');
+
+	const html = `<p>Hola, ${escapar(datos.nombre)}:</p>
+<p>${intro}</p>
+<p>${instruccion}</p>
+<p><a href="${escapar(datos.enlace)}">Elegir contraseña</a></p>
+<p>${caduca}</p>
+<p>${ignorar}</p>`;
 
 	return { asunto, texto, html };
 }

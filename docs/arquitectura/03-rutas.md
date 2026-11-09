@@ -11,8 +11,8 @@ Leyenda de acceso: 🌐 pública · 👤 con sesión · 💼 tesorero.
 | `/entrar` | 🌐 | acción `default`: teléfono + contraseña | HU-A02 |
 | `/salir` | 👤 | acción `default` (POST, nunca GET) | HU-A03 |
 | `/activar?codigo=…` | 🌐 | acción `default`: teléfono + código + contraseña. Vale para un invitado y, con un código reenviado por un tesorero, para un activo: cambia la contraseña y cierra sus sesiones | HU-A01, G02 |
-| `/restablecer` | 🌐 | acción `solicitar` (envía el email) | HU-A04 |
-| `/restablecer/[codigo]` | 🌐 | acción `default`: contraseña nueva | HU-A04 |
+| `/restablecer` | 🌐 | acción `default`: teléfono. Responde lo mismo exista o no, sin esperar al correo, que se crea y envía en segundo plano; límite por IP y por teléfono. `/entrar` solo enlaza aquí con el correo configurado | HU-A04 |
+| `/restablecer/[codigo]` | 🌐 | acción `default`: teléfono + contraseña nueva. Solo para un activo: cambia la contraseña, quita el bloqueo, cierra sus sesiones y entra | HU-A04 |
 | `/cuenta` | 👤 | acción `cambiarContrasena` | HU-A03 |
 
 ## Socio (y tesorero como socio)

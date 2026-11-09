@@ -239,7 +239,11 @@
 		</figure>
 		<ul class="list-disc pl-6">
 			<li>Si te equivocas 5 veces seguidas, espera 15 minutos antes de volver a probar.</li>
-			<li>Si has olvidado la contraseña, pide a un tesorero un enlace para elegir otra.</li>
+			<li>
+				Si has olvidado la contraseña, pulsa <b>¿Has olvidado tu contraseña?</b>, escribe tu
+				teléfono y te llegará al email un enlace para elegir otra; vale 1 hora. Si no aparece esa
+				opción o no te llega el correo, pide el enlace a un tesorero.
+			</li>
 			<li>
 				La app necesita conexión a internet. Si falla la red al enviar un ticket, no se pierde: la
 				próxima vez que abras <b>Nuevo ticket</b> lo recuperas.

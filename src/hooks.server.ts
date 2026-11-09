@@ -78,7 +78,7 @@ export const init: ServerInit = async () => {
 	}
 };
 
-const RUTAS_PUBLICAS = ['/entrar', '/activar', '/salud', '/ayuda'];
+const RUTAS_PUBLICAS = ['/entrar', '/activar', '/restablecer', '/salud', '/ayuda'];
 const esPublica = (ruta: string) =>
 	RUTAS_PUBLICAS.some((p) => ruta === p || ruta.startsWith(`${p}/`));
 

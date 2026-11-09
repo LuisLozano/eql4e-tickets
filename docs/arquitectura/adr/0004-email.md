@@ -26,6 +26,7 @@
 - Detrás de una interfaz `Correo` con dos implementaciones: SMTP para producción y **"consola/fichero"** para desarrollo y pruebas, que nunca envía correos reales.
 - El envío es **síncrono** dentro de la acción. Si falla, el alta se guarda igualmente y el tesorero ve el aviso con el enlace para copiarlo (HU-G02). No hace falta cola con este volumen.
 - Tras el alta, el tesorero **siempre** ve el enlace de activación para copiarlo, no solo si falla el envío: mientras el correo esté en modo consola (hasta tener el Gmail), es la única forma de que llegue al socio. Solo se puede mostrar en ese momento, porque se guarda el hash del código. *(PR 2, 2026-11-05)*
+- **Restablecimiento (HU-A04)**: al revés que la invitación, la acción responde sin esperar: crear el código y enviar el correo pasan en segundo plano, porque solo ocurren si el teléfono tiene cuenta y el tiempo de respuesta lo delataría. Un fallo de envío queda en el log; el usuario puede pedir otro enlace o que un tesorero le reenvíe la invitación. *(2026-11-09)*
 - Con `CORREO_MODO=smtp` y alguna variable `SMTP_*` sin poner, la app arranca igual: cada envío falla con un error que dice qué falta, y el tesorero copia el enlace.
 - Si en el futuro la asociación tiene dominio propio, se cambia a Brevo o similar solo con configuración.
 

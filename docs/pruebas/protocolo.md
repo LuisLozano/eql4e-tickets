@@ -58,6 +58,8 @@ La app no permite borrar usuarios ni tickets. Para no dejar datos de prueba en p
 - [ ] **A-08** **Bloqueo por intentos** (HU-A02). En su navegador, S2 pulsa **Salir** y en la pantalla de entrada escribe mal su contraseña 5 veces seguidas, pulsando **Entrar** cada vez. A la quinta sale «Demasiados intentos fallidos. Espera 15 minutos y vuelve a probar.». Al sexto intento, aun con la contraseña buena, sigue sin entrar.
   Lo que sigue no espera a esto: S2 vuelve a entrar al final del bloque S.
 - [ ] **A-09** **Cambiar la contraseña** (HU-A03). Abre otra sesión de S1 en un navegador del ordenador. En el móvil, S1 pulsa **su nombre** (arriba a la derecha): sale «Mi cuenta». Rellena **Contraseña actual**, **Contraseña nueva** y **Repite la contraseña nueva** y pulsa **Cambiar la contraseña**. Al recargar la página en el ordenador, esa sesión de S1 está cerrada; la del móvil sigue abierta.
+- [ ] **A-10** **Contraseña olvidada** (HU-A04). *Solo con el correo configurado: si no, en la pantalla de entrada no sale el enlace y este paso se salta.* En el móvil, S1 pulsa **Salir**. En la pantalla de entrada pulsa **¿Has olvidado tu contraseña?**, escribe su **Teléfono** y pulsa **Enviar enlace**. Sale «Si el teléfono es de una cuenta activa, te hemos enviado un enlace a su email…». Al email de S1 llega «Elige una contraseña nueva en EQL4E Tickets». Abre el enlace en el móvil, escribe el **Teléfono**, la **Contraseña nueva** y **Repite la contraseña**, y pulsa **Guardar y entrar**: entra en «Mis tickets». Esa es ahora la contraseña de S1.
+  Vuelve a abrir el mismo enlace e intenta usarlo otra vez: sale «El enlace no vale…». Pide también un enlace con un teléfono que no esté dado de alta: sale el mismo mensaje que antes y no llega nada.
 
 ## S. Socio
 
@@ -169,6 +171,7 @@ Resumen de los códigos que salen en los casos. El texto completo está en [04-h
 | HU-A01 | Activar cuenta | Con el enlace de invitación, el usuario confirma su teléfono y elige contraseña. El enlace caduca a los 7 días y solo vale una vez. Si algo falla, el error no dice qué dato. |
 | HU-A02 | Iniciar sesión | Con teléfono y contraseña. El error no dice cuál de los dos falla. Tras 5 fallos seguidos, 15 minutos bloqueado. La sesión dura 30 días. |
 | HU-A03 | Cerrar sesión y cambiar contraseña | **Salir** cierra la sesión. Al cambiar la contraseña se cierran las demás sesiones. |
+| HU-A04 | He olvidado mi contraseña | Con su teléfono, el usuario pide un enlace que le llega por email; vale 1 hora y una sola vez. La pantalla responde igual exista o no el teléfono. Solo se ofrece con el correo configurado. |
 | HU-S01 | Enviar un ticket | Fotos o PDF (hasta 5), importe, fecha (no futura) y concepto. Las fotos se reducen en el móvil y, si falla la red, el ticket no se pierde. |
 | HU-S02 | Ver mis tickets | Lista con pestañas por estado y totales: por autorizar, por cobrar y cobrado del año. |
 | HU-S03 | Detalle de un ticket | Datos, ficheros (las fotos se pueden ampliar) e historial. |
