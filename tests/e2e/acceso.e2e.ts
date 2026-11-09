@@ -9,15 +9,26 @@ test('/salud responde ok con la base de datos', async ({ request }) => {
 	expect(await respuesta.json()).toEqual({ estado: 'ok' });
 });
 
-test('la ayuda se lee sin sesión y se llega desde la pantalla de entrada', async ({ page }) => {
+test('la ayuda del socio y la del tesorero se leen sin sesión, desde la pantalla de entrada', async ({
+	page
+}) => {
 	await page.goto('/entrar');
 	await page.getByRole('link', { name: 'Ayuda' }).click();
 	await expect(page).toHaveURL(/\/ayuda$/);
 	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ayuda de EQL4E Tickets');
 	await expect(page.getByRole('heading', { name: '2. Instalar la app en Android' })).toBeVisible();
-	for (const img of await page.locator('main img').all()) {
-		expect((await page.request.get((await img.getAttribute('src'))!)).status()).toBe(200);
-	}
+	const imagenesBien = async () => {
+		for (const img of await page.locator('main img').all()) {
+			expect((await page.request.get((await img.getAttribute('src'))!)).status()).toBe(200);
+		}
+	};
+	await imagenesBien();
+
+	// Y desde ella, la del tesorero.
+	await page.getByRole('link', { name: 'ayuda del tesorero' }).click();
+	await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ayuda del tesorero');
+	await expect(page.getByRole('heading', { name: '4. Pagar' })).toBeVisible();
+	await imagenesBien();
 });
 
 test('la app se puede instalar: el manifiesto y sus iconos se sirven sin sesión', async ({

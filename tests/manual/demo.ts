@@ -1,5 +1,5 @@
 // Datos de demostración para las capturas de la Ayuda: personas y tickets con aspecto real, en vez
-// de los de las pruebas e2e. Se crean en la base de datos de prueba antes de capturar.
+// de los de las pruebas e2e. preparar.ts los crea en una base de datos vacía.
 import { createHash } from 'node:crypto';
 import { hash } from '@node-rs/argon2';
 import postgres from 'postgres';
@@ -20,19 +20,19 @@ export const TESORERA = {
 	contrasena: 'contraseña de la tesorera de ejemplo'
 } as const;
 
+/** La persona que da de alta la tesorera en las capturas. */
+export const ALTA = {
+	nombre: 'Pablo Sanz',
+	telefono: '+34699000203',
+	email: 'pablo.sanz@ejemplo.invalid'
+} as const;
+
 const sha256 = (texto: string) => createHash('sha256').update(texto).digest('hex');
 
-/** Borra lo que quede de otra vez y crea a la socia (invitada, con su código) y a la tesorera. */
+/** Crea a la socia (invitada, con su código) y a la tesorera. */
 export async function prepararDemo(url: string) {
 	const sql = postgres(url, { max: 1, onnotice: () => {} });
 	try {
-		const telefonos = [SOCIA.telefono, TESORERA.telefono];
-		const suyos = sql`select id from usuario where telefono in ${sql(telefonos)}`;
-		await sql`delete from ticket where socio_id in (${suyos})`;
-		await sql`delete from historial where usuario_id in (${suyos})`;
-		await sql`delete from pago where socio_id in (${suyos}) or registrado_por in (${suyos})`;
-		await sql`delete from usuario where telefono in ${sql(telefonos)}`;
-
 		const [{ id }] = await sql`
 			insert into usuario (nombre, telefono, email)
 			values (${SOCIA.nombre}, ${SOCIA.telefono}, ${SOCIA.email})

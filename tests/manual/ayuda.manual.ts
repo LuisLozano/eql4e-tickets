@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { fotoTicket, prepararDemo, SOCIA, TESORERA } from './demo.ts';
+import { ALTA, fotoTicket, SOCIA, TESORERA } from './demo.ts';
 import { ilustraciones, TAMANO } from './ilustraciones.ts';
 
 // Capturas del móvil a tamaño CSS (412 px de ancho): bastan para la página y pesan poco.
@@ -42,8 +42,6 @@ async function enviarTicket(
 }
 
 test('capturas', async ({ page, browser }) => {
-	await prepararDemo(process.env.DATABASE_URL!);
-
 	await page.goto('/entrar');
 	await capturar(page, 'entrar');
 
@@ -141,6 +139,100 @@ test('capturas', async ({ page, browser }) => {
 	await page.getByRole('link', { name: 'Corregir y reenviar' }).click();
 	await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 	await capturar(page, 'corregir');
+
+	// Ayuda del tesorero. Dos tickets más, para autorizar varios a la vez.
+	const cena = await enviarTicket(page, {
+		comercio: 'RESTAURANTE EL PATIO',
+		lineas: [
+			['Menú del día (x3)', '36,00'],
+			['Cafés (x3)', '6,00']
+		],
+		total: '42,00',
+		concepto: 'Representación'
+	});
+	const pintura = await enviarTicket(page, {
+		comercio: 'FERRETERÍA EL CLAVO',
+		lineas: [
+			['Pintura blanca 750 ml', '7,40'],
+			['Rodillo', '2,50']
+		],
+		total: '9,90',
+		concepto: 'Ferretería'
+	});
+	const t = await (await browser.newContext()).newPage();
+	await entrar(t, TESORERA.telefono, TESORERA.contrasena);
+	await expect(t.getByRole('heading', { name: 'Tickets', exact: true })).toBeVisible();
+	await capturar(t, 't-tickets');
+
+	// Revisar uno: autorizar o rechazar, con el motivo.
+	await t.goto(`/gestion/tickets/${tornillos}`);
+	await t.getByRole('region', { name: 'Acciones' }).scrollIntoViewIfNeeded();
+	await capturar(t, 't-revisar');
+	await t.getByRole('button', { name: 'Rechazar' }).click();
+	await t.getByLabel('Motivo del rechazo').fill('Falta la foto del ticket de los tacos.');
+	await t.getByLabel('Motivo del rechazo').scrollIntoViewIfNeeded();
+	await capturar(t, 't-rechazar');
+	await t.getByRole('button', { name: 'Cancelar' }).click();
+
+	// Autorizar varios desde la lista.
+	await t.goto('/gestion/tickets');
+	for (const numero of [cena, pintura]) {
+		await t
+			.locator('tr, li')
+			.filter({ hasText: `T-${String(numero).padStart(6, '0')}` })
+			.getByRole('checkbox')
+			.locator('visible=true')
+			.check();
+	}
+	await expect(t.getByText('2 seleccionados')).toBeVisible();
+	await capturar(t, 't-varios');
+	await t.getByRole('button', { name: 'Autorizar 2 tickets' }).click();
+	await expect(t.getByText('2 tickets autorizados. Quedan pendientes de pago.')).toBeVisible();
+
+	// Pagar: la lista de lo que se debe y el formulario.
+	await t
+		.getByRole('navigation', { name: 'Principal' })
+		.getByRole('link', { name: 'Pagos' })
+		.click();
+	await expect(t.getByRole('heading', { name: 'Pagos', level: 1 })).toBeVisible();
+	await capturar(t, 't-pagos');
+	await t
+		.getByRole('list', { name: 'Socios con tickets pendientes de pago' })
+		.getByRole('link', { name: new RegExp(SOCIA.nombre) })
+		.click();
+	await expect(t.getByRole('heading', { name: 'Registrar pago' })).toBeVisible();
+	await capturar(t, 't-registrar-pago');
+	await t.getByRole('button', { name: /Registrar pago de/ }).click();
+	await expect(t.getByText('Pago registrado.')).toBeVisible();
+	await capturar(t, 't-pago');
+
+	// Filtros y exportar a CSV.
+	await t.goto('/gestion/tickets');
+	await t.getByText('Filtros y orden').click();
+	await t.getByLabel('Socio').selectOption({ label: SOCIA.nombre });
+	await capturar(t, 't-filtros');
+
+	// Usuarios: el alta y la ficha.
+	await t.goto('/gestion/usuarios');
+	const alta = t.getByRole('region', { name: 'Nuevo usuario' });
+	await alta.getByLabel('Nombre').fill(ALTA.nombre);
+	await alta.getByLabel('Teléfono').fill(ALTA.telefono.slice(3));
+	await alta.getByLabel('Email').fill(ALTA.email);
+	await alta.scrollIntoViewIfNeeded();
+	await capturar(t, 't-alta');
+	await t.goto('/gestion/usuarios');
+	await t
+		.getByRole('main')
+		.getByRole('link', { name: SOCIA.nombre })
+		.locator('visible=true')
+		.click();
+	await expect(t.getByRole('heading', { name: SOCIA.nombre, level: 1 })).toBeVisible();
+	await t.getByRole('region', { name: 'Acceso' }).scrollIntoViewIfNeeded();
+	await capturar(t, 't-ficha');
+
+	// Conceptos.
+	await t.goto('/gestion/conceptos');
+	await capturar(t, 't-conceptos');
 });
 
 // Después de las capturas: el fondo de las de Android e iPhone es la de «Mis tickets».
@@ -158,16 +250,20 @@ test('ilustraciones', async ({ page }) => {
 });
 
 // Necesita una compilación posterior a las capturas: las imágenes se sirven desde build/.
-test('pdf', async ({ page }) => {
-	await page.goto('/ayuda');
-	await page.emulateMedia({ media: 'print' });
-	await page.pdf({
-		path: 'docs/manual/manual-usuario.pdf',
-		format: 'A4',
-		margin: { top: '15mm', bottom: '15mm', left: '15mm', right: '15mm' },
-		displayHeaderFooter: true,
-		headerTemplate: '<span></span>',
-		footerTemplate:
-			'<div style="font-size:8pt;width:100%;text-align:center">Ayuda de EQL4E Tickets · <span class="pageNumber"></span>/<span class="totalPages"></span></div>'
+for (const [ruta, fichero, titulo] of [
+	['/ayuda', 'manual-usuario', 'Ayuda de EQL4E Tickets'],
+	['/ayuda/tesoreros', 'manual-tesorero', 'Ayuda del tesorero de EQL4E Tickets']
+]) {
+	test(`pdf ${fichero}`, async ({ page }) => {
+		await page.goto(ruta);
+		await page.emulateMedia({ media: 'print' });
+		await page.pdf({
+			path: `docs/manual/${fichero}.pdf`,
+			format: 'A4',
+			margin: { top: '15mm', bottom: '15mm', left: '15mm', right: '15mm' },
+			displayHeaderFooter: true,
+			headerTemplate: '<span></span>',
+			footerTemplate: `<div style="font-size:8pt;width:100%;text-align:center">${titulo} · <span class="pageNumber"></span>/<span class="totalPages"></span></div>`
+		});
 	});
-});
+}
