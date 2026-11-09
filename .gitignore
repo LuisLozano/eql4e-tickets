@@ -29,3 +29,6 @@ test-results
 /coverage
 /playwright-report
 /.datos
+
+# PDF generados desde el Markdown o la app (docs/manual/README.md)
+docs/**/*.pdf

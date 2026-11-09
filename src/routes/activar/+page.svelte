@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { superForm } from 'sveltekit-superforms';
+	import { resolve } from '$app/paths';
 	import Aviso from '#lib/componentes/Aviso.svelte';
 	import Boton from '#lib/componentes/Boton.svelte';
 	import Campo from '#lib/componentes/Campo.svelte';
@@ -64,4 +65,9 @@
 		</p>
 		<Boton type="submit" anchoCompleto disabled={$submitting}>Activar y entrar</Boton>
 	</form>
+
+	<p class="text-center text-sm text-muted">
+		Cómo activar la cuenta e instalar la app en el móvil:
+		<a href={resolve('/ayuda')} class="font-bold underline">Ayuda</a>
+	</p>
 </main>

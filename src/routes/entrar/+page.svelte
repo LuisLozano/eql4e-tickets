@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { superForm } from 'sveltekit-superforms';
 	import Aviso from '#lib/componentes/Aviso.svelte';
 	import Boton from '#lib/componentes/Boton.svelte';
@@ -44,5 +45,6 @@
 
 	<p class="text-center text-sm text-muted">
 		¿Aún no tienes cuenta? Pide la invitación a un tesorero.
+		<a href={resolve('/ayuda')} class="font-bold underline">Ayuda</a>
 	</p>
 </main>
