@@ -3,8 +3,10 @@
 Description=Copia de seguridad de eql4e-tickets
 Requires=docker.service
 After=docker.service
-# Monta el disco externo si hace falta; si no está conectado, la copia falla (y se ve en el journal).
-RequiresMountsFor=/mnt/externalHD
+# Espera a que se monten los dos discos de copias, sin exigirlos: si falta uno, copia.sh copia en el
+# otro y termina con error (se ve en systemctl status y en el journal).
+Wants=mnt-eql4e_copias.mount mnt-externalHD.mount
+After=mnt-eql4e_copias.mount mnt-externalHD.mount
 
 [Service]
 Type=oneshot

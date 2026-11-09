@@ -3,7 +3,9 @@
 #   sudo ./restaurar.sh --simulacro <carpeta>   la restaura en un PostgreSQL temporal y la cuenta;
 #                                               producción no se toca
 #   sudo ./restaurar.sh <carpeta>               SUSTITUYE la base y los ficheros de producción
-# <carpeta> es una de las de /mnt/externalHD/eql4e/backups, por ejemplo 2026-11-07_1930.
+# <carpeta> es el nombre de una copia, por ejemplo 2026-11-07_1930: se usa la primera que esté entera
+# de /mnt/eql4e_copias/backups (disco interno) y /mnt/externalHD/eql4e/backups (externo). También vale
+# una ruta completa.
 set -eu
 cd "$(dirname "$0")"
 
@@ -13,16 +15,34 @@ if [ "${1:-}" = --simulacro ]; then
 	shift
 fi
 if [ $# -ne 1 ]; then
-	sed -n '2,6p' "$0" | sed 's/^# \{0,1\}//' >&2
+	sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//' >&2
 	exit 2
 fi
 case "$1" in
-/*) copia=$1 ;;
-*) copia="${DESTINO_COPIAS:-/mnt/externalHD/eql4e/backups}/$1" ;;
+/*) candidatas=$1 ;;
+*)
+	candidatas=''
+	# Los mismos destinos que en copia.sh.
+	for destino in ${DESTINO_COPIAS:-/mnt/eql4e_copias/backups /mnt/externalHD/eql4e/backups}; do
+		candidatas="$candidatas $destino/$1"
+	done
+	;;
 esac
 
-echo "Comprobando $copia"
-(cd "$copia" && sha256sum -c --quiet SHA256SUMS)
+copia=''
+for candidata in $candidatas; do
+	[ -d "$candidata" ] || continue
+	echo "Comprobando $candidata"
+	if (cd "$candidata" && sha256sum -c --quiet SHA256SUMS); then
+		copia=$candidata
+		break
+	fi
+	echo "✘ $candidata está estropeada." >&2
+done
+if [ -z "$copia" ]; then
+	echo "✘ No hay ninguna copia $1 entera." >&2
+	exit 1
+fi
 
 if [ "$simulacro" = si ]; then
 	contenedor=eql4e-simulacro-$$
@@ -59,10 +79,13 @@ read -r respuesta
 }
 
 echo 'Copiando antes el estado actual, por si hay que volver a él'
-SIN_ROTAR=1 ./copia.sh || {
+# Basta con que quede en un disco (salida 3): si se restaura porque uno se ha averiado, el otro no está.
+estado=0
+SIN_ROTAR=1 ./copia.sh || estado=$?
+if [ "$estado" -ne 0 ] && [ "$estado" -ne 3 ]; then
 	echo '✘ No se ha podido copiar el estado actual. No se ha restaurado nada.' >&2
 	exit 1
-}
+fi
 
 docker compose stop app
 trap 'echo "✘ La restauración se ha cortado y la app está PARADA. El estado anterior está en la copia que se acaba de hacer." >&2' EXIT
