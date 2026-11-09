@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { SOCIOS } from '../e2e/datos.ts';
+import { ilustraciones, TAMANO } from './ilustraciones.ts';
 
 // Capturas del móvil a tamaño CSS (412 px de ancho): bastan para la página y pesan poco.
 const capturar = (page: import('@playwright/test').Page, nombre: string) =>
@@ -19,6 +20,20 @@ test('capturas', async ({ page }) => {
 	await page.getByRole('button', { name: 'Activar y entrar' }).click();
 	await expect(page.getByRole('heading', { name: 'Mis tickets' })).toBeVisible();
 	await capturar(page, 'mis-tickets');
+});
+
+// Después de las capturas: el fondo de las de Android e iPhone es la de «Mis tickets».
+test('ilustraciones', async ({ page }) => {
+	await page.setViewportSize(TAMANO);
+	const dibujos = ilustraciones({
+		misTickets: 'static/ayuda/mis-tickets.png',
+		iconoAndroid: 'static/iconos/icono-192.png',
+		iconoIphone: 'static/iconos/apple-touch-icon.png'
+	});
+	for (const [nombre, html] of Object.entries(dibujos)) {
+		await page.setContent(html);
+		await capturar(page, nombre);
+	}
 });
 
 // Necesita una compilación posterior a las capturas: las imágenes se sirven desde build/.

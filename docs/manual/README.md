@@ -12,4 +12,4 @@ pnpm build && pnpm manual:capturas           # 1. capturas en static/ayuda/
 pnpm build && pnpm manual:pdf                # 2. PDF, con las capturas nuevas ya compiladas
 ```
 
-Los pasos de instalar la app en Android e iPhone van sin capturas: esos menús los dibuja el propio móvil, no la app. Si se añaden capturas hechas en un móvil, van en `static/ayuda/` y se enlazan en la página.
+Los pasos de instalar la app en Android e iPhone llevan **ilustraciones esquemáticas** (`static/ayuda/android-*.png` e `iphone-*.png`), no capturas: esos menús los dibuja el propio móvil, no la app. Se generan con el mismo `pnpm manual:capturas` desde `tests/manual/ilustraciones.ts`. Si se consiguen capturas reales hechas en un móvil, pueden sustituirlas con el mismo nombre de fichero.
