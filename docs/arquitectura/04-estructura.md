@@ -6,17 +6,24 @@ eql4e-tickets/
 │   ├── workflows/ci.yml            # lint, pruebas, e2e, imagen a GHCR (ADR-0007)
 │   └── dependabot.yml
 ├── docs/
+│   ├── desarrollo.md               # manual del desarrollador
 │   ├── requisitos/                 # Tarea 1
 │   ├── arquitectura/               # Tarea 2 (este documento) + adr/
-│   └── diseno/                     # Tarea 3: bocetos
+│   ├── diseno/                     # Tarea 3: bocetos
+│   ├── pruebas/protocolo.md        # protocolo de prueba final, manual, en producción
+│   └── manual/                     # cómo se generan la Ayuda y los PDF (D-01)
 ├── deploy/
 │   ├── compose.yaml                # app + db (ADR-0006)
 │   ├── .env.example                # variables documentadas, sin secretos
 │   ├── compose.dev.yaml            # PostgreSQL de desarrollo (127.0.0.1:5436)
 │   ├── Caddyfile.snippet           # bloque para el Caddy existente
-│   ├── desplegar.sh                # pull + up -d + comprobación de salud
-│   └── README.md                   # manual de despliegue y operación
-├── scripts/migrar.js               # aplica las migraciones (entrypoint y pruebas)
+│   ├── desplegar.sh                # pull + up -d + espera a healthy
+│   ├── copia.sh · restaurar.sh     # copias en los discos interno y externo (ADR-0008)
+│   ├── eql4e-copia.service · .timer # copia diaria a las 19:30 (systemd)
+│   └── README.md                   # manual de administrador (y su PDF)
+├── scripts/
+│   ├── migrar.js                   # aplica las migraciones (entrypoint y pruebas)
+│   └── manual-administrador.js     # deploy/README.md → PDF (pnpm manual:admin)
 ├── drizzle/                        # migraciones SQL generadas y versionadas
 ├── src/
 │   ├── hooks.server.ts             # sesión, guardas, cabeceras
@@ -25,8 +32,11 @@ eql4e-tickets/
 │   │   ├── componentes/            # UI propia + shadcn-svelte (ui/); CamposTicket: formulario de enviar y editar
 │   │   ├── esquemas/               # Zod compartido cliente/servidor
 │   │   ├── cliente/                # compresión de fotos (web worker), fotos elegidas (fotos.svelte.ts), borrador en IndexedDB
+│   │   ├── estados.ts              # presentación de los estados: color, icono y texto
 │   │   ├── formato.ts              # importes, fechas (Intl es-ES), hoy en Madrid
 │   │   ├── importe.ts              # «23,45» → céntimos
+│   │   ├── pagos.ts                # métodos de pago y cómo se muestran
+│   │   ├── telefono.ts             # teléfonos en E.164
 │   │   ├── listado-tickets.ts      # filtros, orden y página del listado global en la URL (HU-T01)
 │   │   └── server/
 │   │       ├── dominio/
@@ -45,18 +55,20 @@ eql4e-tickets/
 │   │       │   ├── ficheros/       # huérfanos: en el disco sin ticket ni pago; puerto AlmacenListable
 │   │       │   └── purga/          # tickets de más de 18 meses y aviso de pendientes antiguos (HU-G05)
 │   │       ├── infra/
-│   │       │   ├── db/             # esquema Drizzle, cliente, semilla
+│   │       │   ├── db/             # esquema Drizzle, cliente (los datos iniciales van en migraciones)
 │   │       │   ├── almacenamiento/ # disco.ts (volumen: guardar, leer, borrar, listar) y app.ts (lee RUTA_FICHEROS)
 │   │       │   ├── correo/         # cliente.ts (SMTP | consola) y app.ts (lee el entorno)
 │   │       │   ├── ficheros.ts     # tipo real (file-type) y recodificación (sharp)
 │   │       │   └── tareas.ts       # croner y advisory lock: programar y ejecutar en exclusiva (ADR-0006)
 │   ├── env.ts                      # variables de entorno validadas con Zod (defineEnvVars de SvelteKit 3)
-│   ├── lib/server/web/             # ayudas de la capa SvelteKit: cookie de sesión, limitadores, enlaces
+│   ├── lib/server/web/             # ayudas de la capa SvelteKit: cookie de sesión, limitadores, enlaces, CSV, envío de invitaciones y restablecimientos
 │   └── routes/                     # ver 03-rutas.md
-├── static/                         # iconos PWA
+├── static/                         # iconos y manifiesto PWA; ayuda/: capturas e ilustraciones de la Ayuda
 ├── tests/
 │   ├── integracion/                # Vitest + Testcontainers
-│   └── e2e/                        # Playwright
+│   ├── e2e/                        # Playwright
+│   └── manual/                     # capturas y PDF de la Ayuda, con datos de demostración
+├── playwright.config.ts · playwright.manual.config.ts
 ├── Dockerfile · docker-entrypoint.sh
 ├── .env.example                    # variables de desarrollo
 ├── package.json · pnpm-lock.yaml
