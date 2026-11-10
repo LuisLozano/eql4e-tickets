@@ -23,14 +23,20 @@ Los pasos de instalar la app en Android e iPhone llevan **ilustraciones esquemá
 
 ## Vídeos de demostración
 
-Dos vídeos cortos, sin sonido y con rótulos, para enseñar la app a quien todavía no la conoce: lo que hace un **socio** (`video-socio.mp4`, más o menos 1:15) y lo que hace un **tesorero** (`video-tesorero.mp4`, más o menos 1:45). Los dos están grabados en el móvil, con los mismos datos de demostración que las capturas y dos socios más (Javier Ruiz y Carmen López), para que el tesorero tenga tickets de varias personas.
+Vídeos cortos, sin sonido y con rótulos, para enseñar la app a quien todavía no la conoce:
+
+- **Socio** (`video-socio.mp4`, unos 1:15), grabado en el móvil.
+- **Tesorero** en el ordenador (`video-tesorero.mp4`, unos 1:45), que es donde mejor se ve la gestión.
+- **Tesorero** en el móvil (`video-tesorero-movil.mp4`), con el mismo guion.
+
+Usan los datos de demostración de las capturas y dos socios más (Javier Ruiz y Carmen López), para que el tesorero tenga tickets de varias personas. Cada vídeo del tesorero vuelve a preparar sus datos desde cero.
 
 ```bash
 export DATABASE_URL=postgres://…/eql4e_manual   # la misma base que las capturas; se vacía entera
 pnpm build && pnpm manual:videos             # docs/manual/video-*.mp4 (no se guardan en git)
 ```
 
-El guion está en [tests/manual/videos.manual.ts](../../tests/manual/videos.manual.ts). Playwright graba en WebM al tamaño del móvil, y **ffmpeg** (`sudo apt install ffmpeg`) lo pasa a MP4 a doble tamaño, que se ve en cualquier móvil y se puede mandar por WhatsApp. Lo que la tesorera hace mientras el socio «espera unos días» se hace fuera de cámara y se corta del vídeo. La foto del ticket aparece elegida de la galería, porque la cámara no se puede grabar.
+El guion está en [tests/manual/videos.manual.ts](../../tests/manual/videos.manual.ts). Playwright graba en WebM al tamaño de la pantalla: 412 × 839 en el móvil y 1280 × 720 en el ordenador. **ffmpeg** (`sudo apt install ffmpeg`) lo pasa a MP4, que se ve en cualquier móvil y se puede mandar por WhatsApp, y amplía al doble los de móvil. Lo que la tesorera hace mientras el socio «espera unos días» se hace fuera de cámara y se corta del vídeo. La foto del ticket aparece elegida de la galería, porque la cámara no se puede grabar.
 
 ## Manual de administrador
 

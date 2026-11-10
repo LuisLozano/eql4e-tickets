@@ -3,21 +3,31 @@
 // en WebM y ffmpeg los pasa a MP4, que se ve en cualquier móvil (docs/manual/README.md).
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-import { expect, test, type Browser, type Locator, type Page } from '@playwright/test';
+import { devices, expect, test, type Browser, type Locator, type Page } from '@playwright/test';
 import { entrar, enviarTicket } from './acciones.ts';
 import {
 	ALTA,
 	CONTRASENA_OTROS,
 	fotoTicket,
 	OTROS_SOCIOS,
+	prepararDemo,
 	prepararOtrosSocios,
 	SOCIA,
 	TESORERA
 } from './demo.ts';
+import { vaciar } from './preparar.ts';
 
-// Playwright graba al tamaño CSS del móvil (412 × 839); ffmpeg lo amplía al doble, que los
-// reproductores y WhatsApp tratan mejor que un vídeo tan pequeño.
-const TAMANO = { width: 412, height: 839 };
+// Playwright graba al tamaño CSS de la pantalla. El del móvil (412 × 839) lo amplía ffmpeg al doble,
+// que los reproductores y WhatsApp tratan mejor que un vídeo tan pequeño.
+const FORMATOS = {
+	movil: { opciones: {}, tamano: { width: 412, height: 839 }, escala: 2 },
+	escritorio: {
+		opciones: devices['Desktop Chrome'],
+		tamano: devices['Desktop Chrome'].viewport,
+		escala: 1
+	}
+};
+type Formato = keyof typeof FORMATOS;
 const LOGO = `data:image/png;base64,${readFileSync('static/logo.png').toString('base64')}`;
 
 // Lo que se ve encima de la app: el rótulo de cada paso y un círculo donde se pulsa. Se monta en
@@ -29,9 +39,11 @@ function escena() {
 		rotulo.id = 'demo-rotulo';
 		Object.assign(rotulo.style, {
 			position: 'fixed',
-			left: '10px',
-			right: '10px',
+			left: '50%',
 			bottom: '14px',
+			transform: 'translateX(-50%)',
+			width: 'min(calc(100% - 20px), 720px)',
+			boxSizing: 'border-box',
 			zIndex: '2147483647',
 			padding: '10px 14px',
 			borderRadius: '12px',
@@ -79,20 +91,22 @@ function escena() {
 	else montar();
 }
 
-/** Graba una página del móvil. `tiempo()` da los segundos de vídeo transcurridos, para los cortes. */
-async function grabadora(browser: Browser) {
+/** Graba una página. `tiempo()` da los segundos de vídeo transcurridos, para los cortes. */
+async function grabadora(browser: Browser, formato: Formato = 'movil') {
+	const { opciones, tamano, escala } = FORMATOS[formato];
 	const contexto = await browser.newContext({
-		recordVideo: { dir: 'test-results/videos', size: TAMANO }
+		...opciones,
+		recordVideo: { dir: 'test-results/videos', size: tamano }
 	});
 	await contexto.addInitScript(escena);
 	const page = await contexto.newPage();
 	const inicio = Date.now();
-	return { contexto, page, tiempo: () => (Date.now() - inicio) / 1000 };
+	return { contexto, page, escala, tiempo: () => (Date.now() - inicio) / 1000 };
 }
 
 /** Cierra la grabación y la pasa a MP4 sin los tramos de `cortes` (en segundos). */
 async function guardar(
-	{ contexto, page }: Awaited<ReturnType<typeof grabadora>>,
+	{ contexto, page, escala }: Awaited<ReturnType<typeof grabadora>>,
 	nombre: string,
 	cortes: [number, number][] = []
 ) {
@@ -102,7 +116,7 @@ async function guardar(
 	const filtro = [
 		'fps=25',
 		...(fuera ? [`select='not(${fuera})'`, 'setpts=N/25/TB'] : []),
-		'scale=iw*2:ih*2:flags=lanczos'
+		...(escala > 1 ? [`scale=iw*${escala}:ih*${escala}:flags=lanczos`] : [])
 	].join(',');
 	const opciones = '-an -c:v libx264 -crf 22 -preset slow -pix_fmt yuv420p -movflags +faststart';
 	const r = spawnSync(
@@ -278,13 +292,66 @@ async function revisar(page: Page, numero: number, accion: 'autorizar' | 'rechaz
 	}
 }
 
-const ticketDeLista = (page: Page, importe: string) =>
+const numeroTicket = (numero: number) => `T-${String(numero).padStart(6, '0')}`;
+
+/** El enlace de un ticket en la lista: en el móvil, la tarjeta; en el escritorio, el número. */
+const ticketDeLista = (page: Page, numero: number) =>
 	page
 		.getByRole('main')
-		.getByRole('link', { name: new RegExp(importe) })
+		.getByRole('link', { name: new RegExp(numeroTicket(numero)) })
 		.locator('visible=true');
 
-// En orden: el tesorero revisa lo que ha dejado el socio.
+/** Lo que hace la tesorera con los tickets de Lucía mientras ella «espera unos días». */
+async function revisionDeLaTesorera(browser: Browser, numeros: Record<string, number>) {
+	await aparte(browser, TESORERA.telefono, TESORERA.contrasena, async (p) => {
+		await revisar(p, numeros.agua, 'autorizar');
+		await revisar(p, numeros.taxi, 'autorizar');
+		await p.goto(`/gestion/tickets/${numeros.agua}`);
+		await p.getByRole('link', { name: 'Registrar pago' }).click();
+		await p.getByRole('button', { name: /Registrar pago de/ }).click();
+		await expect(p.getByText('Pago registrado.')).toBeVisible();
+		await revisar(
+			p,
+			numeros.cartulinas,
+			'rechazar',
+			'En la foto no se lee el total. Haz otra con más luz.'
+		);
+	});
+}
+
+/** Los datos del vídeo del tesorero, desde cero: los de Lucía y tickets de otros dos socios. */
+async function prepararTesorero(browser: Browser) {
+	const url = process.env.DATABASE_URL!;
+	await vaciar(url);
+	await prepararDemo(url);
+	await prepararOtrosSocios(url);
+	const numeros: Record<string, number> = {};
+
+	const contexto = await browser.newContext();
+	const p = await contexto.newPage();
+	await p.goto(`/activar?codigo=${SOCIA.codigo}`);
+	await p.getByLabel('Teléfono').fill(SOCIA.telefono.slice(3));
+	await p.getByLabel('Contraseña nueva').fill(SOCIA.contrasena);
+	await p.getByLabel('Repite la contraseña').fill(SOCIA.contrasena);
+	await p.getByRole('button', { name: 'Activar y entrar' }).click();
+	await expect(p.getByRole('heading', { name: 'Mis tickets' })).toBeVisible();
+	for (const t of ['tornillos', 'agua', 'taxi', 'cartulinas'] as const)
+		numeros[t] = await enviarTicket(p, TICKETS[t]);
+	await contexto.close();
+
+	const [javier, carmen] = OTROS_SOCIOS;
+	await aparte(browser, javier.telefono, CONTRASENA_OTROS, async (p) => {
+		for (const t of ['cena', 'gasolina'] as const) numeros[t] = await enviarTicket(p, TICKETS[t]);
+	});
+	await aparte(browser, carmen.telefono, CONTRASENA_OTROS, async (p) => {
+		for (const t of ['pintura', 'fotocopias'] as const)
+			numeros[t] = await enviarTicket(p, TICKETS[t]);
+	});
+	await revisionDeLaTesorera(browser, numeros);
+	return numeros;
+}
+
+// En orden: el del socio necesita la base recién vaciada; los del tesorero la preparan ellos.
 test.describe.configure({ mode: 'serial' });
 
 test('vídeo del socio', async ({ browser }) => {
@@ -342,20 +409,7 @@ test('vídeo del socio', async ({ browser }) => {
 		for (const t of ['agua', 'taxi', 'cartulinas'] as const)
 			numeros[t] = await enviarTicket(p, TICKETS[t]);
 	});
-	await aparte(browser, TESORERA.telefono, TESORERA.contrasena, async (p) => {
-		await revisar(p, numeros.agua, 'autorizar');
-		await revisar(p, numeros.taxi, 'autorizar');
-		await p.goto(`/gestion/tickets/${numeros.agua}`);
-		await p.getByRole('link', { name: 'Registrar pago' }).click();
-		await p.getByRole('button', { name: /Registrar pago de/ }).click();
-		await expect(p.getByText('Pago registrado.')).toBeVisible();
-		await revisar(
-			p,
-			numeros.cartulinas,
-			'rechazar',
-			'En la foto no se lee el total. Haz otra con más luz.'
-		);
-	});
+	await revisionDeLaTesorera(browser, numeros);
 	const hasta = g.tiempo();
 	await pausa(page, 200);
 
@@ -369,7 +423,7 @@ test('vídeo del socio', async ({ browser }) => {
 	await desplazar(page, -300);
 
 	await rotulo(page, 'Si te rechazan uno, ves el motivo…', 1200);
-	await pulsar(ticketDeLista(page, TICKETS.cartulinas.total));
+	await pulsar(ticketDeLista(page, numeros.cartulinas));
 	await page.getByRole('region', { name: 'Motivo del rechazo' }).scrollIntoViewIfNeeded();
 	await pausa(page, 2500);
 	await rotulo(page, '…y lo corriges: aquí, con una foto mejor.', 1200);
@@ -410,142 +464,137 @@ test('vídeo del socio', async ({ browser }) => {
 	await guardar(g, 'video-socio', [[desde, hasta]]);
 });
 
-test('vídeo del tesorero', async ({ browser }) => {
-	test.setTimeout(300_000);
+for (const [formato, nombre] of [
+	['escritorio', 'video-tesorero'],
+	['movil', 'video-tesorero-movil']
+] as const) {
+	test(`vídeo del tesorero (${formato})`, async ({ browser }) => {
+		test.setTimeout(300_000);
+		const numeros = await prepararTesorero(browser);
+		const javier = OTROS_SOCIOS[0];
 
-	// Antes de grabar: tickets de otros dos socios, para que la lista tenga de todo.
-	await prepararOtrosSocios(process.env.DATABASE_URL!);
-	const [javier, carmen] = OTROS_SOCIOS;
-	const numeros: Record<string, number> = {};
-	await aparte(browser, javier.telefono, CONTRASENA_OTROS, async (p) => {
-		for (const t of ['cena', 'gasolina'] as const) numeros[t] = await enviarTicket(p, TICKETS[t]);
-	});
-	await aparte(browser, carmen.telefono, CONTRASENA_OTROS, async (p) => {
-		for (const t of ['pintura', 'fotocopias'] as const)
-			numeros[t] = await enviarTicket(p, TICKETS[t]);
-	});
+		const g = await grabadora(browser, formato);
+		const { page } = g;
+		await portada(
+			page,
+			'EQL4E Tickets',
+			'Lo que puede hacer un tesorero<br><small>(con datos de ejemplo)</small>'
+		);
 
-	const g = await grabadora(browser);
-	const { page } = g;
-	await portada(
-		page,
-		'EQL4E Tickets',
-		'Lo que puede hacer un tesorero<br><small>(con datos de ejemplo)</small>'
-	);
+		await page.goto('/entrar');
+		await rotulo(page, 'Entras con tu teléfono y tu contraseña.', 1500);
+		await escribir(page.getByLabel('Teléfono'), TESORERA.telefono.slice(3));
+		await escribir(page.getByLabel('Contraseña'), TESORERA.contrasena);
+		await pulsar(page.getByRole('button', { name: 'Entrar' }));
+		await expect(page.getByRole('heading', { name: 'Tickets', exact: true })).toBeVisible();
+		await rotulo(
+			page,
+			'Ves los tickets de todos los socios. Primero, los pendientes de autorizar.',
+			3500
+		);
+		await desplazar(page, 500);
+		await desplazar(page, -500);
 
-	await page.goto('/entrar');
-	await rotulo(page, 'Entras con tu teléfono y tu contraseña.', 1500);
-	await escribir(page.getByLabel('Teléfono'), TESORERA.telefono.slice(3));
-	await escribir(page.getByLabel('Contraseña'), TESORERA.contrasena);
-	await pulsar(page.getByRole('button', { name: 'Entrar' }));
-	await expect(page.getByRole('heading', { name: 'Tickets', exact: true })).toBeVisible();
-	await rotulo(
-		page,
-		'Ves los tickets de todos los socios. Primero, los pendientes de autorizar.',
-		3500
-	);
-	await desplazar(page, 500);
-	await desplazar(page, -500);
+		await rotulo(page, 'Abres uno para revisarlo…', 1200);
+		await pulsar(ticketDeLista(page, numeros.tornillos));
+		await rotulo(page, '…y miras la foto del ticket, tan grande como necesites.', 1200);
+		await pulsar(page.getByRole('button', { name: /^Ampliar / }).first(), 2000);
+		await pulsar(page.getByRole('button', { name: 'Ver a tamaño real' }), 2000);
+		await pulsar(page.getByRole('button', { name: 'Cerrar' }));
+		await rotulo(page, 'Si está bien, lo autorizas.', 1200);
+		await pulsar(page.getByRole('button', { name: 'Autorizar' }));
+		await expect(page.getByText('Ticket autorizado. Queda pendiente de pago.')).toBeVisible();
+		await pausa(page, 1500);
 
-	await rotulo(page, 'Abres uno para revisarlo…', 1200);
-	await pulsar(ticketDeLista(page, TICKETS.tornillos.total));
-	await rotulo(page, '…y miras la foto del ticket, tan grande como necesites.', 1200);
-	await pulsar(page.getByRole('button', { name: /^Ampliar / }).first(), 2000);
-	await pulsar(page.getByRole('button', { name: 'Ver a tamaño real' }), 2000);
-	await pulsar(page.getByRole('button', { name: 'Cerrar' }));
-	await rotulo(page, 'Si está bien, lo autorizas.', 1200);
-	await pulsar(page.getByRole('button', { name: 'Autorizar' }));
-	await expect(page.getByText('Ticket autorizado. Queda pendiente de pago.')).toBeVisible();
-	await pausa(page, 1500);
+		await page.goto(`/gestion/tickets/${numeros.gasolina}`);
+		await rotulo(
+			page,
+			'Si algo no cuadra, lo rechazas explicando el motivo. El socio lo verá y podrá corregirlo.',
+			3000
+		);
+		await pulsar(page.getByRole('button', { name: 'Rechazar' }));
+		await escribir(page.getByLabel('Motivo del rechazo'), 'Falta el recibo de la gasolinera.');
+		await pulsar(page.getByRole('button', { name: 'Confirmar rechazo' }));
+		await expect(page.getByText('Ticket rechazado. El socio verá el motivo.')).toBeVisible();
+		await pausa(page, 1500);
 
-	await page.goto(`/gestion/tickets/${numeros.gasolina}`);
-	await rotulo(
-		page,
-		'Si algo no cuadra, lo rechazas explicando el motivo. El socio lo verá y podrá corregirlo.',
-		3000
-	);
-	await pulsar(page.getByRole('button', { name: 'Rechazar' }));
-	await escribir(page.getByLabel('Motivo del rechazo'), 'Falta el recibo de la gasolinera.');
-	await pulsar(page.getByRole('button', { name: 'Confirmar rechazo' }));
-	await expect(page.getByText('Ticket rechazado. El socio verá el motivo.')).toBeVisible();
-	await pausa(page, 1500);
+		await page.goto('/gestion/tickets');
+		await rotulo(page, 'También puedes autorizar varios a la vez.', 1500);
+		for (const t of ['cena', 'pintura'] as const) {
+			await pulsar(
+				page
+					.locator('tr, li')
+					.filter({ hasText: numeroTicket(numeros[t]) })
+					.getByRole('checkbox')
+					.locator('visible=true'),
+				600
+			);
+		}
+		await pulsar(page.getByRole('button', { name: 'Autorizar 2 tickets' }));
+		await expect(page.getByText('2 tickets autorizados. Quedan pendientes de pago.')).toBeVisible();
+		await pausa(page, 1500);
 
-	await page.goto('/gestion/tickets');
-	await rotulo(page, 'También puedes autorizar varios a la vez.', 1500);
-	for (const t of ['cena', 'pintura'] as const) {
+		await pulsar(
+			page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Pagos' })
+		);
+		await rotulo(page, 'En Pagos ves cuánto se le debe a cada socio.', 3000);
 		await pulsar(
 			page
-				.locator('tr, li')
-				.filter({ hasText: `T-${String(numeros[t]).padStart(6, '0')}` })
-				.getByRole('checkbox')
-				.locator('visible=true'),
-			600
+				.getByRole('list', { name: 'Socios con tickets pendientes de pago' })
+				.getByRole('link', { name: new RegExp(SOCIA.nombre) })
 		);
-	}
-	await pulsar(page.getByRole('button', { name: 'Autorizar 2 tickets' }));
-	await expect(page.getByText('2 tickets autorizados. Quedan pendientes de pago.')).toBeVisible();
-	await pausa(page, 1500);
+		await rotulo(
+			page,
+			'Le pagas por Bizum, transferencia o en efectivo y lo registras, con el justificante si quieres.',
+			3500
+		);
+		await desplazar(page, 400);
+		await pulsar(page.getByRole('button', { name: /Registrar pago de/ }));
+		await expect(page.getByText('Pago registrado.')).toBeVisible();
+		await rotulo(page, 'El socio ve en su lista que ya está pagado.', 2500);
 
-	await pulsar(
-		page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Pagos' })
-	);
-	await rotulo(page, 'En Pagos ves cuánto se le debe a cada socio.', 3000);
-	await pulsar(
-		page
-			.getByRole('list', { name: 'Socios con tickets pendientes de pago' })
-			.getByRole('link', { name: new RegExp(SOCIA.nombre) })
-	);
-	await rotulo(
-		page,
-		'Le pagas por Bizum, transferencia o en efectivo y lo registras, con el justificante si quieres.',
-		3500
-	);
-	await desplazar(page, 400);
-	await pulsar(page.getByRole('button', { name: /Registrar pago de/ }));
-	await expect(page.getByText('Pago registrado.')).toBeVisible();
-	await rotulo(page, 'El socio ve en su lista que ya está pagado.', 2500);
+		await page.goto('/gestion/tickets');
+		await rotulo(
+			page,
+			'Puedes filtrar por socio, estado o fechas, y exportarlo a una hoja de cálculo.',
+			1500
+		);
+		await pulsar(page.getByText('Filtros y orden'));
+		await page.getByLabel('Socio').selectOption({ label: javier.nombre });
+		await pausa(page, 1000);
+		await pulsar(page.getByRole('button', { name: 'Aplicar' }), 2000);
+		const exportar = page.getByRole('link', { name: 'Exportar CSV' });
+		await exportar.scrollIntoViewIfNeeded();
+		const descarga = page.waitForEvent('download');
+		await pulsar(exportar, 1500);
+		await descarga;
 
-	await page.goto('/gestion/tickets');
-	await rotulo(
-		page,
-		'Puedes filtrar por socio, estado o fechas, y exportarlo a una hoja de cálculo.',
-		1500
-	);
-	await pulsar(page.getByText('Filtros y orden'));
-	await page.getByLabel('Socio').selectOption({ label: javier.nombre });
-	await pausa(page, 1000);
-	await pulsar(page.getByRole('button', { name: 'Aplicar' }), 2000);
-	const exportar = page.getByRole('link', { name: 'Exportar CSV' });
-	await exportar.scrollIntoViewIfNeeded();
-	const descarga = page.waitForEvent('download');
-	await pulsar(exportar, 1500);
-	await descarga;
+		await pulsar(
+			page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Usuarios' })
+		);
+		await rotulo(page, 'Das de alta a los socios con su nombre, teléfono y email…', 1200);
+		const alta = page.getByRole('region', { name: 'Nuevo usuario' });
+		await escribir(alta.getByLabel('Nombre'), ALTA.nombre);
+		await escribir(alta.getByLabel('Teléfono'), ALTA.telefono.slice(3));
+		await escribir(alta.getByLabel('Email'), ALTA.email);
+		await pulsar(alta.getByRole('button', { name: 'Dar de alta y enviar invitación' }), 1500);
+		await rotulo(
+			page,
+			'…y reciben su enlace para entrar por correo, o se lo pasas tú por WhatsApp.',
+			4000
+		);
 
-	await pulsar(
-		page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Usuarios' })
-	);
-	await rotulo(page, 'Das de alta a los socios con su nombre, teléfono y email…', 1200);
-	const alta = page.getByRole('region', { name: 'Nuevo usuario' });
-	await escribir(alta.getByLabel('Nombre'), ALTA.nombre);
-	await escribir(alta.getByLabel('Teléfono'), ALTA.telefono.slice(3));
-	await escribir(alta.getByLabel('Email'), ALTA.email);
-	await pulsar(alta.getByRole('button', { name: 'Dar de alta y enviar invitación' }), 1500);
-	await rotulo(
-		page,
-		'…y reciben su enlace para entrar por correo, o se lo pasas tú por WhatsApp.',
-		4000
-	);
+		await pulsar(
+			page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Conceptos' })
+		);
+		await rotulo(page, 'Y decides qué conceptos de gasto pueden elegir los socios.', 3000);
 
-	await pulsar(
-		page.getByRole('navigation', { name: 'Principal' }).getByRole('link', { name: 'Conceptos' })
-	);
-	await rotulo(page, 'Y decides qué conceptos de gasto pueden elegir los socios.', 3000);
-
-	await portada(
-		page,
-		'EQL4E Tickets',
-		'Todo el control de los reembolsos,<br>desde el móvil.',
-		4000
-	);
-	await guardar(g, 'video-tesorero');
-});
+		await portada(
+			page,
+			'EQL4E Tickets',
+			'Todo el control de los reembolsos,<br>desde el ordenador o el móvil.',
+			4000
+		);
+		await guardar(g, nombre);
+	});
+}

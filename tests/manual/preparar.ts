@@ -5,6 +5,17 @@ import postgres from 'postgres';
 import { migrar } from '../../scripts/migrar.js';
 import { prepararDemo } from './demo.ts';
 
+/** Borra usuarios, tickets y pagos; en cascada, sesiones, códigos, ficheros e historial. Los
+ * conceptos se quedan. */
+export async function vaciar(url: string) {
+	const sql = postgres(url, { max: 1, onnotice: () => {} });
+	try {
+		await sql`truncate usuario, ticket, pago restart identity cascade`;
+	} finally {
+		await sql.end();
+	}
+}
+
 export default async function preparar() {
 	const url = process.env.DATABASE_URL;
 	if (!url || !new URL(url).pathname.endsWith('_manual')) {
@@ -13,13 +24,7 @@ export default async function preparar() {
 		);
 	}
 	await migrar(url);
-	const sql = postgres(url, { max: 1, onnotice: () => {} });
-	try {
-		// En cascada: sesiones, códigos, ficheros e historial. Los conceptos se quedan.
-		await sql`truncate usuario, ticket, pago restart identity cascade`;
-	} finally {
-		await sql.end();
-	}
+	await vaciar(url);
 	// La app arranca antes que esto y solo crea el tesorero inicial (R-06) al arrancar. Como la base
 	// tiene ya a la tesorera de la vez anterior, o aún no tiene tablas la primera vez, no lo crea.
 	await prepararDemo(url);
