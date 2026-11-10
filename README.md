@@ -2,7 +2,7 @@
 
 Aplicación web (PWA *responsive*) para que los socios de la asociación envíen los tickets de sus compras y los tesoreros los autoricen y registren su pago.
 
-> Estado: **en construcción**. Requisitos, arquitectura y diseño aprobados (v1.0). Esqueleto e infraestructura (Tarea 4) desplegados en https://tickets-eql4e.ddns.net.
+> Estado: **v1 completa** (todas las historias del backlog y la deuda D-01), en producción en https://tickets-eql4e.ddns.net.
 
 ## Documentación
 
@@ -11,6 +11,9 @@ Aplicación web (PWA *responsive*) para que los socios de la asociación envíen
 | Requisitos | [docs/requisitos](docs/requisitos/README.md) |
 | Arquitectura y decisiones (ADR) | [docs/arquitectura](docs/arquitectura/README.md) |
 | Diseño y bocetos | [docs/diseno](docs/diseno/README.md) |
+| **Manual del desarrollador**: entorno, pruebas, cómo añadir una historia, de PR a producción | [docs/desarrollo.md](docs/desarrollo.md) |
+| Manual de administrador (instalación y operación) | [deploy/README.md](deploy/README.md) |
+| Ayuda de usuario y PDF | `/ayuda` en la app · [docs/manual](docs/manual/README.md) |
 | Protocolo de prueba final (manual, en producción) | [docs/pruebas/protocolo.md](docs/pruebas/protocolo.md) |
 
 ## Stack
@@ -35,10 +38,13 @@ pnpm dev
 | `pnpm test:integracion` | Contra PostgreSQL real: `TEST_DATABASE_URL` en local o Testcontainers |
 | `pnpm test:e2e` | Playwright, perfiles móvil y escritorio (necesita `pnpm build` y la base de datos) |
 | `pnpm db:generate` · `pnpm db:migrar` | Generar y aplicar migraciones |
+| `pnpm manual:capturas` · `pnpm manual:pdf` · `pnpm manual:admin` | Capturas de la Ayuda y los PDF de los manuales |
+
+Las bases de datos de cada tipo de prueba y la receta para añadir una historia: [manual del desarrollador](docs/desarrollo.md).
 
 ## Despliegue
 
-Cada *push* a `main` que pasa la CI publica `ghcr.io/luislozano/eql4e-tickets`. En la máquina: `cd /opt/eql4e-tickets && sudo ./desplegar.sh`. Instalación, actualización, logs y vuelta atrás: [manual de despliegue](deploy/README.md). Decisiones: [ADR-0006](docs/arquitectura/adr/0006-despliegue.md).
+Cada *push* a `main` que pasa la CI publica `ghcr.io/luislozano/eql4e-tickets`. En la máquina: `cd /opt/eql4e-tickets && sudo ./desplegar.sh`. Instalación, actualización, logs y vuelta atrás: [manual de administrador](deploy/README.md). Decisiones: [ADR-0006](docs/arquitectura/adr/0006-despliegue.md).
 
 ## Licencia
 
