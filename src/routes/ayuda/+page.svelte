@@ -27,6 +27,11 @@
 		</p>
 	</header>
 
+	<p class="rounded-lg border border-line bg-surface p-4">
+		¿Eres tesorero? Cómo revisar y pagar tickets y gestionar usuarios y conceptos, en la
+		<a class="font-bold underline" href={resolve('/ayuda/tesoreros')}>ayuda del tesorero</a>.
+	</p>
+
 	<nav aria-labelledby="titulo-indice" class="rounded-lg border border-line bg-surface p-4">
 		<h2 id="titulo-indice" class="font-bold">En esta página</h2>
 		<ol class="mt-2 list-decimal pl-6">
