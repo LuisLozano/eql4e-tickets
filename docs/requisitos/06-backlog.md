@@ -48,7 +48,7 @@ Falta documentación para quien usa y quien mantiene la app. Sin sprint asignado
   - Las tareas programadas de la app (purga a las 18:55, huérfanos a las 19:00) y la copia de las 19:30.
   - Instalación, despliegue, copias y restauración, el tesorero inicial (R-06), la configuración de `.env` (correo incluido) y cómo leer los logs.
 - **Hecho cuando**: los dos PDF se generan desde el repositorio (no a mano) y el HTML se sirve en producción.
-- **Avance**: la página **Ayuda** (`/ayuda`) y su PDF ya cubren empezar (de la invitación a la cuenta activada), instalar en Android e iPhone y volver a entrar ([docs/manual/README.md](../manual/README.md)). Los menús de instalación del móvil van con ilustraciones esquemáticas. El manual de administrador es `deploy/README.md`, con el inventario de scripts, las tareas, el log y el `.env`; su PDF sale con `pnpm manual:admin`. Faltan el resto del uso del socio y del tesorero.
+- **Avance**: la página **Ayuda** (`/ayuda`) y su PDF ya cubren todo el uso del socio: empezar (de la invitación a la cuenta activada), instalar en Android e iPhone, enviar, seguir, editar, anular y corregir tickets, y entrar y la contraseña ([docs/manual/README.md](../manual/README.md)). Los menús de instalación del móvil van con ilustraciones esquemáticas. El manual de administrador es `deploy/README.md`, con el inventario de scripts, las tareas, el log y el `.env`; su PDF sale con `pnpm manual:admin`. Falta la ayuda del tesorero.
 
 ## Siguientes versiones (fuera de la v1)
 
