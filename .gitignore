@@ -30,5 +30,6 @@ test-results
 /playwright-report
 /.datos
 
-# PDF generados desde el Markdown o la app (docs/manual/README.md)
+# PDF y vídeos generados desde el Markdown o la app (docs/manual/README.md)
 docs/**/*.pdf
+docs/**/*.mp4

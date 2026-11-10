@@ -22,7 +22,8 @@
 		"db:migrar": "node --env-file-if-exists=.env scripts/migrar.js",
 		"manual:capturas": "playwright test -c playwright.manual.config.ts -g \"capturas|ilustraciones\"",
 		"manual:pdf": "playwright test -c playwright.manual.config.ts -g pdf",
-		"manual:admin": "node scripts/manual-administrador.js"
+		"manual:admin": "node scripts/manual-administrador.js",
+		"manual:videos": "playwright test -c playwright.manual.config.ts -g vídeo"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
