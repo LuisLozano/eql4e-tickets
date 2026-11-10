@@ -10,10 +10,10 @@ Leyenda de acceso: 🌐 pública · 👤 con sesión · 💼 tesorero.
 |---|:-:|---|---|
 | `/entrar` | 🌐 | acción `default`: teléfono + contraseña | HU-A02 |
 | `/salir` | 👤 | acción `default` (POST, nunca GET) | HU-A03 |
-| `/activar?codigo=…` | 🌐 | acción `default`: teléfono + código + contraseña. Vale para un invitado y, con un código reenviado por un tesorero, para un activo: cambia la contraseña y cierra sus sesiones | HU-A01, G02 |
+| `/activar?codigo=…` | 🌐 | acción `default`: teléfono + código + contraseña + IBAN opcional (HU-S07; vacío, conserva el que hubiera). Vale para un invitado y, con un código reenviado por un tesorero, para un activo: cambia la contraseña y cierra sus sesiones | HU-A01, G02 |
 | `/restablecer` | 🌐 | acción `default`: teléfono. Responde lo mismo exista o no, sin esperar al correo, que se crea y envía en segundo plano; límite por IP y por teléfono. `/entrar` solo enlaza aquí con el correo configurado | HU-A04 |
 | `/restablecer/[codigo]` | 🌐 | acción `default`: teléfono + contraseña nueva. Solo para un activo: cambia la contraseña, quita el bloqueo, cierra sus sesiones y entra | HU-A04 |
-| `/cuenta` | 👤 | acción `cambiarContrasena` | HU-A03 |
+| `/cuenta` | 👤 | acciones `cambiarContrasena` y, solo para socios, `cambiarIban` (vacío, lo borra) | HU-A03, S07 |
 
 ## Socio (y tesorero como socio)
 
@@ -33,10 +33,10 @@ Leyenda de acceso: 🌐 pública · 👤 con sesión · 💼 tesorero.
 | `/gestion/tickets.csv` | 💼 | `GET` `+server.ts`, mismos parámetros y orden que el listado, sin paginar (botón «Exportar CSV»). Para Excel en español: `;`, coma decimal, UTF-8 con BOM y CRLF. El teléfono va sin el `+34` y los textos que empiezan por `= + - @` llevan un apóstrofo delante (inyección CSV) | HU-T07 |
 | `/gestion/tickets/[numero]` | 💼 | `load`; acciones `autorizar`, `rechazar` y `deshacer` (autorización o rechazo, con motivo), todas con `version`. Deshacer un pago se hace en `/gestion/pagos/[id]` | HU-T02–T04, T06 |
 | `/gestion/pagos` | 💼 | `load`: socios con tickets pendientes de pago (sin los del propio tesorero, R-04) y últimos pagos | HU-T05 |
-| `/gestion/pagos/nuevo?socio=…&ticket=…` | 💼 | `load`: tickets pendientes de pago del socio, todos marcados (o solo `ticket`, si se viene del detalle); acción `default` (multipart, justificante opcional; cada ticket con su versión, E-04). Vuelve a `/gestion/pagos/[id]?registrado` | HU-T05 |
+| `/gestion/pagos/nuevo?socio=…&ticket=…` | 💼 | `load`: el IBAN del socio para copiarlo (o un aviso con enlace a su ficha, HU-S07) y sus tickets pendientes de pago, todos marcados (o solo `ticket`, si se viene del detalle); acción `default` (multipart, justificante opcional; cada ticket con su versión, E-04). Vuelve a `/gestion/pagos/[id]?registrado` | HU-T05, S07 |
 | `/gestion/pagos/[id]` | 💼 | `load`: detalle del pago y sus tickets (del historial, para que sigan tras deshacerlo); acción `deshacer` (con motivo; el pago completo, E-03) | HU-T05, T06 |
 | `/gestion/usuarios` | 💼 | `load`: listado con estado (cada nombre enlaza a su ficha); acción `alta` (alta + email), con el formulario en la misma página, como en el boceto | HU-G01, G03 |
-| `/gestion/usuarios/[id]` | 💼 | `load`: la ficha, con aviso si tiene los datos ficticios del tesorero inicial (R-06); acciones `guardar` (datos y roles, R-03), `reenviar` (código nuevo de 7 días y su enlace para copiar; a un usuario activo le sirve para elegir otra contraseña), `baja` (confirmada en la página; nadie se da de baja a sí mismo; R-03, R-05) y `reactivar`. Sin control de versión: si dos tesoreros editan a la vez, gana el último | HU-G02, G03 |
+| `/gestion/usuarios/[id]` | 💼 | `load`: la ficha, con aviso si tiene los datos ficticios del tesorero inicial (R-06); acciones `guardar` (datos y roles, R-03), `reenviar` (código nuevo de 7 días y su enlace para copiar; a un usuario activo le sirve para elegir otra contraseña), `cambiarIban` (solo socios, HU-S07), `baja` (confirmada en la página; nadie se da de baja a sí mismo; borra el IBAN; R-03, R-05) y `reactivar`. Sin control de versión: si dos tesoreros editan a la vez, gana el último | HU-G02, G03, S07 |
 | `/gestion/conceptos` | 💼 | `load` con `?editar=<id>` (renombrar en su fila, también sin JavaScript); acciones `crear`, `renombrar`, `subir`, `bajar`, `activar`, `desactivar`. No hay borrado: un concepto se desactiva | HU-G04 |
 
 ## Endpoints

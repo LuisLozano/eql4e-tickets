@@ -1,5 +1,7 @@
-// Formulario de alta de usuario (HU-G01). El dominio vuelve a normalizar y comprueba la unicidad.
+// Formulario de alta de usuario (HU-G01) y el IBAN (HU-S07). El dominio vuelve a normalizar y
+// comprueba la unicidad.
 import { z } from 'zod';
+import { normalizarIban } from '#lib/iban.ts';
 import { normalizarTelefono } from '#lib/telefono.ts';
 
 export const esquemaAlta = z
@@ -25,3 +27,15 @@ export const valoresIniciales = { esSocio: true, esTesorero: false };
 
 /** El mismo formulario sirve para el alta y para editar la ficha (HU-G03). */
 export type CamposUsuario = z.infer<typeof esquemaAlta>;
+
+/** IBAN para los pagos (HU-S07): opcional; vacío lo borra. El dominio lo vuelve a normalizar. */
+export const campoIban = z
+	.string()
+	.trim()
+	.max(50, 'El IBAN no es válido.')
+	.refine(
+		(t) => t === '' || normalizarIban(t) !== null,
+		'El IBAN no es válido: revisa que esté completo y bien copiado.'
+	);
+
+export const esquemaIban = z.object({ iban: campoIban });

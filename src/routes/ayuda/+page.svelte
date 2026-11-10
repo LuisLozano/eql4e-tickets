@@ -42,7 +42,7 @@
 			<li><a class="underline" href="#seguir">Seguir tus tickets</a></li>
 			<li><a class="underline" href="#cambiar">Editar o anular un ticket</a></li>
 			<li><a class="underline" href="#corregir">Corregir un ticket rechazado</a></li>
-			<li><a class="underline" href="#entrar">Volver a entrar y tu contraseña</a></li>
+			<li><a class="underline" href="#entrar">Volver a entrar, tu contraseña y tu IBAN</a></li>
 		</ol>
 	</nav>
 
@@ -69,10 +69,14 @@
 					<b>Teléfono</b> (el mismo que diste al tesorero) y elige una contraseña de al menos 8
 					caracteres; escríbela dos veces, en <b>Contraseña nueva</b> y <b>Repite la contraseña</b>.
 				</p>
+				<p>
+					Si quieres cobrar por transferencia, escribe también tu <b>IBAN</b> (lo encuentras en la app
+					de tu banco; con o sin espacios). Es opcional: puedes ponerlo más tarde en «Mi cuenta».
+				</p>
 				<figure>
 					<img
 						src="/ayuda/activar.png"
-						alt="Pantalla «Activa tu cuenta» con los campos Código de invitación, Teléfono, Contraseña nueva y Repite la contraseña, y el botón Activar y entrar."
+						alt="Pantalla «Activa tu cuenta» con los campos Código de invitación, Teléfono, Contraseña nueva, Repite la contraseña e IBAN para recibir los pagos, y el botón Activar y entrar."
 						width="412"
 						height="915"
 						loading="lazy"
@@ -399,7 +403,7 @@
 
 	<section id="entrar" aria-labelledby="titulo-entrar" class="flex flex-col gap-4">
 		<h2 id="titulo-entrar" class="font-display text-2xl font-bold">
-			8. Volver a entrar y tu contraseña
+			8. Volver a entrar, tu contraseña y tu IBAN
 		</h2>
 		<p>
 			La sesión dura 30 días en cada móvil, así que normalmente no tendrás que escribir nada. Si te
@@ -416,6 +420,20 @@
 		</figure>
 		<ul class="list-disc pl-6">
 			<li>Si te equivocas 5 veces seguidas, espera 15 minutos antes de volver a probar.</li>
+			<li>
+				Para <b>poner o cambiar tu IBAN</b>, pulsa tu nombre, arriba a la derecha: en «Mi cuenta»,
+				escríbelo en <b>Cuenta para los pagos</b> y pulsa <b>Guardar el IBAN</b>. Si lo dejas vacío,
+				se borra. Solo lo ven los tesoreros, para pagarte por transferencia.
+				<figure>
+					<img
+						src="/ayuda/cuenta.png"
+						alt="Pantalla «Mi cuenta»: el apartado Cuenta para los pagos con el IBAN y el botón Guardar el IBAN, y debajo Cambiar la contraseña."
+						width="412"
+						height="915"
+						loading="lazy"
+					/>
+				</figure>
+			</li>
 			<li>
 				Para <b>cambiar la contraseña</b>, pulsa tu nombre, arriba a la derecha: en «Mi cuenta»
 				escribe la actual y dos veces la nueva, y pulsa <b>Cambiar la contraseña</b>. Se cierra la

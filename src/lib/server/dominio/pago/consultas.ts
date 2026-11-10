@@ -32,10 +32,18 @@ export async function porPagar(conexion: Conexion, yo: string) {
 		.orderBy(asc(usuario.nombre));
 }
 
-/** El socio y sus tickets pendientes de pago, lo más antiguo primero. Nulo si no existe. */
+/**
+ * El socio, con su IBAN para la transferencia (HU-S07), y sus tickets pendientes de pago, lo más
+ * antiguo primero. Nulo si no existe.
+ */
 export async function pendientesDeSocio(conexion: Conexion, socioId: string) {
 	const [socio] = await conexion
-		.select({ id: usuario.id, nombre: usuario.nombre, telefono: usuario.telefono })
+		.select({
+			id: usuario.id,
+			nombre: usuario.nombre,
+			telefono: usuario.telefono,
+			iban: usuario.iban
+		})
 		.from(usuario)
 		.where(eq(usuario.id, socioId));
 	if (!socio) return null;

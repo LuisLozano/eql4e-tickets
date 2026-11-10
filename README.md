@@ -2,7 +2,7 @@
 
 Aplicación web (PWA *responsive*) para que los socios de la asociación envíen los tickets de sus compras y los tesoreros los autoricen y registren su pago.
 
-> Estado: **v1 completa** (todas las historias del backlog y la deuda D-01), en producción en https://tickets-eql4e.ddns.net.
+> Estado: **v1 completa** (todas las historias del backlog y la deuda D-01) más el IBAN del socio (HU-S07), en producción en https://tickets-eql4e.ddns.net.
 
 ## Documentación
 

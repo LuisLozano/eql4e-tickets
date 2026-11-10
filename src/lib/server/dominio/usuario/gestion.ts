@@ -93,7 +93,10 @@ export type ResultadoBaja =
 	/** propio: nadie se da de baja a sí mismo; estado: ya estaba de baja. */
 	| { ok: false; motivo: 'no_encontrado' | 'propio' | 'estado' | 'ultimo_tesorero' };
 
-/** Baja (R-05): no puede entrar, se cierran sus sesiones y caducan sus códigos. Los tickets quedan. */
+/**
+ * Baja (R-05): no puede entrar, se cierran sus sesiones y caducan sus códigos. Los tickets quedan;
+ * el IBAN se borra porque ya no hay nada que pagarle (HU-S07, RNF-20).
+ */
 export async function darDeBaja(
 	conexion: Conexion,
 	actorId: string,
@@ -108,7 +111,7 @@ export async function darDeBaja(
 		if (u.estado === 'baja') return { ok: false, motivo: 'estado' } as const;
 		if (esElUltimoTesorero(activos, id)) return { ok: false, motivo: 'ultimo_tesorero' } as const;
 
-		await tx.update(usuario).set({ estado: 'baja' }).where(eq(usuario.id, id));
+		await tx.update(usuario).set({ estado: 'baja', iban: null }).where(eq(usuario.id, id));
 		await invalidarSesionesDe(tx, id);
 		await tx
 			.update(codigoAcceso)

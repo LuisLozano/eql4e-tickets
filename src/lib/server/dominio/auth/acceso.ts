@@ -1,6 +1,7 @@
 // Casos de uso de acceso: iniciar sesión (HU-A02), activar la cuenta (HU-A01), cambiar la
 // contraseña (HU-A03) y restablecerla si se ha olvidado (HU-A04).
 import { eq, sql } from 'drizzle-orm';
+import { normalizarIban } from '#lib/iban.ts';
 import { normalizarTelefono } from '#lib/telefono.ts';
 import { usuario } from '#lib/server/infra/db/esquema.ts';
 import type { Conexion } from '#lib/server/infra/db/tipos.ts';
@@ -71,14 +72,26 @@ export async function iniciarSesion(
 export type ResultadoActivar =
 	| { ok: true; token: string; caducaEn: Date; esTesorero: boolean }
 	| { ok: false; motivo: 'contrasena'; mensaje: string }
-	| { ok: false; motivo: 'codigo' };
+	| { ok: false; motivo: 'codigo' | 'iban' };
 
 type DatosCodigo = { telefono: string; codigo: string; contrasena: string };
 
-export function activarCuenta(conexion: Conexion, datos: DatosCodigo, ahora: Date) {
+/**
+ * El IBAN es opcional (HU-S07): si viene vacío se conserva el que hubiera, para que reenviar la
+ * invitación a un activo no se lo borre.
+ */
+export async function activarCuenta(
+	conexion: Conexion,
+	datos: DatosCodigo & { iban?: string },
+	ahora: Date
+): Promise<ResultadoActivar> {
+	const iban = datos.iban?.trim() ? normalizarIban(datos.iban) : undefined;
+	if (iban === null) return { ok: false, motivo: 'iban' };
 	// Vale para un invitado y, si un tesorero le reenvió la invitación, para un activo: elige otra
 	// contraseña y la anterior deja de valer (HU-G02). Nunca para uno de baja (R-05).
-	return contrasenaConCodigo(conexion, datos, 'activacion', ['invitado', 'activo'], ahora);
+	return contrasenaConCodigo(conexion, datos, 'activacion', ['invitado', 'activo'], ahora, {
+		iban
+	});
 }
 
 /** Elige una contraseña nueva con el código del correo de restablecimiento (HU-A04). */
@@ -95,7 +108,8 @@ async function contrasenaConCodigo(
 	datos: DatosCodigo,
 	tipo: TipoCodigo,
 	estadoUsuario: readonly ('invitado' | 'activo')[],
-	ahora: Date
+	ahora: Date,
+	extra: { iban?: string } = {}
 ): Promise<ResultadoActivar> {
 	const problema = problemaContrasena(datos.contrasena);
 	if (problema) return { ok: false, motivo: 'contrasena', mensaje: problema };
@@ -115,7 +129,7 @@ async function contrasenaConCodigo(
 
 		const [activado] = await tx
 			.update(usuario)
-			.set({ passwordHash, estado: 'activo', intentosFallidos: 0, bloqueadoHasta: null })
+			.set({ passwordHash, estado: 'activo', intentosFallidos: 0, bloqueadoHasta: null, ...extra })
 			.where(eq(usuario.id, usuarioId))
 			.returning({ esTesorero: usuario.esTesorero });
 

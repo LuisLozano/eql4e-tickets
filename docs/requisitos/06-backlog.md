@@ -32,6 +32,7 @@ Todo lo marcado **[M]** forma el MVP: con ello la asociación puede dejar de ges
 | 21 | HU-A04 He olvidado mi contraseña | S | S4 |
 | 22 | HU-G05 Purga de tickets de más de 18 meses | S | S4 |
 | 23 | HU-T03 Autorización múltiple | C | S4 |
+| 24 | HU-S07 IBAN para los pagos (lo pidió el tesorero tras ver la demostración, 2026-11-10) | S | — |
 
 ## Deuda pendiente
 

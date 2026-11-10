@@ -266,6 +266,44 @@ describe('activar la cuenta (HU-A01)', () => {
 		).toEqual({ ok: false, motivo: 'codigo' });
 	});
 
+	it('guarda el IBAN normalizado (HU-S07)', async () => {
+		const { u, codigo } = await invitado();
+		const r = await activarCuenta(
+			db,
+			{
+				telefono: u.telefono,
+				codigo,
+				contrasena: 'mi nueva contraseña',
+				iban: 'es91 2100 0418 4502 0005 1332'
+			},
+			ahora
+		);
+		expect(r.ok).toBe(true);
+		const [activo] = await db.select().from(usuario).where(eq(usuario.id, u.id));
+		expect(activo.iban).toBe('ES9121000418450200051332');
+	});
+
+	it('rechaza un IBAN no válido sin tocar el código', async () => {
+		const { u, codigo } = await invitado();
+		const datos = { telefono: u.telefono, codigo, contrasena: 'mi nueva contraseña' };
+		expect(
+			await activarCuenta(db, { ...datos, iban: 'ES91 2100 0418 4502 0005 1333' }, ahora)
+		).toEqual({ ok: false, motivo: 'iban' });
+		expect((await activarCuenta(db, datos, ahora)).ok).toBe(true);
+	});
+
+	it('sin IBAN conserva el que tenía (invitación reenviada a un activo)', async () => {
+		const { u, codigo } = await invitado();
+		await db.update(usuario).set({ iban: 'ES9121000418450200051332' }).where(eq(usuario.id, u.id));
+		await activarCuenta(
+			db,
+			{ telefono: u.telefono, codigo, contrasena: 'mi nueva contraseña', iban: ' ' },
+			ahora
+		);
+		const [activo] = await db.select().from(usuario).where(eq(usuario.id, u.id));
+		expect(activo.iban).toBe('ES9121000418450200051332');
+	});
+
 	it('no activa a un usuario dado de baja', async () => {
 		const { u, codigo } = await invitado();
 		await db.update(usuario).set({ estado: 'baja' }).where(eq(usuario.id, u.id));

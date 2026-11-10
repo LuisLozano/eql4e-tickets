@@ -22,8 +22,8 @@
 
 ## Protección de datos (RGPD)
 
-- **RNF-20** Datos personales mínimos: nombre, teléfono y email. Las imágenes de tickets y los justificantes pueden contener datos personales y bancarios parciales.
-- **RNF-21** Texto informativo de privacidad en la pantalla de activación. La asociación es la responsable del tratamiento.
+- **RNF-20** Datos personales mínimos: nombre, teléfono y email, y el IBAN que el socio quiera dejar para cobrar por transferencia (HU-S07), que se borra al darle de baja. Las imágenes de tickets y los justificantes pueden contener datos personales y bancarios parciales.
+- **RNF-21** Texto informativo de privacidad en la pantalla de activación, que nombra los datos que se usan (también el IBAN). La asociación es la responsable del tratamiento.
 - **RNF-22** Periodo de conservación: **máximo 18 meses** desde la fecha de compra del ticket. *Aviso: es inferior a los plazos habituales de conservación de justificantes de gasto (4 años, prescripción tributaria). La asociación debe confirmar que la app no es su archivo contable o que exporta los justificantes antes de la purga.* Pasado ese plazo se eliminan de forma automática y definitiva (HU-G05). Las copias de seguridad deben tener una retención igual o menor, para no conservar datos ya purgados.
 - **RNF-23** No se envían datos a servicios de terceros, salvo el proveedor de email para invitaciones y restablecimientos.
 

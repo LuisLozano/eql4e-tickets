@@ -1,6 +1,7 @@
 // Formularios de acceso (HU-A01–A04). La validación del servidor es la que manda:
 // la fortaleza de la contraseña se comprueba en el dominio (lista de contraseñas comunes).
 import { z } from 'zod';
+import { campoIban } from './usuario.ts';
 
 const telefono = z.string().trim().min(1, 'Escribe tu teléfono.');
 
@@ -16,7 +17,8 @@ export const esquemaActivar = z
 		codigo: z.string().trim().min(1, 'Escribe el código de invitación.'),
 		telefono,
 		contrasena: contrasenaNueva,
-		repetir: z.string()
+		repetir: z.string(),
+		iban: campoIban
 	})
 	.refine((d) => d.contrasena === d.repetir, {
 		path: ['repetir'],

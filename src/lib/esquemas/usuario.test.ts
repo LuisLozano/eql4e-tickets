@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { esquemaAlta } from './usuario';
+import { esquemaAlta, esquemaIban } from './usuario';
 
 const valido = {
 	nombre: 'Ana',
@@ -29,5 +29,16 @@ describe('esquemaAlta', () => {
 	])('rechaza %s = «%s»', (campo, valor, mensaje) => {
 		const r = esquemaAlta.safeParse({ ...valido, [campo]: valor });
 		expect(r.error?.issues.map((i) => i.message)).toContain(mensaje);
+	});
+});
+
+describe('esquemaIban', () => {
+	it.each(['', '   ', 'es91 2100 0418 4502 0005 1332'])('acepta «%s»', (iban) => {
+		expect(esquemaIban.safeParse({ iban }).success).toBe(true);
+	});
+
+	it('rechaza un IBAN con el control mal', () => {
+		const r = esquemaIban.safeParse({ iban: 'ES91 2100 0418 4502 0005 1333' });
+		expect(r.error?.issues[0].message).toMatch(/^El IBAN no es válido/);
 	});
 });

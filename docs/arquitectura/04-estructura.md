@@ -36,6 +36,7 @@ eql4e-tickets/
 │   │   ├── formato.ts              # importes, fechas (Intl es-ES), hoy en Madrid
 │   │   ├── importe.ts              # «23,45» → céntimos
 │   │   ├── pagos.ts                # métodos de pago y cómo se muestran
+│   │   ├── iban.ts                 # validar (SEPA y dígitos de control) y formatear el IBAN
 │   │   ├── telefono.ts             # teléfonos en E.164
 │   │   ├── listado-tickets.ts      # filtros, orden y página del listado global en la URL (HU-T01)
 │   │   └── server/
@@ -50,7 +51,7 @@ eql4e-tickets/
 │   │       │   │   ├── permisos.ts # R-01, R-04 (puro)
 │   │       │   │   └── servicio.ts # cambiar de estado: versión (E-04), transición e historial
 │   │       │   ├── pago/       # registrar (HU-T05), deshacer (HU-T06, E-03) y consultas
-│   │       │   ├── usuario/        # alta, listado y ficha, gestión (editar, baja, reactivar, reenviar), texto de la invitación
+│   │       │   ├── usuario/        # alta, listado y ficha, gestión (editar, baja, reactivar, reenviar), IBAN, texto de la invitación
 │   │       │   ├── concepto/
 │   │       │   ├── ficheros/       # huérfanos: en el disco sin ticket ni pago; puerto AlmacenListable
 │   │       │   └── purga/          # tickets de más de 18 meses y aviso de pendientes antiguos (HU-G05)

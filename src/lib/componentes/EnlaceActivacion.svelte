@@ -1,29 +1,11 @@
 <script lang="ts">
 	import Aviso from '#lib/componentes/Aviso.svelte';
-	import Boton from '#lib/componentes/Boton.svelte';
+	import Copiable from '#lib/componentes/Copiable.svelte';
 	import { formatoFecha } from '#lib/formato.ts';
 	import type { ResultadoInvitacion } from '#lib/server/web/invitacion.ts';
 
 	// Tras el alta (HU-G01) o el reenvío (HU-G02): si se envió el correo y el enlace para copiarlo.
 	let { invitacion, hecho }: { invitacion: ResultadoInvitacion; hecho: string } = $props();
-
-	let copiado = $state(false);
-	let campo = $state<HTMLInputElement>();
-	// Un enlace nuevo vuelve a mostrar «Copiar enlace».
-	$effect(() => {
-		void invitacion.enlace;
-		copiado = false;
-	});
-
-	async function copiar() {
-		try {
-			await navigator.clipboard.writeText(invitacion.enlace);
-			copiado = true;
-		} catch {
-			// Sin permiso de portapapeles: se deja seleccionado para copiarlo a mano.
-			campo?.select();
-		}
-	}
 
 	const caduca = $derived(formatoFecha(new Date(invitacion.caducaEn)));
 </script>
@@ -42,16 +24,11 @@
 	</Aviso>
 {/if}
 <div class="flex flex-col gap-1.5">
-	<label for="enlace" class="font-bold">Enlace de activación</label>
-	<div class="flex gap-2">
-		<input
-			id="enlace"
-			bind:this={campo}
-			readonly
-			value={invitacion.enlace}
-			class="min-h-11 w-full min-w-0 rounded-lg border border-line bg-sunken px-3 font-mono text-sm"
-		/>
-		<Boton variante="secundario" onclick={copiar}>{copiado ? 'Copiado' : 'Copiar enlace'}</Boton>
-	</div>
+	<Copiable
+		id="enlace"
+		etiqueta="Enlace de activación"
+		valor={invitacion.enlace}
+		boton="Copiar enlace"
+	/>
 	<p class="text-sm text-muted">Caduca el {caduca}. Solo se muestra ahora.</p>
 </div>

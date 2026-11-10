@@ -9,6 +9,7 @@ import {
 	reactivar,
 	reenviarInvitacion
 } from '../../src/lib/server/dominio/usuario/gestion.ts';
+import { cambiarIban, ibanDe } from '../../src/lib/server/dominio/usuario/iban.ts';
 import { fichaUsuario, listarUsuarios } from '../../src/lib/server/dominio/usuario/listado.ts';
 import { codigoAcceso, usuario } from '../../src/lib/server/infra/db/esquema.ts';
 import type { Conexion } from '../../src/lib/server/infra/db/tipos.ts';
@@ -255,6 +256,14 @@ describe('baja y reactivación (HU-G03, R-05)', () => {
 		expect(await darDeBaja(db, tesorero.id, u.id, ahora)).toEqual({ ok: false, motivo: 'estado' });
 	});
 
+	it('la baja borra el IBAN (HU-S07)', async () => {
+		const tesorero = await crearUsuario(db, { esTesorero: true });
+		const u = await crearUsuario(db);
+		await db.update(usuario).set({ iban: IBAN }).where(eq(usuario.id, u.id));
+		await darDeBaja(db, tesorero.id, u.id, ahora);
+		expect(await ibanDe(db, u.id)).toBeNull();
+	});
+
 	it('nadie se da de baja a sí mismo', async () => {
 		const tesorero = await crearUsuario(db, { esTesorero: true });
 		expect(await darDeBaja(db, tesorero.id, tesorero.id, ahora)).toEqual({
@@ -370,5 +379,62 @@ describe('ficha de usuario', () => {
 		const u = await crearUsuario(db);
 		expect(await fichaUsuario(db, u.id, ahora)).toMatchObject({ id: u.id, ficticio: false });
 		expect(await fichaUsuario(db, '00000000-0000-4000-8000-000000000000', ahora)).toBeNull();
+	});
+});
+
+const IBAN = 'ES9121000418450200051332';
+const sesionDe = (u: { id: string; nombre: string; esSocio: boolean; esTesorero: boolean }) => ({
+	id: u.id,
+	nombre: u.nombre,
+	esSocio: u.esSocio,
+	esTesorero: u.esTesorero
+});
+
+describe('IBAN para los pagos (HU-S07)', () => {
+	it('el socio pone, cambia y borra el suyo', async () => {
+		const u = await crearUsuario(db);
+		expect(await cambiarIban(db, sesionDe(u), u.id, 'es91 2100 0418 4502 0005 1332')).toEqual({
+			ok: true
+		});
+		expect(await ibanDe(db, u.id)).toBe(IBAN);
+		expect(await cambiarIban(db, sesionDe(u), u.id, 'DE89 3704 0044 0532 0130 00')).toEqual({
+			ok: true
+		});
+		expect(await ibanDe(db, u.id)).toBe('DE89370400440532013000');
+		expect(await cambiarIban(db, sesionDe(u), u.id, '  ')).toEqual({ ok: true });
+		expect(await ibanDe(db, u.id)).toBeNull();
+	});
+
+	it('rechaza uno no válido y no toca el guardado', async () => {
+		const u = await crearUsuario(db);
+		await cambiarIban(db, sesionDe(u), u.id, IBAN);
+		expect(await cambiarIban(db, sesionDe(u), u.id, 'ES91 2100 0418 4502 0005 1333')).toEqual({
+			ok: false,
+			motivo: 'invalido'
+		});
+		expect(await ibanDe(db, u.id)).toBe(IBAN);
+	});
+
+	it('un socio no cambia el de otro; un tesorero sí', async () => {
+		const u = await crearUsuario(db);
+		const otro = await crearUsuario(db);
+		const tesorero = await crearUsuario(db, { esTesorero: true, esSocio: false });
+		expect(await cambiarIban(db, sesionDe(otro), u.id, IBAN)).toEqual({
+			ok: false,
+			motivo: 'permiso'
+		});
+		expect(await ibanDe(db, u.id)).toBeNull();
+		expect(await cambiarIban(db, sesionDe(tesorero), u.id, IBAN)).toEqual({ ok: true });
+		expect(await ibanDe(db, u.id)).toBe(IBAN);
+		expect(
+			await cambiarIban(db, sesionDe(tesorero), '00000000-0000-0000-0000-000000000000', IBAN)
+		).toEqual({ ok: false, motivo: 'no_encontrado' });
+	});
+
+	it('la base de datos solo admite el IBAN normalizado', async () => {
+		const u = await crearUsuario(db);
+		await expect(
+			db.update(usuario).set({ iban: 'es91 2100' }).where(eq(usuario.id, u.id))
+		).rejects.toThrow();
 	});
 });

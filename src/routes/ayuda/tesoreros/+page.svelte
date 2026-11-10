@@ -29,7 +29,7 @@
 		},
 		registrar: {
 			src: 't-registrar-pago',
-			alt: 'Pantalla «Registrar pago» a Lucía Martín: los tres tickets marcados con el total, la fecha del pago y el método, con Bizum elegido.'
+			alt: 'Pantalla «Registrar pago» a Lucía Martín: su IBAN con el botón Copiar IBAN, los tres tickets marcados con el total, la fecha del pago y el método, con Bizum elegido.'
 		},
 		pago: {
 			src: 't-pago',
@@ -45,7 +45,7 @@
 		},
 		ficha: {
 			src: 't-ficha',
-			alt: 'Ficha de Lucía Martín: el apartado Acceso con su estado y los botones Enviar enlace para otra contraseña y Dar de baja.'
+			alt: 'Ficha de Lucía Martín: el apartado Cuenta para los pagos con su IBAN y, debajo, Acceso con su estado y los botones Enviar enlace para otra contraseña y Dar de baja.'
 		},
 		conceptos: {
 			src: 't-conceptos',
@@ -174,6 +174,11 @@
 					quieres, añade el <b>Justificante</b> (una captura del Bizum, por ejemplo). Pulsa
 					<b>Registrar pago de …</b>.
 				</p>
+				<p>
+					Si el socio ha dejado su IBAN, sale arriba: <b>Copiar IBAN</b> lo copia sin espacios para pegarlo
+					en la app del banco al hacer la transferencia. Si no lo ha dejado, sale un aviso con enlace
+					a su ficha, donde puedes ponerlo tú.
+				</p>
 				{@render figura(figuras.registrar)}
 			</li>
 			<li>
@@ -240,7 +245,8 @@
 			<li>
 				<p>
 					Pulsa un usuario para abrir su ficha. En <b>Datos</b> puedes cambiar su nombre, teléfono,
-					email y roles. En <b>Acceso</b>:
+					email y roles. En <b>Cuenta para los pagos</b>, el IBAN de un socio, por si te lo da de
+					palabra (normalmente lo pone él al activar su cuenta o en «Mi cuenta»). En <b>Acceso</b>:
 				</p>
 				<ul class="mt-2 list-disc pl-6">
 					<li>
@@ -248,8 +254,8 @@
 						<b>Enviar enlace para otra contraseña</b> si ya la había activado y la ha olvidado.
 					</li>
 					<li>
-						<b>Dar de baja…</b>: ya no puede entrar, pero sus tickets se conservan.
-						<b>Reactivar</b> lo deshace.
+						<b>Dar de baja…</b>: ya no puede entrar, pero sus tickets se conservan; su IBAN se
+						borra. <b>Reactivar</b> lo deshace.
 					</li>
 				</ul>
 				{@render figura(figuras.ficha)}
