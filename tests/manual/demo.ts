@@ -27,6 +27,13 @@ export const ALTA = {
 	email: 'pablo.sanz@ejemplo.invalid'
 } as const;
 
+/** Otros socios, ya activos, para que el tesorero de los vídeos tenga tickets de varias personas. */
+export const OTROS_SOCIOS = [
+	{ nombre: 'Javier Ruiz', telefono: '+34699000204', email: 'javier.ruiz@ejemplo.invalid' },
+	{ nombre: 'Carmen López', telefono: '+34699000205', email: 'carmen.lopez@ejemplo.invalid' }
+] as const;
+export const CONTRASENA_OTROS = 'contraseña de los socios de ejemplo';
+
 const sha256 = (texto: string) => createHash('sha256').update(texto).digest('hex');
 
 /** Crea a la socia (invitada, con su código) y a la tesorera. */
@@ -44,6 +51,21 @@ export async function prepararDemo(url: string) {
 			insert into usuario (nombre, telefono, email, password_hash, estado, es_socio, es_tesorero)
 			values (${TESORERA.nombre}, ${TESORERA.telefono}, ${TESORERA.email},
 				${await hash(TESORERA.contrasena)}, 'activo', false, true)`;
+	} finally {
+		await sql.end();
+	}
+}
+
+/** Da de alta a OTROS_SOCIOS, activos, después de prepararDemo. */
+export async function prepararOtrosSocios(url: string) {
+	const sql = postgres(url, { max: 1, onnotice: () => {} });
+	try {
+		const passwordHash = await hash(CONTRASENA_OTROS);
+		for (const s of OTROS_SOCIOS) {
+			await sql`
+				insert into usuario (nombre, telefono, email, password_hash, estado)
+				values (${s.nombre}, ${s.telefono}, ${s.email}, ${passwordHash}, 'activo')`;
+		}
 	} finally {
 		await sql.end();
 	}
