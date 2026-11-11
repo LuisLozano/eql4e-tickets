@@ -32,7 +32,7 @@ COPY --from=dependencias /app/node_modules ./node_modules
 COPY --from=compilacion /app/build ./build
 COPY package.json ./
 COPY drizzle ./drizzle
-COPY scripts/migrar.js ./scripts/
+COPY scripts/migrar.js scripts/restablecer-acceso.js ./scripts/
 COPY --chmod=755 docker-entrypoint.sh ./
 RUN mkdir -p /data/ficheros && chown node:node /data/ficheros
 USER node
