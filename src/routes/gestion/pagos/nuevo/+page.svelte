@@ -5,9 +5,11 @@
 	import { page } from '$app/state';
 	import Aviso from '#lib/componentes/Aviso.svelte';
 	import Boton from '#lib/componentes/Boton.svelte';
+	import Copiable from '#lib/componentes/Copiable.svelte';
 	import { ticketMarcado } from '#lib/esquemas/pago.ts';
 	import { ACEPTA } from '#lib/esquemas/ticket.ts';
 	import { formatoDia, formatoImporte, formatoNumeroTicket } from '#lib/formato.ts';
+	import { formatoIban } from '#lib/iban.ts';
 	import { METODOS_PAGO, TEXTO_METODO } from '#lib/pagos.ts';
 	import { formatoTelefono } from '#lib/telefono.ts';
 	import type { PageProps } from './$types';
@@ -48,6 +50,28 @@
 			<span class="font-mono text-sm text-muted">{formatoTelefono(socio.telefono)}</span>
 		</p>
 	</div>
+
+	{#if socio.tickets.length > 0}
+		<div class="max-w-md">
+			{#if socio.iban}
+				<Copiable
+					id="iban"
+					etiqueta="IBAN para la transferencia"
+					valor={formatoIban(socio.iban)}
+					copiar={socio.iban}
+					boton="Copiar IBAN"
+				/>
+			{:else}
+				<p class="text-sm text-muted">
+					No ha puesto su IBAN. Si le pagas por transferencia, pídeselo: puede ponerlo en «Mi
+					cuenta», o tú en
+					<a href={resolve('/gestion/usuarios/[id]', { id: socio.id })} class="font-bold underline"
+						>su ficha</a
+					>.
+				</p>
+			{/if}
+		</div>
+	{/if}
 
 	{#if socio.tickets.length === 0}
 		<p class="rounded-lg bg-sunken px-4 py-3">

@@ -69,6 +69,8 @@ export const usuario = pgTable(
 		/** E.164: +34612345678 */
 		telefono: text().notNull().unique(),
 		email: text().notNull().unique(),
+		/** Cuenta donde recibe los pagos (HU-S07), sin espacios: ES9121000418450200051332. */
+		iban: text(),
 		/** Argon2id. Nulo hasta que el usuario activa su cuenta. */
 		passwordHash: text(),
 		esSocio: boolean().notNull().default(true),
@@ -84,7 +86,9 @@ export const usuario = pgTable(
 		check(
 			'usuario_activo_con_password',
 			sql`${t.estado} <> 'activo' or ${t.passwordHash} is not null`
-		)
+		),
+		// El dígito de control lo comprueba la app (lib/iban.ts); aquí, que se guarde normalizado.
+		check('usuario_iban_normalizado', sql`${t.iban} ~ '^[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}$'`)
 	]
 );
 

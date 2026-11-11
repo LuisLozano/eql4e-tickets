@@ -107,6 +107,15 @@ test('un socio activa su cuenta, sale y vuelve a entrar (HU-A01, A02, A03)', asy
 	await expect(campoTelefono).toHaveValue(agrupado.slice(0, -1));
 	await campoTelefono.pressSequentially(numero.slice(-1));
 	await expect(campoTelefono).toHaveValue(agrupado);
+	// El IBAN es opcional, pero si se pone tiene que ser válido (HU-S07).
+	const campoIban = page.getByLabel('IBAN para recibir los pagos (opcional)');
+	await campoIban.fill('ES91 2100 0418 4502 0005 133');
+	await page.getByLabel('Contraseña nueva').fill('12345678');
+	await page.getByLabel('Repite la contraseña').fill('12345678');
+	await page.getByRole('button', { name: 'Activar y entrar' }).click();
+	await expect(page.getByText('El IBAN no es válido')).toBeVisible();
+
+	await campoIban.fill('ES91 2100 0418 4502 0005 1332');
 	await page.getByLabel('Contraseña nueva').fill('12345678');
 	await page.getByLabel('Repite la contraseña').fill('12345678');
 	await page.getByRole('button', { name: 'Activar y entrar' }).click();
@@ -117,6 +126,16 @@ test('un socio activa su cuenta, sale y vuelve a entrar (HU-A01, A02, A03)', asy
 	await page.getByRole('button', { name: 'Activar y entrar' }).click();
 	await expect(page.getByRole('heading', { name: 'Mis tickets' })).toBeVisible();
 	await expect(page.getByRole('link', { name: socio.nombre })).toBeVisible();
+
+	// En «Mi cuenta» ve el IBAN que puso y puede borrarlo.
+	await page.goto('/cuenta');
+	const iban = page.getByLabel('IBAN', { exact: true });
+	await expect(iban).toHaveValue('ES91 2100 0418 4502 0005 1332');
+	await iban.fill('');
+	await page.getByRole('button', { name: 'Guardar el IBAN' }).click();
+	await expect(page.getByText('IBAN borrado.')).toBeVisible();
+	await page.reload();
+	await expect(iban).toHaveValue('');
 
 	// Un socio no ve la gestión (404, R-01).
 	const gestion = await page.goto('/gestion/tickets');

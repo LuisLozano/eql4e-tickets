@@ -2,13 +2,15 @@ import { error, fail, type RequestEvent } from '@sveltejs/kit';
 import { message, setError, superValidate } from 'sveltekit-superforms';
 import { zod4 } from 'sveltekit-superforms/adapters';
 import { URL_PUBLICA } from '$app/env/private';
-import { esquemaAlta } from '#lib/esquemas/usuario.ts';
+import { esquemaAlta, esquemaIban } from '#lib/esquemas/usuario.ts';
+import { formatoIban, normalizarIban } from '#lib/iban.ts';
 import {
 	darDeBaja,
 	editarUsuario,
 	reactivar,
 	reenviarInvitacion
 } from '#lib/server/dominio/usuario/gestion.ts';
+import { cambiarIban, ibanDe } from '#lib/server/dominio/usuario/iban.ts';
 import { fichaUsuario } from '#lib/server/dominio/usuario/listado.ts';
 import { db } from '#lib/server/infra/db/app.ts';
 import { enviarInvitacion } from '#lib/server/web/invitacion.ts';
@@ -35,10 +37,18 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		esSocio: u.esSocio,
 		esTesorero: u.esTesorero
 	};
+	// El IBAN (HU-S07), solo de los socios: se puede corregir por si lo da de palabra.
+	const iban = u.esSocio ? await ibanDe(db, u.id) : null;
 	return {
 		usuario: u,
 		yo: u.id === locals.usuario!.id,
-		form: await superValidate(datos, zod4(esquemaAlta), { errors: false })
+		form: await superValidate(datos, zod4(esquemaAlta), { errors: false }),
+		formIban: u.esSocio
+			? await superValidate({ iban: iban ? formatoIban(iban) : '' }, zod4(esquemaIban), {
+					id: 'iban',
+					errors: false
+				})
+			: null
 	};
 };
 
@@ -71,6 +81,20 @@ export const actions: Actions = {
 			);
 		}
 		return message(form, 'Cambios guardados.');
+	},
+
+	cambiarIban: async (evento) => {
+		const yo = actor(evento);
+		const form = await superValidate(evento.request, zod4(esquemaIban), { id: 'iban' });
+		if (!form.valid) return fail(400, { form });
+		const r = await cambiarIban(db, yo, idDe(evento.params), form.data.iban);
+		if (!r.ok) {
+			if (r.motivo !== 'invalido') error(404, 'No encontrado');
+			return setError(form, 'iban', 'El IBAN no es válido.');
+		}
+		const iban = normalizarIban(form.data.iban);
+		form.data.iban = iban ? formatoIban(iban) : '';
+		return message(form, iban ? 'IBAN guardado.' : 'IBAN borrado.');
 	},
 
 	reenviar: async (evento) => {

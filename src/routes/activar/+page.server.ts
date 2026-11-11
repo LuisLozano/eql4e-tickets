@@ -31,11 +31,12 @@ export const actions: Actions = {
 
 		const resultado = await activarCuenta(
 			db,
-			{ telefono: form.data.telefono, codigo: form.data.codigo, contrasena },
+			{ telefono: form.data.telefono, codigo: form.data.codigo, contrasena, iban: form.data.iban },
 			new Date()
 		);
 		if (!resultado.ok) {
 			if (resultado.motivo === 'contrasena') return setError(form, 'contrasena', resultado.mensaje);
+			if (resultado.motivo === 'iban') return setError(form, 'iban', 'El IBAN no es válido.');
 			return message(
 				form,
 				'Código no válido. Comprueba el teléfono o pide una invitación nueva a un tesorero.',

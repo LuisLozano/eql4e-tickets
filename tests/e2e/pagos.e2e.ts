@@ -30,8 +30,27 @@ test('un tesorero registra un pago agrupado y otro desde el ticket; el socio lo 
 	);
 	await porPagar.click();
 
-	// Todos marcados; el total sigue a lo marcado. Bizum, de entrada.
+	// Sin IBAN, el aviso lleva a su ficha para ponérselo; con él, se ve para copiarlo (HU-S07).
 	await expect(page.getByRole('heading', { name: 'Registrar pago' })).toBeVisible();
+	await expect(page.getByText('No ha puesto su IBAN.')).toBeVisible();
+	await page.getByRole('link', { name: 'su ficha' }).click();
+	await page.getByLabel('IBAN', { exact: true }).fill('es91 2100 0418 4502 0005 1333');
+	await page.getByRole('button', { name: 'Guardar el IBAN' }).click();
+	await expect(page.getByText('El IBAN no es válido')).toBeVisible();
+	await page.getByLabel('IBAN', { exact: true }).fill('es91 2100 0418 4502 0005 1332');
+	await page.getByRole('button', { name: 'Guardar el IBAN' }).click();
+	await expect(page.getByText('IBAN guardado.')).toBeVisible();
+	await expect(page.getByLabel('IBAN', { exact: true })).toHaveValue(
+		'ES91 2100 0418 4502 0005 1332'
+	);
+	await page.goBack();
+	await page.reload();
+	await expect(page.getByLabel('IBAN para la transferencia')).toHaveValue(
+		'ES91 2100 0418 4502 0005 1332'
+	);
+	await expect(page.getByRole('button', { name: 'Copiar IBAN' })).toBeVisible();
+
+	// Todos marcados; el total sigue a lo marcado. Bizum, de entrada.
 	const registrar = page.getByRole('button', { name: /Registrar pago de/ });
 	await expect(registrar).toHaveText(/25,00/);
 	await page.getByRole('checkbox', { name: /5,00/ }).uncheck();
@@ -60,7 +79,7 @@ test('un tesorero registra un pago agrupado y otro desde el ticket; el socio lo 
 		.click();
 	await page.getByRole('link', { name: 'Registrar pago' }).click();
 	await expect(registrar).toHaveText(/5,00/);
-	await page.locator('label', { hasText: 'Transferencia' }).click();
+	await page.getByText('Transferencia', { exact: true }).click();
 	await registrar.click();
 	await expect(page.getByText('Pago registrado.')).toBeVisible();
 

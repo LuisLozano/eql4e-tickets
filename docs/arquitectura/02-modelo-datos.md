@@ -21,6 +21,7 @@ erDiagram
         text nombre
         text telefono UK "E.164 +34..."
         text email UK "en minúsculas"
+        text iban "null; sin espacios (HU-S07)"
         text password_hash "null hasta activar"
         bool es_socio
         bool es_tesorero
@@ -132,7 +133,7 @@ erDiagram
 ## Notas de diseño
 
 - **Implementación** (2026-11-05): [esquema.ts](../../src/lib/server/infra/db/esquema.ts) y las migraciones de [drizzle/](../../drizzle). En TypeScript los nombres van en camelCase; Drizzle los traduce a snake_case (`casing`).
-- **Restricciones añadidas al implementar**: email en minúsculas; un usuario *activo* tiene contraseña; al menos un rol; longitudes de `concepto_otro` (1–100) y `observaciones` (≤ 500); `sustituido_en` y `sustituido_por` van juntos; la anulación del pago (`anulado_en`, `anulado_por`, `motivo_anulacion`) va completa; el justificante lleva ruta y tipo juntos.
+- **Restricciones añadidas al implementar**: email en minúsculas; el IBAN se guarda normalizado (letras y cifras en mayúsculas; el dígito de control lo comprueba la app); un usuario *activo* tiene contraseña; al menos un rol; longitudes de `concepto_otro` (1–100) y `observaciones` (≤ 500); `sustituido_en` y `sustituido_por` van juntos; la anulación del pago (`anulado_en`, `anulado_por`, `motivo_anulacion`) va completa; el justificante lleva ruta y tipo juntos.
 - **Historial inmutable**: un *trigger* rechaza cualquier `UPDATE`. El `DELETE` se permite para la purga en cascada.
 - **`codigo_acceso.creado_por`** es nulo cuando lo genera el sistema (tesorero inicial, R-06).
 

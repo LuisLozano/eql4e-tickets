@@ -96,6 +96,8 @@ async function grabadora(browser: Browser, formato: Formato = 'movil') {
 	const { opciones, tamano, escala } = FORMATOS[formato];
 	const contexto = await browser.newContext({
 		...opciones,
+		// Para que «Copiar IBAN» funcione y diga «Copiado».
+		permissions: ['clipboard-write'],
 		recordVideo: { dir: 'test-results/videos', size: tamano }
 	});
 	await contexto.addInitScript(escena);
@@ -333,6 +335,7 @@ async function prepararTesorero(browser: Browser) {
 	await p.getByLabel('Teléfono').fill(SOCIA.telefono.slice(3));
 	await p.getByLabel('Contraseña nueva').fill(SOCIA.contrasena);
 	await p.getByLabel('Repite la contraseña').fill(SOCIA.contrasena);
+	await p.getByLabel('IBAN para recibir los pagos (opcional)').fill(SOCIA.iban);
 	await p.getByRole('button', { name: 'Activar y entrar' }).click();
 	await expect(p.getByRole('heading', { name: 'Mis tickets' })).toBeVisible();
 	for (const t of ['tornillos', 'agua', 'taxi', 'cartulinas'] as const)
@@ -374,6 +377,8 @@ test('vídeo del socio', async ({ browser }) => {
 	await escribir(page.getByLabel('Teléfono'), SOCIA.telefono.slice(3));
 	await escribir(page.getByLabel('Contraseña nueva'), SOCIA.contrasena);
 	await escribir(page.getByLabel('Repite la contraseña'), SOCIA.contrasena);
+	await rotulo(page, 'Si quieres cobrar por transferencia, pones tu IBAN. Es opcional.', 1500);
+	await escribir(page.getByLabel('IBAN para recibir los pagos (opcional)'), SOCIA.iban);
 	await pulsar(page.getByRole('button', { name: 'Activar y entrar' }));
 	await expect(page.getByRole('heading', { name: 'Mis tickets' })).toBeVisible();
 	await rotulo(page, 'Ya estás dentro. Aquí verás tus tickets.');
@@ -543,6 +548,8 @@ for (const [formato, nombre] of [
 				.getByRole('list', { name: 'Socios con tickets pendientes de pago' })
 				.getByRole('link', { name: new RegExp(SOCIA.nombre) })
 		);
+		await rotulo(page, 'Si el socio dejó su IBAN, lo copias para hacerle la transferencia.', 2500);
+		await pulsar(page.getByRole('button', { name: 'Copiar IBAN' }));
 		await rotulo(
 			page,
 			'Le pagas por Bizum, transferencia o en efectivo y lo registras, con el justificante si quieres.',

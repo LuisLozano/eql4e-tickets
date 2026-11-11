@@ -10,7 +10,9 @@ export const SOCIA = {
 	telefono: '+34699000201',
 	email: 'lucia.martin@ejemplo.invalid',
 	codigo: 'LUCI-AMAR-TINA-AAAA-AAAA-AAAA-AAAA',
-	contrasena: 'una contraseña de ejemplo'
+	contrasena: 'una contraseña de ejemplo',
+	/** El IBAN de ejemplo que usan los bancos españoles en su documentación. */
+	iban: 'ES91 2100 0418 4502 0005 1332'
 } as const;
 
 export const TESORERA = {

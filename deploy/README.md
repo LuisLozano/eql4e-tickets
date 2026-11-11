@@ -215,6 +215,8 @@ Cada día a las 19:30 (antes de la copia de Salazar, a las 20:00, y del apagado 
 - `ficheros.tar.gz`: las fotos y los justificantes;
 - `SHA256SUMS`: las sumas para comprobar que no se han estropeado.
 
+Las copias no van cifradas y llevan los datos personales de los socios: nombre, teléfono, email y, si lo han dejado, su IBAN (HU-S07). Protege los dos discos igual que la propia máquina y no saques copias de casa sin cifrarlas.
+
 La copia se hace en el disco interno y se replica en el externo, comprobando las sumas. Si falta uno de los dos discos, la copia queda en el otro y el servicio termina con error. En cada disco se guardan las 7 copias más recientes y la última de cada semana anterior, hasta 5 semanas. Las decisiones están en [ADR-0008](../docs/arquitectura/adr/0008-copias.md).
 
 ### 5.1 Instalación (una sola vez)

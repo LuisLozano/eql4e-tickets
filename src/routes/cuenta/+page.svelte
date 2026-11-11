@@ -3,6 +3,7 @@
 	import Aviso from '#lib/componentes/Aviso.svelte';
 	import Boton from '#lib/componentes/Boton.svelte';
 	import Campo from '#lib/componentes/Campo.svelte';
+	import FormularioIban from '#lib/componentes/FormularioIban.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -17,6 +18,17 @@
 
 <main class="mx-auto flex max-w-sm flex-col gap-6 px-4 py-8">
 	<h1 class="font-display text-3xl font-bold">Mi cuenta</h1>
+
+	{#if data.formIban}
+		<section class="flex flex-col gap-4" aria-labelledby="titulo-iban">
+			<h2 id="titulo-iban" class="font-display text-xl font-bold">Cuenta para los pagos</h2>
+			<FormularioIban
+				datos={data.formIban}
+				ayuda="El tesorero lo usa para pagarte por transferencia. Déjalo vacío para borrarlo."
+				anchoCompleto
+			/>
+		</section>
+	{/if}
 
 	<section class="flex flex-col gap-4" aria-labelledby="titulo-contrasena">
 		<h2 id="titulo-contrasena" class="font-display text-xl font-bold">Cambiar la contraseña</h2>

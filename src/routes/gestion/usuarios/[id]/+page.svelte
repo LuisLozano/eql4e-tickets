@@ -8,6 +8,7 @@
 	import Boton from '#lib/componentes/Boton.svelte';
 	import CamposUsuario from '#lib/componentes/CamposUsuario.svelte';
 	import EnlaceActivacion from '#lib/componentes/EnlaceActivacion.svelte';
+	import FormularioIban from '#lib/componentes/FormularioIban.svelte';
 	import { formatoFecha } from '#lib/formato.ts';
 	import type { PageProps } from './$types';
 
@@ -92,6 +93,19 @@
 			<Boton type="submit" class="self-start" disabled={$submitting}>Guardar cambios</Boton>
 		</form>
 	</section>
+
+	{#if data.formIban}
+		<section
+			aria-labelledby="titulo-iban"
+			class="flex flex-col gap-4 rounded-lg border border-line bg-surface p-4"
+		>
+			<h2 id="titulo-iban" class="font-display text-xl font-bold">Cuenta para los pagos</h2>
+			<FormularioIban
+				datos={data.formIban}
+				ayuda="Normalmente lo pone el socio al activar su cuenta o en «Mi cuenta». Vacío, lo borra."
+			/>
+		</section>
+	{/if}
 
 	<section
 		aria-labelledby="titulo-acceso"

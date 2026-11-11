@@ -4,6 +4,7 @@
 	import Aviso from '#lib/componentes/Aviso.svelte';
 	import Boton from '#lib/componentes/Boton.svelte';
 	import Campo from '#lib/componentes/Campo.svelte';
+	import CampoIban from '#lib/componentes/CampoIban.svelte';
 	import CampoTelefono from '#lib/componentes/CampoTelefono.svelte';
 	import type { PageProps } from './$types';
 
@@ -59,9 +60,14 @@
 			bind:value={$form.repetir}
 			errores={$errors.repetir}
 		/>
+		<CampoIban
+			ayuda="Para que el tesorero te pague por transferencia. Puedes ponerlo o cambiarlo después en «Mi cuenta»."
+			bind:value={$form.iban}
+			errores={$errors.iban}
+		/>
 		<p class="text-sm text-muted">
-			La asociación usa tu nombre, teléfono y email solo para gestionar reembolsos. Los tickets se
-			borran a los 18 meses de la fecha de compra.
+			La asociación usa tu nombre, teléfono, email e IBAN solo para gestionar reembolsos. Los
+			tickets se borran a los 18 meses de la fecha de compra.
 		</p>
 		<Boton type="submit" anchoCompleto disabled={$submitting}>Activar y entrar</Boton>
 	</form>

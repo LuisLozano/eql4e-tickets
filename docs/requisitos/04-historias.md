@@ -71,6 +71,16 @@
 - **Dado** un ticket mío *Rechazado*, puedo modificar sus datos y ficheros y **reenviarlo**; vuelve a *Pendiente de autorizar*.
 - El historial conserva el rechazo anterior, su motivo y los ficheros sustituidos.
 
+### HU-S07 · IBAN para los pagos [S]
+**Como** socio **quiero** dejar el IBAN de mi cuenta **para** que el tesorero me pague por transferencia sin tener que pedírmelo.
+
+- Al **activar la cuenta** (HU-A01) puedo escribir mi IBAN. Es **opcional**: quien cobra por Bizum o en efectivo no lo necesita.
+- En **«Mi cuenta»** puedo ponerlo, cambiarlo o borrarlo (dejándolo vacío).
+- Se admiten los IBAN de la zona SEPA, con o sin espacios; se comprueban la longitud del país y los dígitos de control. **Dado** un IBAN no válido, **entonces** se muestra un error y no se guarda nada.
+- El tesorero lo ve al **registrar un pago** (HU-T05), en grupos de 4 y con un botón para copiarlo sin espacios. Si no lo hay, un aviso enlaza a la ficha del socio, donde el tesorero también puede ponerlo o corregirlo (HU-G03).
+- Solo lo ven el propio socio y los tesoreros. **No** sale en el CSV (HU-T07).
+- Al **dar de baja** al socio, su IBAN se borra (RNF-20).
+
 ---
 
 ## T · Tesorero

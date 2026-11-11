@@ -16,6 +16,7 @@ test('capturas', async ({ page, browser }) => {
 	await page.getByLabel('Teléfono').fill(SOCIA.telefono.slice(3));
 	await page.getByLabel('Contraseña nueva').fill(SOCIA.contrasena);
 	await page.getByLabel('Repite la contraseña').fill(SOCIA.contrasena);
+	await page.getByLabel('IBAN para recibir los pagos (opcional)').fill(SOCIA.iban);
 	await capturar(page, 'activar');
 	await page.getByRole('button', { name: 'Activar y entrar' }).click();
 	await expect(page.getByRole('heading', { name: 'Mis tickets' })).toBeVisible();
@@ -87,6 +88,10 @@ test('capturas', async ({ page, browser }) => {
 	await tesorera.getByRole('button', { name: 'Confirmar rechazo' }).click();
 	await expect(tesorera.getByText('Ticket rechazado. El socio verá el motivo.')).toBeVisible();
 	await contexto.close();
+
+	// Mi cuenta: el IBAN y la contraseña.
+	await page.goto('/cuenta');
+	await capturar(page, 'cuenta');
 
 	// Seguir los tickets: la lista con cada estado.
 	await page.goto('/tickets');
