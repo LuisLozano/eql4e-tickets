@@ -31,6 +31,7 @@ Los ficheros de `deploy/` del repositorio se copian a mano a la máquina (aparta
 | `deploy/.env.example` | `/opt/eql4e-tickets/` | — | Plantilla del `.env` (apartado 7) |
 | `deploy/Caddyfile.snippet` | Dentro de `/home/luis/salazar/https/Caddyfile` | Caddy | El bloque que publica la app en `tickets-eql4e.ddns.net` (apartado 4.3) |
 | `scripts/migrar.js` | En la imagen | `docker-entrypoint.sh`, al arrancar el contenedor | Aplica las migraciones de la base que falten antes de arrancar la app |
+| `scripts/restablecer-acceso.js` | En la imagen | Tú: `sudo docker compose exec app node scripts/restablecer-acceso.js <teléfono>` | Genera el enlace para que un usuario elija otra contraseña, cuando nadie puede enviárselo desde la app (apartado 6.1) |
 | `docker-entrypoint.sh` | En la imagen | Docker, al arrancar el contenedor | Lanza `migrar.js` y después la app |
 | `deploy/compose.dev.yaml` | — | Solo en desarrollo | PostgreSQL para el desarrollo y las pruebas en local (puerto 5436) |
 
@@ -300,6 +301,23 @@ Si el disco del sistema se ha perdido entero: haz la instalación desde cero (ap
 | 502 en el navegador | Caddy funciona, pero la app no responde en `127.0.0.1:3080` | `sudo docker compose ps` y el log de la app |
 | Error de certificado | El DNS no apunta a la máquina o los puertos 80 y 443 no llegan | Log de Caddy; `getent hosts tickets-eql4e.ddns.net` |
 | `docker compose pull` falla | Sin red, o la CI no llegó a publicar la imagen | Pestaña *Actions* en GitHub |
+| Un tesorero no recuerda su contraseña | — | Apartado 6.1 |
+
+### 6.1 Contraseña olvidada sin nadie que la restablezca
+
+Lo normal es que otro tesorero abra la ficha y pulse **Enviar enlace para otra contraseña** (HU-G02) o, con el correo configurado, que el propio usuario pulse **¿Has olvidado tu contraseña?** al entrar (HU-A04). Si ninguna de las dos es posible (por ejemplo, el único tesorero ha olvidado la suya), genera el enlace desde la máquina, con el teléfono del usuario:
+
+```bash
+cd /opt/eql4e-tickets && sudo docker compose exec app node scripts/restablecer-acceso.js 600123456
+```
+
+Sale el nombre y los roles de la persona (comprueba que es quien crees) y el enlace:
+
+- **Cuenta activa**: enlace para elegir otra contraseña, válido **1 hora**. La contraseña actual sigue valiendo hasta que se use. Al usarlo se quita el bloqueo por intentos fallidos y se cierran sus sesiones abiertas.
+- **Invitado** (nunca activó la cuenta): invitación nueva de 7 días.
+- **De baja**: no genera nada. Si no queda ningún tesorero activo, reinicia la app (`sudo docker compose restart app`) y saldrá en el log el enlace del tesorero inicial (apartado 4.4).
+
+El enlace solo vale una vez y, si lo vuelves a generar, el anterior deja de valer. El script no cambia ninguna contraseña ni la escribe en el terminal. Ábrelo tú en el móvil o envíaselo a esa persona por un canal privado.
 
 ## 7. Configuración (`.env`)
 

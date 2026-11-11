@@ -23,6 +23,7 @@ eql4e-tickets/
 │   └── README.md                   # manual de administrador (y su PDF)
 ├── scripts/
 │   ├── migrar.js                   # aplica las migraciones (entrypoint y pruebas)
+│   ├── restablecer-acceso.js       # enlace para otra contraseña, desde el servidor
 │   └── manual-administrador.js     # deploy/README.md → PDF (pnpm manual:admin)
 ├── drizzle/                        # migraciones SQL generadas y versionadas
 ├── src/
