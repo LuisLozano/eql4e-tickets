@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { correoConsola, crearCorreo } from './cliente';
+import { conRegistro, correoConsola, crearCorreo, type Correo } from './cliente';
 
 const mensaje = {
 	para: 'ana@ejemplo.invalid',
@@ -40,5 +40,24 @@ describe('correo', () => {
 			remitente: 'Tickets <t@ejemplo.invalid>'
 		});
 		expect(correo.envia).toBe(true);
+	});
+
+	it('registra en el log el envío aceptado, y nada si falla', async () => {
+		const lineas: string[] = [];
+		let falla = false;
+		const base: Correo = {
+			envia: true,
+			enviar: async () => {
+				if (falla) throw new Error('535');
+			}
+		};
+		const correo = conRegistro(base, (t) => lineas.push(t));
+		await correo.enviar(mensaje);
+		expect(correo.envia).toBe(true);
+		expect(lineas).toEqual(['[correo] Enviado a ana@ejemplo.invalid: «Hola»']);
+
+		falla = true;
+		await expect(correo.enviar(mensaje)).rejects.toThrow('535');
+		expect(lineas).toHaveLength(1);
 	});
 });

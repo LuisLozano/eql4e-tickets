@@ -20,7 +20,24 @@ export type ConfigCorreo = {
 };
 
 export function crearCorreo(config: ConfigCorreo): Correo {
-	return config.modo === 'smtp' ? correoSmtp(config) : correoConsola();
+	return config.modo === 'smtp' ? conRegistro(correoSmtp(config)) : correoConsola();
+}
+
+/**
+ * Deja en el log cada correo que el servidor ha aceptado, para distinguirlo de uno que no se llegó
+ * a intentar. Los fallos los registra quien envía, que sabe qué hacer con ellos.
+ */
+export function conRegistro(
+	correo: Correo,
+	escribir: (texto: string) => void = console.log
+): Correo {
+	return {
+		envia: correo.envia,
+		async enviar(mensaje) {
+			await correo.enviar(mensaje);
+			escribir(`[correo] Enviado a ${mensaje.para}: «${mensaje.asunto}»`);
+		}
+	};
 }
 
 /** Escribe el correo en el log, con el enlace, en vez de enviarlo. */
