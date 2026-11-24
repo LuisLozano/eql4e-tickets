@@ -108,6 +108,7 @@ Ejecuta estos comandos desde `/opt/eql4e-tickets`.
 | `[tareas] purga: …` y `[tareas] huerfanos: …` | Resultado de las tareas diarias. `[tareas] … error` es un fallo: va seguido del motivo |
 | `TESORERO INICIAL` | No hay ningún tesorero activo: el enlace para activar el tesorero inicial (apartado 4.4) |
 | `CORREO (modo consola, no se envía)` | Con `CORREO_MODO=consola`, un correo que no se ha enviado, con su enlace |
+| `[correo] Enviado a …` | Gmail ha aceptado el correo. Si no llega, mira el spam del destinatario |
 | `[correo] No se pudo enviar …` | Ha fallado un envío: invitación o restablecimiento de contraseña. El motivo va detrás (apartado 7.1) |
 | `env_invalid` | Falta una variable del `.env` o no es válida; la línea dice cuál. La app no arranca |
 
@@ -351,6 +352,6 @@ Mientras `CORREO_MODO=consola`, la app no envía nada: el tesorero copia el enla
 1. En la cuenta de Google de la asociación, activa la **verificación en dos pasos**: Google solo da contraseñas de aplicación a las cuentas que la tienen.
 2. En *Cuenta de Google → Seguridad → Contraseñas de aplicaciones*, crea una para «EQL4E Tickets». Son 16 letras; se puede revocar cuando quieras sin cambiar la clave de la cuenta.
 3. En el `.env`, pon `CORREO_MODO=smtp`, `SMTP_USER`, `SMTP_PASS` (la contraseña de aplicación, sin espacios) y `SMTP_FROM`, y despliega.
-4. Prueba: un tesorero reenvía una invitación a un usuario de prueba con tu email. Si llega, en el log no sale nada; si falla, sale `[correo] No se pudo enviar …` con el motivo, y el tesorero sigue viendo el enlace para copiarlo.
+4. Prueba: un tesorero reenvía una invitación a un usuario de prueba con tu email. En el log sale `[correo] Enviado a …` si Gmail lo ha aceptado, o `[correo] No se pudo enviar …` con el motivo si ha fallado; en ese caso el tesorero sigue viendo el enlace para copiarlo. Con «¿Has olvidado tu contraseña?» no sale nada si el teléfono no es de un usuario activo: así no se delata qué teléfonos tienen cuenta.
 
 Si cambia la clave de la cuenta de Google, las contraseñas de aplicación se revocan: crea otra y cámbiala en el `.env`.
